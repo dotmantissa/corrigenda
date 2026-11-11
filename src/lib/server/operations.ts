@@ -78,7 +78,7 @@ export async function queueCommand(identity: Identity, input: Command) {
   if (input.kind !== 'deploy_consumers' && !target)
     throw new ApiError(503, 'The correction network has not been configured yet.');
   const payloadDigest = createHash('sha256').update(canonical(input)).digest('hex');
-  const id =
+  let id =
     input.kind === 'acknowledge_generation'
       ? `ack.${payloadDigest}`
       : input.kind === 'replay_notice'
@@ -95,8 +95,25 @@ export async function queueCommand(identity: Identity, input: Command) {
     (prior[0].payload_digest !== payloadDigest || prior[0].identity_id !== identity.id)
   )
     throw new ApiError(409, 'That request name is already used for a different operation.');
-  if (prior.length)
-    return { id, status: (await sql`SELECT status FROM operations WHERE id=${id}`)[0].status };
+  if (prior.length) {
+    if (input.kind !== 'assess_impact')
+      return { id, status: (await sql`SELECT status FROM operations WHERE id=${id}`)[0].status };
+    const base = id;
+    const attempts =
+      await sql`SELECT id,status,payload_digest,identity_id FROM operations WHERE id IN (${base},${base + '.attempt.2'},${base + '.attempt.3'}) ORDER BY created_at`;
+    if (
+      attempts.some((op) => op.payload_digest !== payloadDigest || op.identity_id !== identity.id)
+    )
+      throw new ApiError(409, 'That assessment belongs to a different signed request.');
+    const retained = attempts.find((op) => op.status !== 'DELIVERY_FAILED');
+    if (retained) return { id: retained.id, status: retained.status };
+    if (attempts.length >= 3)
+      throw new ApiError(
+        409,
+        'Three assessment attempts failed. The evidence remains quarantined; review the source and recovery path.',
+      );
+    id = `${base}.attempt.${attempts.length + 1}`;
+  }
   // A bounded quota prevents a session from exhausting the signing queue.
   const count =
     await sql`SELECT count(*)::int AS total FROM operations WHERE identity_id=${identity.id} AND created_at>now()-interval '1 minute'`;

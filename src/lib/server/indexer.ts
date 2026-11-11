@@ -66,7 +66,7 @@ export async function projectEvent(event: Record<string, unknown>) {
     await refreshRecord('notice', String(event.notice_id), contracts.dispatcher, 'get_notice');
 }
 
-export async function indexPage(contract: string) {
+export async function indexPage(contract: string, pauseBetweenRecordsMs = 0) {
   const sql = db(),
     cursors = await sql`SELECT cursor FROM index_cursors WHERE contract=${contract}`;
   const cursor = Number(cursors[0]?.cursor ?? 0);
@@ -81,6 +81,8 @@ export async function indexPage(contract: string) {
     await sql`INSERT INTO chain_events(contract,sequence,payload) VALUES(${contract},${cursor + i},${JSON.stringify(page.items[i])}) ON CONFLICT(contract,sequence) DO UPDATE SET payload=EXCLUDED.payload`;
     // Commit the cursor only after every event and its projection are durable. A failed page is replayed in full.
     await projectEvent(page.items[i]);
+    if (pauseBetweenRecordsMs)
+      await new Promise((resolve) => setTimeout(resolve, pauseBetweenRecordsMs));
   }
   await sql`INSERT INTO index_cursors(contract,cursor) VALUES(${contract},${page.next}) ON CONFLICT(contract) DO UPDATE SET cursor=EXCLUDED.cursor,updated_at=now()`;
   return { ...page, contract };
@@ -115,7 +117,14 @@ export async function snapshot(identityId?: string): Promise<Snapshot> {
   const users = identityId
     ? await sql`SELECT address,listing_consumer,deployment_consumer FROM identities WHERE id=${identityId}`
     : [];
-  const incidents = rows.filter((x) => x.kind === 'incident').map((x) => x.payload as Incident);
+  const incidents = rows
+    .filter((x) => x.kind === 'incident')
+    .map((x) => {
+      const incident = { ...x.payload } as Incident;
+      // The court represents a pending certificate as {}. Expose absence until a decision vector exists.
+      if (!Array.isArray(incident.certificate?.decisions)) delete incident.certificate;
+      return incident;
+    });
   for (const incident of incidents) {
     if (incident.status === 'ASSESSED') {
       try {

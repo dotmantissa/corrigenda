@@ -5,7 +5,7 @@ import { contracts, read } from './chain';
 export async function scheduleDispatch() {
   const sql = db();
   const rows =
-    await sql`SELECT payload FROM indexed_records WHERE kind='incident' AND payload->>'status' IN ('ASSESSED','UNRESOLVED') ORDER BY updated_at ASC LIMIT 4`;
+    await sql`SELECT payload FROM indexed_records WHERE kind='incident' AND payload->>'status' IN ('ASSESSED','UNRESOLVED','TIMEOUT') ORDER BY updated_at ASC LIMIT 4`;
   for (const row of rows)
     for (const proposition of row.payload.propositions) {
       let page;

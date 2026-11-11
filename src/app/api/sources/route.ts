@@ -13,7 +13,13 @@ export async function GET(request: Request) {
       return Response.json({ error: 'This revision has not been indexed yet.' }, { status: 404 });
     const manifest = rows[0].payload;
     const url = new URL(manifest.url);
+    const controlledFixture =
+      url.origin === new URL(process.env.APP_ORIGIN ?? 'http://localhost:3000').origin &&
+      /^\/evidence\/integration\/(initial|withdrawn|replacement)\.txt$/.test(url.pathname) &&
+      !url.search &&
+      !url.hash;
     if (
+      !controlledFixture &&
       ![
         'raw.githubusercontent.com',
         'www.rfc-editor.org',

@@ -3,11 +3,13 @@ const state = vi.hoisted(() => ({
   queries: [] as string[],
   reads: [] as string[],
   failRecord: false,
+  records: [] as { kind: string; payload: Record<string, unknown> }[],
 }));
 vi.mock('../../src/lib/server/db', () => ({
   db: () => async (strings: TemplateStringsArray) => {
     const q = strings.join('?');
     state.queries.push(q);
+    if (q.startsWith('SELECT kind,payload')) return state.records;
     return q.startsWith('SELECT cursor') ? [{ cursor: 0 }] : [];
   },
 }));
@@ -28,11 +30,30 @@ vi.mock('../../src/lib/server/chain', () => ({
     return { revision_id: args[0] };
   },
 }));
-import { indexPage } from '../../src/lib/server/indexer';
+import { indexPage, snapshot } from '../../src/lib/server/indexer';
 beforeEach(() => {
   state.queries = [];
   state.reads = [];
   state.failRecord = false;
+  state.records = [];
+});
+
+describe('pending incident snapshots', () => {
+  it('exposes an empty on-chain certificate as absent without mutating the projection', async () => {
+    const payload = { request_id: 'pending', status: 'PENDING', certificate: {} };
+    state.records = [{ kind: 'incident', payload }];
+    const result = await snapshot();
+    expect(result.incidents[0].certificate).toBeUndefined();
+    expect(payload.certificate).toEqual({});
+  });
+
+  it('retains actual certificate decisions for a completed incident', async () => {
+    const certificate = { decisions: [{ proposition_id: 'status', action: 'QUARANTINE' }] };
+    state.records = [
+      { kind: 'incident', payload: { request_id: 'completed', status: 'FINALIZED', certificate } },
+    ];
+    expect((await snapshot()).incidents[0].certificate).toEqual(certificate);
+  });
 });
 describe('replayable history projection', () => {
   it('projects all twenty events before advancing the cursor', async () => {
