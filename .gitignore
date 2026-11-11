@@ -14,3 +14,9 @@ playwright-report/
 *.log
 AGENT.md
 AGENTS.md
+
+*.tsbuildinfo
+next-env.d.ts
+artifacts/
+
+.vercel/

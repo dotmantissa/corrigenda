@@ -1,0 +1,11 @@
+node_modules
+.venv
+.next
+.env*
+TASKS.md
+AGENT.md
+AGENTS.md
+.impeccable
+verification
+package-lock.json
+contracts
