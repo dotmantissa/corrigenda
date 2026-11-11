@@ -30,15 +30,29 @@ def test_nonmaterial_releases_only_current_clear_flag(direct_vm,court,evidence):
  c,m,r,views,calls=court;c.open_correction(json.dumps(r));evidence('NONMATERIAL','TRUE',False);c.assess_impact('correction')
  assert c.get_flag('r0','security')['status']=='CLEAR'
 
-def test_unresolved_retry_and_deadline(direct_vm,court):
+def test_unresolved_successor_preserves_certificates_and_bounds_retries(direct_vm,court,evidence):
  c,m,r,views,calls=court;c.open_correction(json.dumps(r));direct_vm.mock_web('https://example.org/',{'status':503,'body':''})
- for i in range(3):c.assess_impact('correction')
- with direct_vm.expect_revert('retry limit'):c.assess_impact('correction')
- assert c.get_request('correction')['status']=='UNRESOLVED'
- direct_vm.warp('2287-01-01T00:00:00Z')
- m.gl.message_raw['datetime']=direct_vm.get_message_raw()['datetime']
+ c.assess_impact('correction');original=c.get_request('correction')['certificate'];c.assess_impact('correction')
+ assert c.get_request('correction')['attempts']==1
+ for i in range(2,4):
+  r=dict(r,request_id='recovery'+str(i),generation=i,supersedes_request=r['request_id'])
+  c.open_correction(json.dumps(r));c.assess_impact(r['request_id'])
+ assert c.get_request('correction')['certificate']==original
+ assert c.get_request('correction')['status']=='SUPERSEDED'
+ with direct_vm.expect_revert('Evidence retry limit'):c.open_correction(json.dumps(dict(r,request_id='recovery4',generation=4,supersedes_request=r['request_id'])))
+ assert c.get_flag('r0','security')['status']=='UNRESOLVED'
+
+def test_timeout_recovery_and_locked_binding(direct_vm,court,evidence):
+ c,m,r,views,calls=court;c.open_correction(json.dumps(r))
+ direct_vm.warp('2287-01-01T00:00:00Z');m.gl.message_raw['datetime']=direct_vm.get_message_raw()['datetime']
  with direct_vm.expect_revert('Deadline'):c.assess_impact('correction')
  c.expire('correction');assert c.get_request('correction')['status']=='TIMEOUT'
+ assert json.loads(calls[-1]['calldata']['args'][0])['unresolved']
+ recovery=dict(r,request_id='recovered',generation=2,deadline=19999999999,supersedes_request='correction')
+ with direct_vm.expect_revert('locked'):c.open_correction(json.dumps(dict(recovery,subject_id='other')))
+ c.open_correction(json.dumps(recovery));evidence('NONMATERIAL','TRUE',False);c.assess_impact('recovered')
+ assert c.get_request('recovered')['status']=='ASSESSED'
+ assert c.get_request('correction')['superseded_by']=='recovered'
 
 def test_owner_generation_envelope_and_conflicting_reuse(direct_vm,court,direct_bob):
  c,m,r,views,calls=court

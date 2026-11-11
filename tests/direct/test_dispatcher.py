@@ -46,7 +46,9 @@ def test_old_acknowledgement_cannot_clear_new_generation(direct_vm,graph):
     flags['r0/security']={'generation':2,'status':'QUARANTINED'}
     direct_vm.sender=m.Address(consumer)
     ack={'notice_id':notice['operation_id'],'operation_id':'ack1','dependency_id':'d0','decision_digest':notice['decision_digest'],'certificate_digest':'c'*64,'generation':1,'route':'REFRESHED','replacement_certificate_id':'correction'}
-    with direct_vm.expect_revert('Superseded'):c.acknowledge_generation(json.dumps(ack))
+    with direct_vm.expect_revert('Superseded'):c.validate_acknowledgement(json.dumps(ack))
+    c.acknowledge_generation(json.dumps(ack))
+    assert json.loads(calls[-1]['calldata']['args'][0])['delivery_status']=='REJECTED'
     assert not c.get_dependency('d0')['usable']
 
 def test_finalized_refresh_duplicate_and_quarantine_recovery(direct_vm,graph):

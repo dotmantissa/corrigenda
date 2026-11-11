@@ -11,6 +11,7 @@ def consumer(request,module,direct_vm,cross_calls,packet):
  direct_vm.sender=m.Address(dispatcher);c.receive_binding(json.dumps(binding));direct_vm.sender=m.Address(owner)
  state={'usable':True,'last_applied_generation':0,'restrictions':[]}
  views['get_dependency']=lambda *args:state
+ views['validate_acknowledgement']=lambda *args:True
  return c,m,views,calls,config,binding,state,owner,dispatcher,action,status
 
 def test_consumer_action_queries_ancestor_before_notice(direct_vm,consumer):
@@ -31,7 +32,7 @@ def test_consumer_owner_and_consequence_binding(direct_vm,consumer,direct_bob):
 
 def test_duplicate_reordered_notice_and_finalized_ack_gate(direct_vm,consumer):
  c,m,views,calls,config,binding,state,owner,dispatcher,action,status=consumer
- cert=dict(config,generation=2,certificate_digest='c'*64,decisions=[{'proposition_id':'security','new_support':'TRUE'}],unresolved=False)
+ cert=dict(config,generation=2,old_revision='r0',certificate_digest='c'*64,decisions=[{'proposition_id':'security','new_support':'TRUE'}],unresolved=False)
  views['get_certificate']=lambda *args:cert
  notice={'operation_id':'notice2','dependency_id':'decision','decision_digest':binding['decision_digest'],'certificate':cert,'proposition_id':'security','action':'REFRESH'}
  direct_vm.sender=m.Address(dispatcher);c.receive_notice(json.dumps(notice));c.receive_notice(json.dumps(notice))
@@ -49,3 +50,14 @@ def test_consumer_deadline(direct_vm,consumer):
  direct_vm.warp('2287-01-01T00:00:00Z')
  m.gl.message_raw['datetime']=direct_vm.get_message_raw()['datetime']
  with direct_vm.expect_revert('Deadline'):getattr(c,action)('decision','operation','b'*64)
+
+
+def test_unrelated_proposition_generation_does_not_block_ack(direct_vm,consumer):
+ c,m,views,calls,config,binding,state,owner,dispatcher,action,status=consumer
+ cert=dict(config,generation=1,old_revision='r0',certificate_digest='c'*64,decisions=[{'proposition_id':'security','new_support':'TRUE'}],unresolved=False)
+ views['get_certificate']=lambda *args:cert
+ notice={'operation_id':'first','dependency_id':'decision','decision_digest':binding['decision_digest'],'certificate':cert,'proposition_id':'security','action':'REFRESH'}
+ direct_vm.sender=m.Address(dispatcher);c.receive_notice(json.dumps(notice))
+ c.receive_notice(json.dumps(dict(notice,operation_id='other',proposition_id='unrelated',certificate=dict(cert,generation=2))))
+ direct_vm.sender=m.Address(owner);c.acknowledge_generation('first',1,'REFRESHED')
+ assert calls[-1]['on']=='finalized'
