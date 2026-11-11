@@ -1,0 +1,8 @@
+{
+  "url": "https://corrigenda.vercel.app",
+  "deployment_id": "dpl_3c6xNiGLyY4JLdkFTYDSZBm1MwQr",
+  "deployment_url": "https://corrigenda-1avdqnd9v-mantissas-projects.vercel.app",
+  "build": "READY",
+  "node": "22.23.4",
+  "source_commit": "3dfcf3f"
+}
