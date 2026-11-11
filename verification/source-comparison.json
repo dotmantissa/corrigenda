@@ -1,0 +1,26 @@
+{
+  "complete": true,
+  "results": [
+    {
+      "viewport": 1440,
+      "before_exact": true,
+      "after_exact": true,
+      "before_digest": "e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5",
+      "after_digest": "1384cd319c6af0556a7e415cbc317822067203b17457df3031e5cec649ec76ed",
+      "overflow": false
+    },
+    {
+      "viewport": 390,
+      "before_exact": true,
+      "after_exact": true,
+      "before_digest": "e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5",
+      "after_digest": "1384cd319c6af0556a7e415cbc317822067203b17457df3031e5cec649ec76ed",
+      "overflow": false
+    },
+    {
+      "empty_form_signin_opens_email_field": true,
+      "mobile_refresh_named": 1,
+      "hidden_sidebar": true
+    }
+  ]
+}

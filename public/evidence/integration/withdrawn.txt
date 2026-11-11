@@ -1,0 +1,6 @@
+Corrigenda controlled verification record
+This is a public integration fixture, not a customer attestation or real adoption.
+Subject: corrigenda_test_application
+Security assertion: The previous security assertion is withdrawn. One critical finding remains unresolved. The test application does not meet the approval policy.
+Controlling exception: Authorization requires no unresolved critical finding.
+Unrelated proposition: The documentation license is MIT.

@@ -1,0 +1,6 @@
+Corrigenda controlled verification record
+This is a public integration fixture, not a customer attestation or real adoption.
+Subject: corrigenda_test_application
+Security assertion: The critical finding is resolved after remediation. All critical findings are resolved. The test application meets the approval policy.
+Controlling exception: Authorization requires no unresolved critical finding.
+Unrelated proposition: The documentation license is MIT.
