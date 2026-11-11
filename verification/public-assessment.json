@@ -1,0 +1,190 @@
+{
+  "attempts": 1,
+  "certificate": {
+    "certificate_digest": "da9ff8471ab57fb49d82531bf45f0bccc06a17743edf933bdd9857045923e938",
+    "consequence_digest": "f5905b49edae028a327ecafd9dbdab7b45f261e9def13a7299588bf56e5b1286",
+    "consumer": "0xA6EbE57a9911F55d1d7765897051271f68D1f4b2",
+    "coverage": true,
+    "deadline": 1893456000,
+    "decisions": [
+      {
+        "action": "QUARANTINE",
+        "impact": "RETRACTION",
+        "material": true,
+        "new_support": "FALSE",
+        "old_support": "TRUE",
+        "proposition_id": "draft_status",
+        "rule_ids": [
+          "draft",
+          "exception"
+        ],
+        "witness_ids": [
+          "1384cd319c6af0556a7e415cbc317822067203b17457df3031e5cec649ec76ed:status",
+          "e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5:status"
+        ]
+      }
+    ],
+    "generation": 1,
+    "manifests": [
+      {
+        "authority_id": "python_peps_observer",
+        "byte_digest": "e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5",
+        "byte_size": 12521,
+        "channel": "public_record_observer",
+        "request_id": "public.pep724.r0",
+        "revision_id": "pep724.r0",
+        "scope": "The complete official PEP 724 record, including status and exceptions",
+        "source_id": "pep724",
+        "spans": [
+          {
+            "digest": "b354e53da1bf29b944a85fa988c07018d340f1a842ca38adf1527bebdf84288d",
+            "end": 323,
+            "id": "status",
+            "start": 310
+          }
+        ],
+        "supersedes": "",
+        "url": "https://raw.githubusercontent.com/python/peps/a75631e0d4192d83158bdcb98ac43f618ecf83d5/peps/pep-0724.rst"
+      },
+      {
+        "authority_id": "python_peps_observer",
+        "byte_digest": "1384cd319c6af0556a7e415cbc317822067203b17457df3031e5cec649ec76ed",
+        "byte_size": 12672,
+        "channel": "public_record_observer",
+        "request_id": "public.pep724.r1",
+        "revision_id": "pep724.r1",
+        "scope": "The complete official PEP 724 record, including status and exceptions",
+        "source_id": "pep724",
+        "spans": [
+          {
+            "digest": "d1f7a5e59483f918c6640d4996cda4321c49a0a96bb2f48722097abd67e6ae00",
+            "end": 327,
+            "id": "status",
+            "start": 310
+          }
+        ],
+        "supersedes": "pep724.r0",
+        "url": "https://raw.githubusercontent.com/python/peps/4112eff73b7e3c53bd40025602fda442b7b97b9e/peps/pep-0724.rst"
+      }
+    ],
+    "new_revision": "pep724.r1",
+    "old_revision": "pep724.r0",
+    "owner": "0xBC1399c55538eC034d4Da550C03c34Ae0C357f53",
+    "parties": [
+      "0xBC1399c55538eC034d4Da550C03c34Ae0C357f53",
+      "0x016cBF0ADC8529ce0de61a17216288da97667Be3"
+    ],
+    "policy_id": "proposal_listing",
+    "policy_revision": 1,
+    "propositions": [
+      {
+        "id": "draft_status",
+        "materiality_question": "Does the official status permit continued authorization of the active proposal listing?",
+        "new_span": "status",
+        "old_span": "status",
+        "rule_ids": [
+          "draft",
+          "exception"
+        ],
+        "statement": "PEP 724 has official Draft status and remains an active proposal"
+      }
+    ],
+    "reason": "",
+    "request_id": "public.pep724.withdrawal",
+    "source_manifest_digest": "3019e560f8fa64e3c2623d793bad6cbc9387e37573e83285ffddf5d62d4f935c",
+    "status": "ASSESSED",
+    "subject_digest": "c6bc5ef1c18581e08e89ba294518efbea12c8a185f9af6c83c82a8aa711b59e2",
+    "subject_id": "pep724_active_proposal",
+    "superseded_by": "",
+    "unresolved": false
+  },
+  "consequence_digest": "f5905b49edae028a327ecafd9dbdab7b45f261e9def13a7299588bf56e5b1286",
+  "consumer": "0xA6EbE57a9911F55d1d7765897051271f68D1f4b2",
+  "deadline": 1893456000,
+  "generation": 1,
+  "manifests": [
+    {
+      "authority_id": "python_peps_observer",
+      "byte_digest": "e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5",
+      "byte_size": 12521,
+      "channel": "public_record_observer",
+      "request_id": "public.pep724.r0",
+      "revision_id": "pep724.r0",
+      "scope": "The complete official PEP 724 record, including status and exceptions",
+      "source_id": "pep724",
+      "spans": [
+        {
+          "digest": "b354e53da1bf29b944a85fa988c07018d340f1a842ca38adf1527bebdf84288d",
+          "end": 323,
+          "id": "status",
+          "start": 310
+        }
+      ],
+      "supersedes": "",
+      "url": "https://raw.githubusercontent.com/python/peps/a75631e0d4192d83158bdcb98ac43f618ecf83d5/peps/pep-0724.rst"
+    },
+    {
+      "authority_id": "python_peps_observer",
+      "byte_digest": "1384cd319c6af0556a7e415cbc317822067203b17457df3031e5cec649ec76ed",
+      "byte_size": 12672,
+      "channel": "public_record_observer",
+      "request_id": "public.pep724.r1",
+      "revision_id": "pep724.r1",
+      "scope": "The complete official PEP 724 record, including status and exceptions",
+      "source_id": "pep724",
+      "spans": [
+        {
+          "digest": "d1f7a5e59483f918c6640d4996cda4321c49a0a96bb2f48722097abd67e6ae00",
+          "end": 327,
+          "id": "status",
+          "start": 310
+        }
+      ],
+      "supersedes": "pep724.r0",
+      "url": "https://raw.githubusercontent.com/python/peps/4112eff73b7e3c53bd40025602fda442b7b97b9e/peps/pep-0724.rst"
+    }
+  ],
+  "new_revision": "pep724.r1",
+  "old_revision": "pep724.r0",
+  "original_digest": "a44e77b3df0cdc70f15bfc3cda503255d9cd751bcb284b8731506f871fa8157c",
+  "owner": "0xBC1399c55538eC034d4Da550C03c34Ae0C357f53",
+  "parties": [
+    "0xBC1399c55538eC034d4Da550C03c34Ae0C357f53",
+    "0x016cBF0ADC8529ce0de61a17216288da97667Be3"
+  ],
+  "policy": {
+    "policy_id": "proposal_listing",
+    "revision": 1,
+    "rules": [
+      {
+        "id": "draft",
+        "text": "Authorize a proposal listing only while its official status is Draft."
+      },
+      {
+        "id": "exception",
+        "text": "A Withdrawn, Rejected, Deferred or Superseded status does not authorize the listing. Descriptive examples and proposals inside the document do not override its official status."
+      }
+    ]
+  },
+  "policy_id": "proposal_listing",
+  "policy_revision": 1,
+  "propositions": [
+    {
+      "id": "draft_status",
+      "materiality_question": "Does the official status permit continued authorization of the active proposal listing?",
+      "new_span": "status",
+      "old_span": "status",
+      "rule_ids": [
+        "draft",
+        "exception"
+      ],
+      "statement": "PEP 724 has official Draft status and remains an active proposal"
+    }
+  ],
+  "request_id": "public.pep724.withdrawal",
+  "source_manifest_digest": "3019e560f8fa64e3c2623d793bad6cbc9387e37573e83285ffddf5d62d4f935c",
+  "status": "ASSESSED",
+  "subject_digest": "c6bc5ef1c18581e08e89ba294518efbea12c8a185f9af6c83c82a8aa711b59e2",
+  "subject_id": "pep724_active_proposal",
+  "superseded_by": ""
+}

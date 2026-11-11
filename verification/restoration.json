@@ -1,0 +1,142 @@
+{
+  "network": "studionet",
+  "chain_id": 61999,
+  "runner": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6",
+  "classification": "Controlled public integration fixtures, not real adoption",
+  "revisions": [
+    {
+      "request_id": "controlled.revision.0",
+      "revision_id": "controlled.r0",
+      "source_id": "controlled_verification_record",
+      "authority_id": "corrigenda_verification",
+      "channel": "controlled_verification",
+      "url": "https://corrigenda.vercel.app/evidence/integration/initial.txt",
+      "byte_size": 401,
+      "byte_digest": "d6dbb2ef72f453bf06b9f5bc5fa89d43421eafdc09fc56efc9c4660981661657",
+      "scope": "Complete controlled integration fixture. This is not a customer attestation or real adoption.",
+      "spans": [
+        {
+          "id": "record",
+          "start": 0,
+          "end": 401,
+          "digest": "d6dbb2ef72f453bf06b9f5bc5fa89d43421eafdc09fc56efc9c4660981661657"
+        }
+      ],
+      "supersedes": ""
+    },
+    {
+      "request_id": "controlled.revision.1",
+      "revision_id": "controlled.r1",
+      "source_id": "controlled_verification_record",
+      "authority_id": "corrigenda_verification",
+      "channel": "controlled_verification",
+      "url": "https://corrigenda.vercel.app/evidence/integration/withdrawn.txt",
+      "byte_size": 460,
+      "byte_digest": "a5b693bbcf6e1c3e8e74ab9c0fe6776950ee1a32bbc68581e20a123168febe38",
+      "scope": "Complete controlled integration fixture. This is not a customer attestation or real adoption.",
+      "spans": [
+        {
+          "id": "record",
+          "start": 0,
+          "end": 460,
+          "digest": "a5b693bbcf6e1c3e8e74ab9c0fe6776950ee1a32bbc68581e20a123168febe38"
+        }
+      ],
+      "supersedes": "controlled.r0"
+    },
+    {
+      "request_id": "controlled.revision.2",
+      "revision_id": "controlled.r2",
+      "source_id": "controlled_verification_record",
+      "authority_id": "corrigenda_verification",
+      "channel": "controlled_verification",
+      "url": "https://corrigenda.vercel.app/evidence/integration/replacement.txt",
+      "byte_size": 453,
+      "byte_digest": "2b8d80bd7f2e54a8ade5c26c2801daafc1070628ee88625bb64a0e3adacbe5e8",
+      "scope": "Complete controlled integration fixture. This is not a customer attestation or real adoption.",
+      "spans": [
+        {
+          "id": "record",
+          "start": 0,
+          "end": 453,
+          "digest": "2b8d80bd7f2e54a8ade5c26c2801daafc1070628ee88625bb64a0e3adacbe5e8"
+        }
+      ],
+      "supersedes": "controlled.r1"
+    }
+  ],
+  "withdrawal": {
+    "request_id": "controlled.withdrawal",
+    "owner": "0xBC1399c55538eC034d4Da550C03c34Ae0C357f53",
+    "parties": [
+      "0xBC1399c55538eC034d4Da550C03c34Ae0C357f53",
+      "0x016cBF0ADC8529ce0de61a17216288da97667Be3",
+      "0x65d6720eB4478009f66CC1752872554cBD845E05"
+    ],
+    "policy_id": "controlled_verification",
+    "policy_revision": 1,
+    "subject_id": "corrigenda_test_application",
+    "subject_digest": "62e0e7b0c0d28dadd006c52312c6eb9d394a246481b26057b17158efdbb6abe9",
+    "source_manifest_digest": "6c737115112a0d128703341ac1573ee982d3dc458df7adddf6c219903939a2d4",
+    "consumer": "0xA6EbE57a9911F55d1d7765897051271f68D1f4b2",
+    "consequence_digest": "39d612d04699bcb37fd1adbbcf6932c380d60445885b4b8fe59c1d56cae38bef",
+    "generation": 2,
+    "deadline": 1893456000,
+    "old_revision": "controlled.r0",
+    "new_revision": "controlled.r1",
+    "propositions": [
+      {
+        "id": "critical_resolved",
+        "statement": "All critical findings for corrigenda_test_application are resolved",
+        "materiality_question": "Does the evidence permit future authorization under the no unresolved critical finding policy?",
+        "old_span": "record",
+        "new_span": "record",
+        "rule_ids": [
+          "approval",
+          "exception"
+        ]
+      }
+    ]
+  },
+  "replacement": {
+    "request_id": "controlled.replacement",
+    "owner": "0xBC1399c55538eC034d4Da550C03c34Ae0C357f53",
+    "parties": [
+      "0xBC1399c55538eC034d4Da550C03c34Ae0C357f53",
+      "0x016cBF0ADC8529ce0de61a17216288da97667Be3",
+      "0x65d6720eB4478009f66CC1752872554cBD845E05"
+    ],
+    "policy_id": "controlled_verification",
+    "policy_revision": 1,
+    "subject_id": "corrigenda_test_application",
+    "subject_digest": "62e0e7b0c0d28dadd006c52312c6eb9d394a246481b26057b17158efdbb6abe9",
+    "source_manifest_digest": "3363a054fb94a913331eb512aaf3f062c1fa3b6f09f46ac4ede3ab66168126e8",
+    "consumer": "0xA6EbE57a9911F55d1d7765897051271f68D1f4b2",
+    "consequence_digest": "39d612d04699bcb37fd1adbbcf6932c380d60445885b4b8fe59c1d56cae38bef",
+    "generation": 3,
+    "deadline": 1893456000,
+    "old_revision": "controlled.r1",
+    "new_revision": "controlled.r2",
+    "propositions": [
+      {
+        "id": "critical_resolved",
+        "statement": "All critical findings for corrigenda_test_application are resolved",
+        "materiality_question": "Does the evidence permit future authorization under the no unresolved critical finding policy?",
+        "old_span": "record",
+        "new_span": "record",
+        "rule_ids": [
+          "approval",
+          "exception"
+        ]
+      }
+    ]
+  },
+  "separate_owners": {
+    "listing": "0x016cBF0ADC8529ce0de61a17216288da97667Be3",
+    "deployment": "0x65d6720eB4478009f66CC1752872554cBD845E05"
+  },
+  "listing_suspended_and_restored": true,
+  "deployment_suspended_and_restored": true,
+  "replacement_acceptance_required": true,
+  "complete": true
+}

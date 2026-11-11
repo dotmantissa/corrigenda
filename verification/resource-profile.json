@@ -1,0 +1,290 @@
+{
+  "network": "studionet",
+  "chain_id": 61999,
+  "observations": [
+    {
+      "file": "controlled.replacement-assess.json",
+      "hash": "0xc9de89d45122be094cd4efeba6147b279464ae8c4e611ee104ac75f139189571",
+      "mode": "leader",
+      "vote": null,
+      "gas_used": 0,
+      "processing_time": 3387,
+      "execution_result": "SUCCESS",
+      "execution_stats": {
+        "llm": {
+          "tokens": {
+            "node-0x0cf3809a31B0c7E0742d126451aDE1977e3748D2/google/gemini-3-flash-preview": {
+              "input": 1559,
+              "total": 1627,
+              "output": 68
+            }
+          }
+        },
+        "call_counts": {
+          "CONSUME_FUEL": 1,
+          "STORAGE_READ": 139,
+          "NOTIFY_FINISHED": 1,
+          "REMAINING_FUEL_AS_GEN": 1
+        },
+        "host_first_method": "STORAGE_READ",
+        "delete_genvm_status": 200,
+        "host_loop_entered_s": 19851.087063461,
+        "host_loop_enter_wait_ms": 5,
+        "host_time_per_method_ms": {
+          "CONSUME_FUEL": 0,
+          "STORAGE_READ": 34,
+          "REMAINING_FUEL_AS_GEN": 0
+        },
+        "host_total_handling_time_ms": 34,
+        "manager_run_attempt_success": {
+          "attempt": 0,
+          "duration_ms": 3
+        },
+        "host_first_method_received_s": 19851.087235235,
+        "host_accept_to_first_method_ms": 0
+      }
+    },
+    {
+      "file": "controlled.replacement-assess.json",
+      "hash": "0xc9de89d45122be094cd4efeba6147b279464ae8c4e611ee104ac75f139189571",
+      "mode": "validator",
+      "vote": "agree",
+      "gas_used": 0,
+      "processing_time": 3959,
+      "execution_result": "SUCCESS",
+      "execution_stats": {
+        "llm": {
+          "tokens": {
+            "node-0x0cf3809a31B0c7E0742d126451aDE1977e3748D2/google/gemini-3-flash-preview": {
+              "input": 1559,
+              "total": 1627,
+              "output": 68
+            }
+          }
+        },
+        "call_counts": {
+          "CONSUME_FUEL": 1,
+          "STORAGE_READ": 139,
+          "NOTIFY_FINISHED": 1,
+          "REMAINING_FUEL_AS_GEN": 1
+        },
+        "host_first_method": "STORAGE_READ",
+        "delete_genvm_status": 200,
+        "host_loop_entered_s": 19854.752781624,
+        "host_loop_enter_wait_ms": 9,
+        "host_time_per_method_ms": {
+          "CONSUME_FUEL": 0,
+          "STORAGE_READ": 130,
+          "REMAINING_FUEL_AS_GEN": 0
+        },
+        "host_total_handling_time_ms": 130,
+        "manager_run_attempt_success": {
+          "attempt": 0,
+          "duration_ms": 6
+        },
+        "host_first_method_received_s": 19854.752940807,
+        "host_accept_to_first_method_ms": 0
+      }
+    },
+    {
+      "file": "controlled.withdrawal-assess.json",
+      "hash": "0x05910035440bb96f549042c15cd9538c39d0a52cc389cba6f095a8a541c9eac1",
+      "mode": "leader",
+      "vote": null,
+      "gas_used": 0,
+      "processing_time": 3883,
+      "execution_result": "SUCCESS",
+      "execution_stats": {
+        "llm": {
+          "tokens": {
+            "node-0x37CD8552B86b2B662eCfb69C4A1253dBE41EB4C1/policy:prd-gpt-5-4": {
+              "input": 1304,
+              "total": 1345,
+              "output": 41
+            }
+          }
+        },
+        "call_counts": {
+          "CONSUME_FUEL": 1,
+          "STORAGE_READ": 100,
+          "NOTIFY_FINISHED": 1,
+          "REMAINING_FUEL_AS_GEN": 1
+        },
+        "host_first_method": "STORAGE_READ",
+        "delete_genvm_status": 200,
+        "host_loop_entered_s": 19599.354847299,
+        "host_loop_enter_wait_ms": 6,
+        "host_time_per_method_ms": {
+          "CONSUME_FUEL": 0,
+          "STORAGE_READ": 25,
+          "REMAINING_FUEL_AS_GEN": 0
+        },
+        "host_total_handling_time_ms": 25,
+        "manager_run_attempt_success": {
+          "attempt": 0,
+          "duration_ms": 3
+        },
+        "host_first_method_received_s": 19599.355002212,
+        "host_accept_to_first_method_ms": 0
+      }
+    },
+    {
+      "file": "controlled.withdrawal-assess.json",
+      "hash": "0x05910035440bb96f549042c15cd9538c39d0a52cc389cba6f095a8a541c9eac1",
+      "mode": "validator",
+      "vote": "agree",
+      "gas_used": 0,
+      "processing_time": 4871,
+      "execution_result": "SUCCESS",
+      "execution_stats": {
+        "llm": {
+          "tokens": {
+            "node-0x37CD8552B86b2B662eCfb69C4A1253dBE41EB4C1/policy:prd-gpt-5-4": {
+              "input": 1304,
+              "total": 1345,
+              "output": 41
+            }
+          }
+        },
+        "call_counts": {
+          "CONSUME_FUEL": 1,
+          "STORAGE_READ": 100,
+          "NOTIFY_FINISHED": 1,
+          "REMAINING_FUEL_AS_GEN": 1
+        },
+        "host_first_method": "STORAGE_READ",
+        "delete_genvm_status": 200,
+        "host_loop_entered_s": 19603.592151378,
+        "host_loop_enter_wait_ms": 8,
+        "host_time_per_method_ms": {
+          "CONSUME_FUEL": 0,
+          "STORAGE_READ": 100,
+          "REMAINING_FUEL_AS_GEN": 0
+        },
+        "host_total_handling_time_ms": 100,
+        "manager_run_attempt_success": {
+          "attempt": 0,
+          "duration_ms": 5
+        },
+        "host_first_method_received_s": 19603.59228702,
+        "host_accept_to_first_method_ms": 0
+      }
+    },
+    {
+      "file": "network-public-assessment.json",
+      "hash": "0x5aac18fcc6689ee02399eed7cb8aba6ca92d405b993d34125952ac604f804c8a",
+      "mode": "leader",
+      "vote": null,
+      "gas_used": 0,
+      "processing_time": 5114,
+      "execution_result": "SUCCESS",
+      "execution_stats": {
+        "llm": {
+          "tokens": {
+            "node-0x0174b4D7494Be33F46B76976f6c9F94004F1b27f/policy:prd-gemini": {
+              "input": 8814,
+              "total": 8881,
+              "output": 67
+            }
+          }
+        },
+        "call_counts": {
+          "CONSUME_FUEL": 1,
+          "STORAGE_READ": 59,
+          "NOTIFY_FINISHED": 1,
+          "REMAINING_FUEL_AS_GEN": 1
+        },
+        "host_first_method": "STORAGE_READ",
+        "delete_genvm_status": 200,
+        "host_loop_entered_s": 17577.628315566,
+        "host_loop_enter_wait_ms": 5,
+        "host_time_per_method_ms": {
+          "CONSUME_FUEL": 0,
+          "STORAGE_READ": 15,
+          "REMAINING_FUEL_AS_GEN": 0
+        },
+        "host_total_handling_time_ms": 15,
+        "manager_run_attempt_success": {
+          "attempt": 0,
+          "duration_ms": 2
+        },
+        "host_first_method_received_s": 17577.628440797,
+        "host_accept_to_first_method_ms": 0
+      }
+    },
+    {
+      "file": "network-public-assessment.json",
+      "hash": "0x5aac18fcc6689ee02399eed7cb8aba6ca92d405b993d34125952ac604f804c8a",
+      "mode": "validator",
+      "vote": "agree",
+      "gas_used": 0,
+      "processing_time": 6558,
+      "execution_result": "SUCCESS",
+      "execution_stats": {
+        "llm": {
+          "tokens": {
+            "node-0x0174b4D7494Be33F46B76976f6c9F94004F1b27f/policy:prd-gemini": {
+              "input": 8814,
+              "total": 8881,
+              "output": 67
+            }
+          }
+        },
+        "call_counts": {
+          "CONSUME_FUEL": 1,
+          "STORAGE_READ": 59,
+          "NOTIFY_FINISHED": 1,
+          "REMAINING_FUEL_AS_GEN": 1
+        },
+        "host_first_method": "STORAGE_READ",
+        "delete_genvm_status": 200,
+        "host_loop_entered_s": 17583.867732164,
+        "host_loop_enter_wait_ms": 9,
+        "host_time_per_method_ms": {
+          "CONSUME_FUEL": 0,
+          "STORAGE_READ": 68,
+          "REMAINING_FUEL_AS_GEN": 0
+        },
+        "host_total_handling_time_ms": 68,
+        "manager_run_attempt_success": {
+          "attempt": 0,
+          "duration_ms": 6
+        },
+        "host_first_method_received_s": 17583.867974938,
+        "host_accept_to_first_method_ms": 0
+      }
+    }
+  ],
+  "transactions": [
+    {
+      "file": "controlled.replacement-assess.json",
+      "hash": "0xc9de89d45122be094cd4efeba6147b279464ae8c4e611ee104ac75f139189571",
+      "created_at": "2026-11-11T19:37:41.332266+00:00",
+      "created_timestamp": 1794425861,
+      "last_vote_timestamp": 1794425872,
+      "creation_to_last_vote_seconds": 11
+    },
+    {
+      "file": "controlled.withdrawal-assess.json",
+      "hash": "0x05910035440bb96f549042c15cd9538c39d0a52cc389cba6f095a8a541c9eac1",
+      "created_at": "2026-11-11T19:33:30.123463+00:00",
+      "created_timestamp": 1794425610,
+      "last_vote_timestamp": 1794425620,
+      "creation_to_last_vote_seconds": 10
+    },
+    {
+      "file": "network-public-assessment.json",
+      "hash": "0x5aac18fcc6689ee02399eed7cb8aba6ca92d405b993d34125952ac604f804c8a",
+      "created_at": "2026-11-11T17:42:50.108796+00:00",
+      "created_timestamp": 1794418970,
+      "last_vote_timestamp": 1794419025,
+      "creation_to_last_vote_seconds": 55
+    }
+  ],
+  "reported_participant_metrics": {
+    "gas_used": 6,
+    "processing_time": 6,
+    "execution_stats": 6
+  },
+  "unit_note": "Participant metrics are retained only as supplied by Studio; null means unavailable. Transaction timing is measured between Studio creation and its last vote, not model CPU time. No CPU, memory or gas usage is inferred from missing fields or gas limits. Observations are not promised ceilings."
+}

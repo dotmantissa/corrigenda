@@ -1,0 +1,31 @@
+{
+  "hash": "0x37d52fbe143f184668543b9de3c31e8b8cc76de9949e35857e565bf92c063f77",
+  "status": "FINALIZED",
+  "execution": "SUCCESS",
+  "votes": {
+    "0x0174b4D7494Be33F46B76976f6c9F94004F1b27f": "agree",
+    "0x1Cd67946A11E6410a3DF1b27d35F4a511e93c882": "agree",
+    "0x2bB088e4E6Fd1faBBd23d93F38D01f28a954A49c": "agree",
+    "0x709a1dDECA594C16AB3864A00Eaa2BB1Cd9b5305": "agree",
+    "0xC65Ec56a1141866951B34D846be8EF433764A48B": "idle"
+  },
+  "result": [
+    {
+      "execution_result": "SUCCESS",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "{\"decision_digest\":\"70b1dfe49809fa3a89ddb855d527c5389f05da90b4ebd821244bca327fa67c78\"\"generation\":0\"policy_id\":\"proposal_listing\"\"policy_revision\":1\"request\":{\"consequence_digest\":\"f5905b49edae028a327ecafd9dbdab7b45f261e9def13a7299588bf56e5b1286\"\"dependency_id\":\"pep724.listing.20\"\"operation_id\":\"public.before.correction\"}\"status\":\"LISTED\"\"subject_digest\":\"c6bc5ef1c18581e08e89ba294518efbea12c8a185f9af6c83c82a8aa711b59e2\"\"subject_id\":\"pep724_active_proposal\"}"
+        }
+      }
+    },
+    {
+      "execution_result": "ERROR",
+      "result": {
+        "status": "contract_error",
+        "payload": "idle"
+      }
+    }
+  ],
+  "triggered": []
+}

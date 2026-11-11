@@ -1,0 +1,421 @@
+{
+  "hash": "0x9d17447fc15c7d320dd5c25e6ed1959cf4adf0f949dbb54b55092f04eae497fa",
+  "status": "FINALIZED",
+  "execution": "SUCCESS",
+  "votes": {
+    "0x0cf3809a31B0c7E0742d126451aDE1977e3748D2": "idle",
+    "0x1Cd67946A11E6410a3DF1b27d35F4a511e93c882": "idle",
+    "0x2C93031BCCd12836A67f81a249e68abAFEaac2E5": "agree",
+    "0x709a1dDECA594C16AB3864A00Eaa2BB1Cd9b5305": "agree",
+    "0xC65Ec56a1141866951B34D846be8EF433764A48B": "agree"
+  },
+  "leader_receipts": [
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "leader",
+      "vote": null,
+      "node_config": {
+        "stake": 100,
+        "address": "0x2C93031BCCd12836A67f81a249e68abAFEaac2E5",
+        "primary_model": {
+          "model": "policy:prd-sonnet",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "claude-sonnet-4-6"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-5.4"
+                  ],
+                  [
+                    "family_eq",
+                    "gemini-3-flash-preview"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "claude-sonnet-4-6"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-5.4"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gemini-3-flash-preview"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          },
+          "fallback_validator": "0x1Cd67946A11E6410a3DF1b27d35F4a511e93c882"
+        },
+        "secondary_model": {
+          "model": "openai/gpt-5.4",
+          "config": {
+            "models": [
+              "openai/gpt-5.4",
+              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3-flash-preview"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "address": "0x1Cd67946A11E6410a3DF1b27d35F4a511e93c882",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"{\\\"action\\\":\\\"QUARANTINE\\\",\\\"certificate\\\":{\\\"certificate_digest\\\":\\\"f6edd3411ca0f452f873763588c5c452fda7c3b4c3df8f8a05d0f0dc20d0303d\\\",\\\"consequence_digest\\\":\\\"39d612d04699bcb37fd1adbbcf6932c380d60445885b4b8fe59c1d56cae38bef\\\",\\\"consumer\\\":\\\"0xA6EbE57a9911F55d1d7765897051271f68D1f4b2\\\",\\\"coverage\\\":true,\\\"deadline\\\":1893456000,\\\"decisions\\\":[{\\\"action\\\":\\\"QUARANTINE\\\",\\\"impact\\\":\\\"RETRACTION\\\",\\\"material\\\":true,\\\"new_support\\\":\\\"FALSE\\\",\\\"old_support\\\":\\\"TRUE\\\",\\\"proposition_id\\\":\\\"critical_resolved\\\",\\\"rule_ids\\\":[\\\"approval\\\",\\\"exception\\\"],\\\"witness_ids\\\":[\\\"a5b693bbcf6e1c3e8e74ab9c0fe6776950ee1a32bbc68581e20a123168febe38:record\\\",\\\"d6dbb2ef72f453bf06b9f5bc5fa89d43421eafdc09fc56efc9c4660981661657:record\\\"]}],\\\"generation\\\":2,\\\"manifests\\\":[{\\\"authority_id\\\":\\\"corrigenda_verification\\\",\\\"byte_digest\\\":\\\"d6dbb2ef72f453bf06b9f5bc5fa89d43421eafdc09fc56efc9c4660981661657\\\",\\\"byte_size\\\":401,\\\"channel\\\":\\\"controlled_verification\\\",\\\"request_id\\\":\\\"controlled.revision.0\\\",\\\"revision_id\\\":\\\"controlled.r0\\\",\\\"scope\\\":\\\"Complete controlled integration fixture. This is not a customer attestation or real adoption.\\\",\\\"source_id\\\":\\\"controlled_verification_record\\\",\\\"spans\\\":[{\\\"digest\\\":\\\"d6dbb2ef72f453bf06b9f5bc5fa89d43421eafdc09fc56efc9c4660981661657\\\",\\\"end\\\":401,\\\"id\\\":\\\"record\\\",\\\"start\\\":0}],\\\"supersedes\\\":\\\"\\\",\\\"url\\\":\\\"https://corrigenda.vercel.app/evidence/integration/initial.txt\\\"},{\\\"authority_id\\\":\\\"corrigenda_verification\\\",\\\"byte_digest\\\":\\\"a5b693bbcf6e1c3e8e74ab9c0fe6776950ee1a32bbc68581e20a123168febe38\\\",\\\"byte_size\\\":460,\\\"channel\\\":\\\"controlled_verification\\\",\\\"request_id\\\":\\\"controlled.revision.1\\\",\\\"revision_id\\\":\\\"controlled.r1\\\",\\\"scope\\\":\\\"Complete controlled integration fixture. This is not a customer attestation or real adoption.\\\",\\\"source_id\\\":\\\"controlled_verification_record\\\",\\\"spans\\\":[{\\\"digest\\\":\\\"a5b693bbcf6e1c3e8e74ab9c0fe6776950ee1a32bbc68581e20a123168febe38\\\",\\\"end\\\":460,\\\"id\\\":\\\"record\\\",\\\"start\\\":0}],\\\"supersedes\\\":\\\"controlled.r0\\\",\\\"url\\\":\\\"https://corrigenda.vercel.app/evidence/integration/withdrawn.txt\\\"}],\\\"new_revision\\\":\\\"controlled.r1\\\",\\\"old_revision\\\":\\\"controlled.r0\\\",\\\"owner\\\":\\\"0xBC1399c55538eC034d4Da550C03c34Ae0C357f53\\\",\\\"parties\\\":[\\\"0xBC1399c55538eC034d4Da550C03c34Ae0C357f53\\\",\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\",\\\"0x65d6720eB4478009f66CC1752872554cBD845E05\\\"],\\\"policy_id\\\":\\\"controlled_verification\\\",\\\"policy_revision\\\":1,\\\"propositions\\\":[{\\\"id\\\":\\\"critical_resolved\\\",\\\"materiality_question\\\":\\\"Does the evidence permit future authorization under the no unresolved critical finding policy?\\\",\\\"new_span\\\":\\\"record\\\",\\\"old_span\\\":\\\"record\\\",\\\"rule_ids\\\":[\\\"approval\\\",\\\"exception\\\"],\\\"statement\\\":\\\"All critical findings for corrigenda_test_application are resolved\\\"}],\\\"reason\\\":\\\"\\\",\\\"request_id\\\":\\\"controlled.withdrawal\\\",\\\"source_manifest_digest\\\":\\\"6c737115112a0d128703341ac1573ee982d3dc458df7adddf6c219903939a2d4\\\",\\\"status\\\":\\\"FINALIZED\\\",\\\"subject_digest\\\":\\\"62e0e7b0c0d28dadd006c52312c6eb9d394a246481b26057b17158efdbb6abe9\\\",\\\"subject_id\\\":\\\"corrigenda_test_application\\\",\\\"superseded_by\\\":\\\"\\\",\\\"unresolved\\\":false},\\\"decision_digest\\\":\\\"f69f36a243eac9973d72285caedc4cce444a6dd1936c6292cfc5de7013dd6629\\\",\\\"dependency_id\\\":\\\"controlled.listing\\\",\\\"operation_id\\\":\\\"controlled.withdrawal:critical_resolved:controlled.listing\\\",\\\"proposition_id\\\":\\\"critical_resolved\\\",\\\"status\\\":\\\"BROADCAST\\\"}\",]\"method\":\"receive_notice\"}"
+      },
+      "eq_outputs": {},
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    },
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "validator",
+      "vote": "agree",
+      "node_config": {
+        "stake": 100,
+        "address": "0x2C93031BCCd12836A67f81a249e68abAFEaac2E5",
+        "primary_model": {
+          "model": "policy:prd-sonnet",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "claude-sonnet-4-6"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-5.4"
+                  ],
+                  [
+                    "family_eq",
+                    "gemini-3-flash-preview"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "claude-sonnet-4-6"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-5.4"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gemini-3-flash-preview"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          },
+          "fallback_validator": "0x1Cd67946A11E6410a3DF1b27d35F4a511e93c882"
+        },
+        "secondary_model": {
+          "model": "openai/gpt-5.4",
+          "config": {
+            "models": [
+              "openai/gpt-5.4",
+              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3-flash-preview"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "address": "0x1Cd67946A11E6410a3DF1b27d35F4a511e93c882",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"{\\\"action\\\":\\\"QUARANTINE\\\",\\\"certificate\\\":{\\\"certificate_digest\\\":\\\"f6edd3411ca0f452f873763588c5c452fda7c3b4c3df8f8a05d0f0dc20d0303d\\\",\\\"consequence_digest\\\":\\\"39d612d04699bcb37fd1adbbcf6932c380d60445885b4b8fe59c1d56cae38bef\\\",\\\"consumer\\\":\\\"0xA6EbE57a9911F55d1d7765897051271f68D1f4b2\\\",\\\"coverage\\\":true,\\\"deadline\\\":1893456000,\\\"decisions\\\":[{\\\"action\\\":\\\"QUARANTINE\\\",\\\"impact\\\":\\\"RETRACTION\\\",\\\"material\\\":true,\\\"new_support\\\":\\\"FALSE\\\",\\\"old_support\\\":\\\"TRUE\\\",\\\"proposition_id\\\":\\\"critical_resolved\\\",\\\"rule_ids\\\":[\\\"approval\\\",\\\"exception\\\"],\\\"witness_ids\\\":[\\\"a5b693bbcf6e1c3e8e74ab9c0fe6776950ee1a32bbc68581e20a123168febe38:record\\\",\\\"d6dbb2ef72f453bf06b9f5bc5fa89d43421eafdc09fc56efc9c4660981661657:record\\\"]}],\\\"generation\\\":2,\\\"manifests\\\":[{\\\"authority_id\\\":\\\"corrigenda_verification\\\",\\\"byte_digest\\\":\\\"d6dbb2ef72f453bf06b9f5bc5fa89d43421eafdc09fc56efc9c4660981661657\\\",\\\"byte_size\\\":401,\\\"channel\\\":\\\"controlled_verification\\\",\\\"request_id\\\":\\\"controlled.revision.0\\\",\\\"revision_id\\\":\\\"controlled.r0\\\",\\\"scope\\\":\\\"Complete controlled integration fixture. This is not a customer attestation or real adoption.\\\",\\\"source_id\\\":\\\"controlled_verification_record\\\",\\\"spans\\\":[{\\\"digest\\\":\\\"d6dbb2ef72f453bf06b9f5bc5fa89d43421eafdc09fc56efc9c4660981661657\\\",\\\"end\\\":401,\\\"id\\\":\\\"record\\\",\\\"start\\\":0}],\\\"supersedes\\\":\\\"\\\",\\\"url\\\":\\\"https://corrigenda.vercel.app/evidence/integration/initial.txt\\\"},{\\\"authority_id\\\":\\\"corrigenda_verification\\\",\\\"byte_digest\\\":\\\"a5b693bbcf6e1c3e8e74ab9c0fe6776950ee1a32bbc68581e20a123168febe38\\\",\\\"byte_size\\\":460,\\\"channel\\\":\\\"controlled_verification\\\",\\\"request_id\\\":\\\"controlled.revision.1\\\",\\\"revision_id\\\":\\\"controlled.r1\\\",\\\"scope\\\":\\\"Complete controlled integration fixture. This is not a customer attestation or real adoption.\\\",\\\"source_id\\\":\\\"controlled_verification_record\\\",\\\"spans\\\":[{\\\"digest\\\":\\\"a5b693bbcf6e1c3e8e74ab9c0fe6776950ee1a32bbc68581e20a123168febe38\\\",\\\"end\\\":460,\\\"id\\\":\\\"record\\\",\\\"start\\\":0}],\\\"supersedes\\\":\\\"controlled.r0\\\",\\\"url\\\":\\\"https://corrigenda.vercel.app/evidence/integration/withdrawn.txt\\\"}],\\\"new_revision\\\":\\\"controlled.r1\\\",\\\"old_revision\\\":\\\"controlled.r0\\\",\\\"owner\\\":\\\"0xBC1399c55538eC034d4Da550C03c34Ae0C357f53\\\",\\\"parties\\\":[\\\"0xBC1399c55538eC034d4Da550C03c34Ae0C357f53\\\",\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\",\\\"0x65d6720eB4478009f66CC1752872554cBD845E05\\\"],\\\"policy_id\\\":\\\"controlled_verification\\\",\\\"policy_revision\\\":1,\\\"propositions\\\":[{\\\"id\\\":\\\"critical_resolved\\\",\\\"materiality_question\\\":\\\"Does the evidence permit future authorization under the no unresolved critical finding policy?\\\",\\\"new_span\\\":\\\"record\\\",\\\"old_span\\\":\\\"record\\\",\\\"rule_ids\\\":[\\\"approval\\\",\\\"exception\\\"],\\\"statement\\\":\\\"All critical findings for corrigenda_test_application are resolved\\\"}],\\\"reason\\\":\\\"\\\",\\\"request_id\\\":\\\"controlled.withdrawal\\\",\\\"source_manifest_digest\\\":\\\"6c737115112a0d128703341ac1573ee982d3dc458df7adddf6c219903939a2d4\\\",\\\"status\\\":\\\"FINALIZED\\\",\\\"subject_digest\\\":\\\"62e0e7b0c0d28dadd006c52312c6eb9d394a246481b26057b17158efdbb6abe9\\\",\\\"subject_id\\\":\\\"corrigenda_test_application\\\",\\\"superseded_by\\\":\\\"\\\",\\\"unresolved\\\":false},\\\"decision_digest\\\":\\\"f69f36a243eac9973d72285caedc4cce444a6dd1936c6292cfc5de7013dd6629\\\",\\\"dependency_id\\\":\\\"controlled.listing\\\",\\\"operation_id\\\":\\\"controlled.withdrawal:critical_resolved:controlled.listing\\\",\\\"proposition_id\\\":\\\"critical_resolved\\\",\\\"status\\\":\\\"BROADCAST\\\"}\",]\"method\":\"receive_notice\"}"
+      },
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    }
+  ]
+}

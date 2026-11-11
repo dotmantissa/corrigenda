@@ -1,0 +1,34 @@
+{
+  "network": "studionet",
+  "chain_id": 61999,
+  "genvm_runner": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6",
+  "owners": {
+    "listing": "0x016cBF0ADC8529ce0de61a17216288da97667Be3",
+    "deployment": "0x65d6720eB4478009f66CC1752872554cBD845E05"
+  },
+  "consumers": {
+    "listing": "0xA6EbE57a9911F55d1d7765897051271f68D1f4b2",
+    "deployment": "0xE78936C4452BE4a734870A9028b8f4259787E025"
+  },
+  "dependents": 21,
+  "deep_chain": 21,
+  "stale_action_refused_before_notice": true,
+  "public_withdrawal": {
+    "action": "QUARANTINE",
+    "impact": "RETRACTION",
+    "material": true,
+    "new_support": "FALSE",
+    "old_support": "TRUE",
+    "proposition_id": "draft_status",
+    "rule_ids": [
+      "draft",
+      "exception"
+    ],
+    "witness_ids": [
+      "1384cd319c6af0556a7e415cbc317822067203b17457df3031e5cec649ec76ed:status",
+      "e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5:status"
+    ]
+  },
+  "assessment_attempts": 1,
+  "complete": true
+}

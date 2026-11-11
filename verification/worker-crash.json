@@ -1,0 +1,23 @@
+{
+  "operation_id": "public.page.0",
+  "hash": "0x0dd5adef90a4e82396c1300a1e29b44a6ad72d933476a75d989251332d5d63ff",
+  "termination": {
+    "code": null,
+    "signal": "SIGKILL",
+    "pid": 31903
+  },
+  "complete": true,
+  "receipt": {
+    "hash": "0x0dd5adef90a4e82396c1300a1e29b44a6ad72d933476a75d989251332d5d63ff",
+    "votes": {
+      "0x0174b4D7494Be33F46B76976f6c9F94004F1b27f": "agree",
+      "0x8644a8D2D08903cAFA1F0fb28E34E0ecA727e9ED": "agree",
+      "0x8ADae333478F9D037c78b0E3E8279DdAAb20a1B3": "agree",
+      "0xD0eD149D26E76cf49fB588c970E608E44Dd4DAB8": "agree",
+      "0xe1626534791FC675ED813Cc2C89C427866526113": "agree"
+    },
+    "status": "FINALIZED",
+    "execution": "SUCCESS"
+  },
+  "recovered_status": "FINALIZED"
+}
