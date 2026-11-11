@@ -26,7 +26,7 @@ export async function transact(
     hash: hash as TransactionHash,
     status: TransactionStatus.FINALIZED,
     interval: 20000,
-    retries: 25,
+    retries: 60,
   });
   const success = executionSucceeded(receipt),
     result = {
@@ -46,7 +46,7 @@ export async function waitUntil<T>(
   read: () => Promise<T>,
   predicate: (value: T) => boolean = () => true,
 ): Promise<T> {
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 40; i++) {
     try {
       const value = await read();
       if (predicate(value)) return value;

@@ -232,7 +232,15 @@ for (const role of ['listing', 'deployment'] as const) {
   const before = await read<{ usable: boolean }>(contracts.dispatcher, 'get_dependency', [
     config.dependency_id,
   ]);
-  if (before.usable) throw new Error('Replacement cleared quarantine before owner acceptance');
+  let accepted = false;
+  try {
+    const saved = JSON.parse(
+      await readFile(`verification/receipts/restoration-accept-${role}.json`, 'utf8'),
+    );
+    accepted = saved.status === 'FINALIZED' && saved.execution === 'SUCCESS';
+  } catch {}
+  if (before.usable && !accepted)
+    throw new Error('Replacement cleared quarantine before owner acceptance');
   await transact(
     `restoration-accept-${role}`,
     keys[role],
@@ -243,6 +251,24 @@ for (const role of ['listing', 'deployment'] as const) {
   await waitUntil(
     () => read<{ usable: boolean }>(contracts.dispatcher, 'get_dependency', [config.dependency_id]),
     (v) => v.usable,
+  );
+  // Dispatcher acceptance precedes the authenticated callback to the consumer.
+  // Only that callback permits a future action; keep the same acceptance on resume.
+  const acknowledgementId = `${notice}:REFRESHED:${replacement.request_id}`;
+  await waitUntil(
+    async () => {
+      type Page = { total: number; items: { event: string; operation_id?: string }[] };
+      const first = await read<Page>(config.consumer, 'get_history', [0, 20]);
+      const last =
+        first.total > 20
+          ? await read<Page>(config.consumer, 'get_history', [first.total - 20, 20])
+          : first;
+      return last.items.some(
+        (event) =>
+          event.event === 'REMEDIATION_FINALIZED' && event.operation_id === acknowledgementId,
+      );
+    },
+    (finalized) => finalized,
   );
   await transact(
     `restoration-restored-${role}`,
