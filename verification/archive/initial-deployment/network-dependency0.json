@@ -1,0 +1,49 @@
+{
+  "hash": "0x5b4e2977a79c535d140b3807621dcf58954e1cbbdeb4e634eafbdb6110edd483",
+  "status": "CANCELED",
+  "execution": "SUCCESS",
+  "votes": {
+    "0x560FBD37a10bC2B96F118071e922c9106c12Ba1d": "agree",
+    "0x8ADae333478F9D037c78b0E3E8279DdAAb20a1B3": "agree",
+    "0x8f1abcAF0fF10678Af925f83b2Bb8b3534c4b94b": "idle",
+    "0xc675c2B7E1F066B7c1D2fe54EF7B76C91CdFa5F4": "idle",
+    "0xf1EAD5E5f876eae701eF1881b42861079cd9A287": "agree"
+  },
+  "result": [
+    {
+      "execution_result": "SUCCESS",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      },
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      }
+    },
+    {
+      "execution_result": "SUCCESS",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      },
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      }
+    }
+  ],
+  "triggered": [
+    "0x53e969d50b50b2096baa91f37e78834c9789626a2785f75eeba8a41d90842976"
+  ]
+}

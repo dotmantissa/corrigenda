@@ -1,0 +1,29 @@
+{
+  "hash": "0xcd8e14e202a474dbe85817797d5de8b5fa214ee02a49d45308702ede6c49a17e",
+  "status": "FINALIZED",
+  "execution": "FAILED",
+  "votes": {
+    "0x2bB088e4E6Fd1faBBd23d93F38D01f28a954A49c": "agree",
+    "0x560FBD37a10bC2B96F118071e922c9106c12Ba1d": "agree",
+    "0x8644a8D2D08903cAFA1F0fb28E34E0ecA727e9ED": "idle",
+    "0x8ADae333478F9D037c78b0E3E8279DdAAb20a1B3": "agree",
+    "0xC65Ec56a1141866951B34D846be8EF433764A48B": "agree"
+  },
+  "result": [
+    {
+      "execution_result": "ERROR",
+      "result": {
+        "status": "rollback",
+        "payload": "[EXPECTED] Evidence quarantined or unresolved"
+      }
+    },
+    {
+      "execution_result": "ERROR",
+      "result": {
+        "status": "rollback",
+        "payload": "[EXPECTED] Evidence quarantined or unresolved"
+      }
+    }
+  ],
+  "triggered": []
+}

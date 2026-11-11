@@ -1,0 +1,27 @@
+{
+  "probe": "0x2632CD6f97C04e0BE657f22e8F565e0C4580C4D3",
+  "locked_court": "0x0AdF2Ace71F57149E79198FC8fE40140215cC21f",
+  "result": {
+    "decisions": [
+      {
+        "action": "QUARANTINE",
+        "impact": "CONTRADICTION",
+        "material": true,
+        "new_support": "FALSE",
+        "old_support": "TRUE",
+        "proposition_id": "draft_status",
+        "rule_ids": [
+          "draft",
+          "exception"
+        ],
+        "witness_ids": [
+          "1384cd319c6af0556a7e415cbc317822067203b17457df3031e5cec649ec76ed:status",
+          "e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5:status"
+        ]
+      }
+    ],
+    "reason": "",
+    "status": "ASSESSED"
+  },
+  "note": "Deployed probe uses the repaired deterministic binding algorithm and the prior seven-field prompt example. The final application example uses only semantic fields; exact deployed source is retained here."
+}

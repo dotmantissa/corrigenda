@@ -1,0 +1,33 @@
+{
+  "hash": "0x91e25cd4947399ed94481d1e408c585648c72c31d7e0fcbacab417fbf376db7e",
+  "status": "FINALIZED",
+  "execution": "SUCCESS",
+  "votes": {
+    "0x0174b4D7494Be33F46B76976f6c9F94004F1b27f": "idle",
+    "0x2bB088e4E6Fd1faBBd23d93F38D01f28a954A49c": "agree",
+    "0x722474B013fA39E5aA8785f927dCeB0e3F89815B": "agree",
+    "0x8f1abcAF0fF10678Af925f83b2Bb8b3534c4b94b": "agree",
+    "0xf1EAD5E5f876eae701eF1881b42861079cd9A287": "agree"
+  },
+  "result": [
+    {
+      "execution_result": "SUCCESS",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "{\"decision_digest\":\"5e34719709d1839fdb33ab821b607a97d277c240441df554dceb7093d06a3aab\"\"generation\":0\"policy_id\":\"proposal_listing\"\"policy_revision\":1\"request\":{\"consequence_digest\":\"f5905b49edae028a327ecafd9dbdab7b45f261e9def13a7299588bf56e5b1286\"\"dependency_id\":\"pep724.listing.20\"\"operation_id\":\"public.before.correction\"}\"status\":\"LISTED\"\"subject_digest\":\"c6bc5ef1c18581e08e89ba294518efbea12c8a185f9af6c83c82a8aa711b59e2\"\"subject_id\":\"pep724_active_proposal\"}"
+        }
+      }
+    },
+    {
+      "execution_result": "SUCCESS",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "{\"decision_digest\":\"5e34719709d1839fdb33ab821b607a97d277c240441df554dceb7093d06a3aab\"\"generation\":0\"policy_id\":\"proposal_listing\"\"policy_revision\":1\"request\":{\"consequence_digest\":\"f5905b49edae028a327ecafd9dbdab7b45f261e9def13a7299588bf56e5b1286\"\"dependency_id\":\"pep724.listing.20\"\"operation_id\":\"public.before.correction\"}\"status\":\"LISTED\"\"subject_digest\":\"c6bc5ef1c18581e08e89ba294518efbea12c8a185f9af6c83c82a8aa711b59e2\"\"subject_id\":\"pep724_active_proposal\"}"
+        }
+      }
+    }
+  ],
+  "triggered": []
+}

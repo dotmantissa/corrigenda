@@ -1,0 +1,34 @@
+{
+  "network": "studionet",
+  "chain_id": 61999,
+  "identity_address": "0x320d7bf112eA05683436EebB1AA1234B1239c9A3",
+  "operation_id": "email.verification.adapters.20261111",
+  "complete": true,
+  "consumers": {
+    "listing": "0x04115A577B39Cb55525d0B315D1515eafeD6F86d",
+    "deployment": "0x3F3EAd2ABD6719b4A69644835c7c10D84F6F680d"
+  },
+  "operations": [
+    {
+      "id": "email.verification.adapters.20261111.deployment",
+      "kind": "deploy_consumers",
+      "status": "FINALIZED",
+      "hash": "0x34102aab7979d7f86ce3f3086d803b3410e37beb7552f867728b58aadf8bd44e",
+      "created_at": "2026-11-11T15:28:33.898Z",
+      "error": null
+    },
+    {
+      "id": "email.verification.adapters.20261111",
+      "kind": "deploy_consumers",
+      "status": "FINALIZED",
+      "hash": "0x56e5deed0bb775e8f162e18abbef2cee10c964bcf600f0c81b2095b2c77d9fc8",
+      "created_at": "2026-11-11T15:27:27.849Z",
+      "error": null
+    }
+  ],
+  "email_login_verified": true,
+  "server_identity_verified": true,
+  "custody_not_exposed": true,
+  "verification_scope": "Production before successor-network activation; preserved as distinct historical authentication/HTTP evidence.",
+  "dispatcher": "0x217f83870D844a21A9035E4F88fbEC5Cd29A10Cd"
+}

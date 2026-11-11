@@ -1,0 +1,35 @@
+{
+  "hash": "0x0f7fcf41bf03e0dccde2a432f0e2218cdb1034b09bbdaec00260f59812c3b54a",
+  "status": "FINALIZED",
+  "execution": "SUCCESS",
+  "votes": {
+    "0x0174b4D7494Be33F46B76976f6c9F94004F1b27f": "idle",
+    "0x2C93031BCCd12836A67f81a249e68abAFEaac2E5": "agree",
+    "0x8644a8D2D08903cAFA1F0fb28E34E0ecA727e9ED": "agree",
+    "0xc675c2B7E1F066B7c1D2fe54EF7B76C91CdFa5F4": "idle",
+    "0xf1EAD5E5f876eae701eF1881b42861079cd9A287": "agree"
+  },
+  "result": [
+    {
+      "execution_result": "SUCCESS",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    },
+    {
+      "execution_result": "SUCCESS",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    }
+  ],
+  "triggered": [
+    "0x3ec3320bb44795ae99bf397c00ed8009431351a0934ee89856c560b52cd6d48e"
+  ]
+}

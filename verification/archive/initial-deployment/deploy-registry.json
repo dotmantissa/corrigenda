@@ -1,0 +1,14 @@
+{
+  "hash": "0x8f4065b3304326ba2dc5b5f8ddda10220ea084ef361d652ff4ee37c28e4bb4ab",
+  "address": "0x523B95203f19Fb137F710d76005E7D4786DBa0DB",
+  "status": "CANCELED",
+  "execution": "SUCCESS",
+  "source_digest": "bbe3f7fd869dcbd525cfdc1c23d907fb08e4807e8817ace7a166d0071945bd58",
+  "votes": {
+    "0x0174b4D7494Be33F46B76976f6c9F94004F1b27f": "agree",
+    "0x2C93031BCCd12836A67f81a249e68abAFEaac2E5": "idle",
+    "0x37CD8552B86b2B662eCfb69C4A1253dBE41EB4C1": "agree",
+    "0x709a1dDECA594C16AB3864A00Eaa2BB1Cd9b5305": "idle",
+    "0x722474B013fA39E5aA8785f927dCeB0e3F89815B": "agree"
+  }
+}

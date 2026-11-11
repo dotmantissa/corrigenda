@@ -1,0 +1,30 @@
+{
+  "origin": "https://corrigenda.vercel.app",
+  "scenarios": [
+    {
+      "name": "Missing session",
+      "status": 401
+    },
+    {
+      "name": "Forged session",
+      "status": 401
+    },
+    {
+      "name": "Wrong origin",
+      "status": 403
+    },
+    {
+      "name": "Foreign consumer",
+      "status": 403
+    },
+    {
+      "name": "Private scheduler",
+      "status": 401
+    },
+    {
+      "name": "Invalid revision",
+      "status": 400
+    }
+  ],
+  "complete": true
+}

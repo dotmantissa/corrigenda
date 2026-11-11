@@ -1,0 +1,29 @@
+{
+  "hash": "0xdc58a84d49140d0179b7fa564d57d2205779c8dc3f9e048be071e755ad7e59c0",
+  "status": "FINALIZED",
+  "execution": "FAILED",
+  "votes": {
+    "0x0174b4D7494Be33F46B76976f6c9F94004F1b27f": "disagree",
+    "0x2bB088e4E6Fd1faBBd23d93F38D01f28a954A49c": "idle",
+    "0x560FBD37a10bC2B96F118071e922c9106c12Ba1d": "idle",
+    "0x709a1dDECA594C16AB3864A00Eaa2BB1Cd9b5305": "disagree",
+    "0xf1EAD5E5f876eae701eF1881b42861079cd9A287": "disagree"
+  },
+  "result": [
+    {
+      "execution_result": "ERROR",
+      "result": {
+        "status": "rollback",
+        "payload": "[LLM_ERROR] Forged witness or omitted controlling rule"
+      }
+    },
+    {
+      "execution_result": "ERROR",
+      "result": {
+        "status": "contract_error",
+        "payload": "idle"
+      }
+    }
+  ],
+  "triggered": []
+}

@@ -1,0 +1,38 @@
+{
+  "hash": "0xbe3057b540dd7bc3c185274c93e5f592548bc19af2f9639121d6e6e5e6b278ee",
+  "contract": "0x1e95943C9aC81Fc133cd70e9f273c37a40E78A8b",
+  "status": 7,
+  "result": 6,
+  "votes": {
+    "0x0cf3809a31B0c7E0742d126451aDE1977e3748D2": "agree",
+    "0x2bB088e4E6Fd1faBBd23d93F38D01f28a954A49c": "agree",
+    "0xC65Ec56a1141866951B34D846be8EF433764A48B": "agree",
+    "0xD0eD149D26E76cf49fB588c970E608E44Dd4DAB8": "agree",
+    "0xe1626534791FC675ED813Cc2C89C427866526113": "idle"
+  },
+  "executions": [
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      }
+    },
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      }
+    }
+  ],
+  "triggered": [
+    "0xb0a891687f2278fa557d499c560350627e216f4fe379673623e5b0787bc27e44"
+  ]
+}

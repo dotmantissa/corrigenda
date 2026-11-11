@@ -1,0 +1,49 @@
+{
+  "hash": "0x2d0720a6c7729ad10068837d18fdc15ad11d480a9cdbc4abf9c61ed2d3c68e0c",
+  "status": "CANCELED",
+  "execution": "SUCCESS",
+  "votes": {
+    "0x0cf3809a31B0c7E0742d126451aDE1977e3748D2": "agree",
+    "0x29300188B54F5BFEE91542595611603b4B201008": "idle",
+    "0x711353514049EAc21213834ADd07eF552aF394E6": "agree",
+    "0xD0eD149D26E76cf49fB588c970E608E44Dd4DAB8": "agree",
+    "0xe1626534791FC675ED813Cc2C89C427866526113": "agree"
+  },
+  "result": [
+    {
+      "execution_result": "SUCCESS",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      },
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      }
+    },
+    {
+      "execution_result": "SUCCESS",
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      },
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      }
+    }
+  ],
+  "triggered": [
+    "0xc820da1b0b0b5c3dce25d37562668cf19e295dca693820be9ec4fe341e49009c"
+  ]
+}

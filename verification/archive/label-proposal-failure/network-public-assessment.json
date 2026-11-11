@@ -1,0 +1,29 @@
+{
+  "hash": "0xf590d86992985dad241b0c4a1edb3a0c279fc3d05fc5736fbc792d3ce7825b4f",
+  "status": "FINALIZED",
+  "execution": "FAILED",
+  "votes": {
+    "0x2bB088e4E6Fd1faBBd23d93F38D01f28a954A49c": "idle",
+    "0x711353514049EAc21213834ADd07eF552aF394E6": "idle",
+    "0x8644a8D2D08903cAFA1F0fb28E34E0ecA727e9ED": "disagree",
+    "0xD0eD149D26E76cf49fB588c970E608E44Dd4DAB8": "disagree",
+    "0xe83D7241D0FF0f1f808B9ab3cb06dD2565bDc605": "disagree"
+  },
+  "result": [
+    {
+      "execution_result": "ERROR",
+      "result": {
+        "status": "rollback",
+        "payload": "[LLM_ERROR] Invalid decision labels"
+      }
+    },
+    {
+      "execution_result": "ERROR",
+      "result": {
+        "status": "rollback",
+        "payload": "[LLM_ERROR] Invalid decision labels"
+      }
+    }
+  ],
+  "triggered": []
+}
