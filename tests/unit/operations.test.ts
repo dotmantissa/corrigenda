@@ -4,6 +4,7 @@ const state = vi.hoisted(() => ({
   identical: false,
   digest: '',
   writes: 0,
+  court: 'court',
 }));
 vi.mock('../../src/lib/server/db', () => ({
   db:
@@ -29,7 +30,13 @@ vi.mock('../../src/lib/server/db', () => ({
     },
 }));
 vi.mock('../../src/lib/server/chain', () => ({
-  contracts: { court: 'court', registry: 'registry', dispatcher: 'dispatcher' },
+  contracts: {
+    get court() {
+      return state.court;
+    },
+    registry: 'registry',
+    dispatcher: 'dispatcher',
+  },
 }));
 import { queueCommand } from '../../src/lib/server/operations';
 const identity = {
@@ -43,6 +50,7 @@ beforeEach(() => {
   state.race = false;
   state.identical = false;
   state.writes = 0;
+  state.court = 'court';
 });
 it('rejects a concurrent conflicting operation ID rather than reporting it queued', async () => {
   state.race = true;
@@ -55,7 +63,7 @@ it('returns the existing journal status when an identical request wins the race'
   state.identical = true;
   await expect(
     queueCommand(identity, { kind: 'assess_impact', request_id: 'correction' }),
-  ).resolves.toMatchObject({ id: 'assess_impact.correction', status: 'SIGNED' });
+  ).resolves.toMatchObject({ id: 'court.assess_impact.correction', status: 'SIGNED' });
 });
 it('refuses an authorization for an account controlled by another identity', async () => {
   await expect(
@@ -69,4 +77,13 @@ it('refuses an authorization for an account controlled by another identity', asy
     }),
   ).rejects.toMatchObject({ status: 403 });
   expect(state.writes).toBe(0);
+});
+it('journals identical payloads separately when the target court changes', async () => {
+  const input = { kind: 'assess_impact', request_id: 'correction' } as const;
+  const historical = await queueCommand(identity, input);
+  state.court = 'successor';
+  const current = await queueCommand(identity, input);
+  expect(historical.id).toBe('court.assess_impact.correction');
+  expect(current.id).toBe('successor.assess_impact.correction');
+  expect(current.id).not.toBe(historical.id);
 });

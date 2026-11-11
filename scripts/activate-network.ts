@@ -1,5 +1,5 @@
 /** Reset cached adapters when activating a successor dispatcher, retaining identities and operations. */
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, rename } from 'node:fs/promises';
 import { contracts } from '../src/lib/server/chain';
 import { db } from '../src/lib/server/db';
 import { createHash } from 'node:crypto';
@@ -7,6 +7,10 @@ import { canonical } from '../src/lib/shared/canonical';
 
 const sql = db();
 const file = '.env.network-activation.json';
+async function persist(value: unknown) {
+  await writeFile(file + '.tmp', JSON.stringify(value, null, 2) + '\n', { mode: 0o600 });
+  await rename(file + '.tmp', file);
+}
 let saved: { dispatcher: string; adapters: string[]; complete: boolean } | undefined;
 try {
   saved = JSON.parse(await readFile(file, 'utf8'));
@@ -29,7 +33,7 @@ if (saved?.dispatcher === contracts.dispatcher && saved.complete) {
       ] as string[],
       complete: false,
     };
-    await writeFile(file, JSON.stringify(saved, null, 2) + '\n', { mode: 0o600 });
+    await persist(saved);
   }
   // Only clear addresses captured before activation. A resumed run preserves any newly deployed adapters.
   const oldAdapters = JSON.stringify(saved!.adapters);
@@ -44,10 +48,11 @@ if (saved?.dispatcher === contracts.dispatcher && saved.complete) {
     }),
     sql`UPDATE identities SET listing_consumer=NULL WHERE listing_consumer IN (SELECT jsonb_array_elements_text(${oldAdapters}::jsonb))`,
     sql`UPDATE identities SET deployment_consumer=NULL WHERE deployment_consumer IN (SELECT jsonb_array_elements_text(${oldAdapters}::jsonb))`,
+    sql`DELETE FROM indexed_records`,
+    sql`DELETE FROM chain_events`,
+    sql`DELETE FROM index_cursors`,
   ]);
-  await writeFile(file, JSON.stringify({ ...saved, complete: true }, null, 2) + '\n', {
-    mode: 0o600,
-  });
+  await persist({ ...saved, complete: true });
   console.log(
     'Successor dispatcher activated. Identity keys and signed history retained; historical caches reset and replacement adapters queued.',
   );

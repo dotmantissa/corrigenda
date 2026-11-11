@@ -75,7 +75,7 @@ export async function queueCommand(identity: Identity, input: Command) {
     case 'deploy_consumers':
       break;
   }
-  if (input.kind !== 'deploy_consumers' && !target)
+  if (!target && (input.kind !== 'deploy_consumers' || !contracts.dispatcher))
     throw new ApiError(503, 'The correction network has not been configured yet.');
   const payloadDigest = createHash('sha256').update(canonical(input)).digest('hex');
   let id =
@@ -88,6 +88,8 @@ export async function queueCommand(identity: Identity, input: Command) {
           : 'operation_id' in input
             ? input.operation_id
             : `${input.kind}.${input.request_id}`;
+  // A successor deployment must not reuse a historical operation merely because its payload is identical.
+  id = `${(target ?? contracts.dispatcher).toLowerCase()}.${id}`;
   const sql = db();
   const prior = await sql`SELECT payload_digest,identity_id FROM operations WHERE id=${id}`;
   if (

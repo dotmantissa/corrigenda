@@ -14,7 +14,9 @@ vi.mock('../../src/lib/server/db', () => ({
         return [{ payload_digest: digest, identity_id: 'email_identity' }];
       if (q.startsWith('SELECT id,status'))
         return state.statuses.map((status, i) => ({
-          id: i ? `assess_impact.correction.attempt.${i + 1}` : 'assess_impact.correction',
+          id: i
+            ? `court.assess_impact.correction.attempt.${i + 1}`
+            : 'court.assess_impact.correction',
           status,
           payload_digest: digest,
           identity_id: 'email_identity',
@@ -42,15 +44,15 @@ beforeEach(() => {
 });
 it('retains a finalized failure and allocates a distinct retry journal operation', async () => {
   await expect(queueCommand(identity, payload)).resolves.toMatchObject({
-    id: 'assess_impact.correction.attempt.2',
+    id: 'court.assess_impact.correction.attempt.2',
     status: 'PENDING',
   });
-  expect(state.writes[0][0]).toBe('assess_impact.correction.attempt.2');
+  expect(state.writes[0][0]).toBe('court.assess_impact.correction.attempt.2');
 });
 it('reuses an in-flight retry without submitting it twice', async () => {
   state.statuses.push('SUBMITTED');
   await expect(queueCommand(identity, payload)).resolves.toMatchObject({
-    id: 'assess_impact.correction.attempt.2',
+    id: 'court.assess_impact.correction.attempt.2',
     status: 'SUBMITTED',
   });
   expect(state.writes).toHaveLength(0);

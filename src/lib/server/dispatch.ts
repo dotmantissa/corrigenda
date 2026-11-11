@@ -29,7 +29,7 @@ export async function scheduleDispatch() {
         await sql`UPDATE indexed_records SET payload=${JSON.stringify(row.payload)} WHERE kind='incident' AND id=${row.payload.request_id}`;
         continue;
       }
-      const operationId = `dispatch.${createHash('sha256').update(`${row.payload.request_id}/${proposition.id}/${page.cursor}`).digest('hex')}`;
+      const operationId = `dispatch.${createHash('sha256').update(`${contracts.dispatcher.toLowerCase()}/${row.payload.request_id}/${proposition.id}/${page.cursor}`).digest('hex')}`;
       const payload = {
         kind: 'dispatch_page',
         request_id: row.payload.request_id,
