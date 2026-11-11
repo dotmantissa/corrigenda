@@ -55,3 +55,31 @@ export async function waitUntil<T>(
   }
   throw new Error('Finalized callback did not arrive; restrictions retained');
 }
+
+export async function finalizedCallbacks(name: string, parent: { triggered: string[] }) {
+  if (!parent.triggered.length) throw new Error(`${name} did not emit a consumer callback`);
+  const results = [];
+  for (const [index, hash] of parent.triggered.entries()) {
+    const receipt = await chain().waitForTransactionReceipt({
+      hash: hash as TransactionHash,
+      status: TransactionStatus.FINALIZED,
+      interval: 20000,
+      retries: 60,
+    });
+    const result = {
+      hash,
+      status: receiptStatus(receipt),
+      execution: executionSucceeded(receipt) ? 'SUCCESS' : 'FAILED',
+      votes: receipt.consensus_data?.votes,
+      leader_receipts: receipt.consensus_data?.leader_receipt,
+    };
+    await writeFile(
+      `verification/receipts/${name}-callback${index}.json`,
+      JSON.stringify(result, null, 2) + '\n',
+    );
+    if (result.status !== 'FINALIZED' || result.execution !== 'SUCCESS')
+      throw new Error(`Unexpected callback result in ${name}`);
+    results.push(result);
+  }
+  return results;
+}

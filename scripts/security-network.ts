@@ -1,9 +1,10 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { createAccount } from 'genlayer-js';
 import type { Hex } from 'viem';
+import type { TransactionHash } from 'genlayer-js/types';
 import { canonical } from '../src/lib/shared/canonical';
-import { contracts, read } from '../src/lib/server/chain';
-import { transact, waitUntil } from './lib/studio';
+import { chain, contracts, read } from '../src/lib/server/chain';
+import { finalizedCallbacks, transact, waitUntil } from './lib/studio';
 
 const keys = JSON.parse(await readFile('.env.consumer-keys', 'utf8')) as {
   listing: Hex;
@@ -73,10 +74,28 @@ const before = await read<{ last_applied_generation: number; usable: boolean }>(
   'get_decision',
   ['controlled.listing'],
 );
-await transact('security-replay-notice', main, contracts.dispatcher, 'replay_notice', [noticeId]);
-await transact('security-duplicate-notice', main, contracts.dispatcher, 'replay_notice', [
-  noticeId,
-]);
+const replay = await transact(
+  'security-replay-notice',
+  main,
+  contracts.dispatcher,
+  'replay_notice',
+  [noticeId],
+);
+const replayCallbacks = await finalizedCallbacks('security-replay', replay);
+const replayAgain = await transact(
+  'security-duplicate-notice',
+  main,
+  contracts.dispatcher,
+  'replay_notice',
+  [noticeId],
+);
+const duplicateCallbacks = await finalizedCallbacks('security-duplicate', replayAgain);
+async function studioTime() {
+  const receipt = await chain().getTransaction({ hash: replay.hash as TransactionHash });
+  const now = Number((receipt as unknown as Record<string, unknown>).current_timestamp);
+  if (!Number.isSafeInteger(now) || now <= 0) throw new Error('Studio clock unavailable');
+  return now;
+}
 await waitUntil(
   () => read<{ status: string }>(contracts.dispatcher, 'get_notice', [noticeId]),
   (n) => n.status === 'DELIVERED',
@@ -90,6 +109,8 @@ if (duplicate.last_applied_generation !== before.last_applied_generation || !dup
   throw new Error('Duplicate notice changed restored authorization');
 
 const nextId = 'controlled.security.newer';
+const networkNow = await studioTime();
+const localNow = Math.floor(Date.now() / 1000);
 let request: Record<string, unknown>;
 try {
   const saved = await read<Record<string, unknown>>(contracts.court, 'get_request', [nextId]);
@@ -126,7 +147,8 @@ try {
   );
   request.request_id = nextId;
   request.generation = (await read<number>(contracts.court, 'get_generation')) + 1;
-  request.deadline = Math.floor(Date.now() / 1000) + 180;
+  // Deadlines are evaluated by Studio's transaction clock, which can differ from local UTC.
+  request.deadline = networkNow + 300;
   request.owner = operator;
 }
 await transact('security-newer-open', main, contracts.court, 'open_correction', [
@@ -180,10 +202,7 @@ await transact(
   ],
   false,
 );
-await waitUntil(
-  async () => Math.floor(Date.now() / 1000),
-  (now) => now >= Number(request.deadline),
-);
+await waitUntil(studioTime, (now) => now >= Number(request.deadline));
 await transact('security-expire', main, contracts.court, 'expire', [nextId]);
 await waitUntil(
   () => read<{ unresolved: boolean }>(contracts.dispatcher, 'get_certificate', [nextId]),
@@ -201,8 +220,17 @@ await writeFile(
       unauthorized_writes_refused: true,
       forged_finalized_messages_refused: true,
       duplicate_notices_idempotent: true,
+      replay_callbacks: replayCallbacks,
+      duplicate_callbacks: duplicateCallbacks,
+      decision_after_duplicate: duplicate,
       old_acknowledgement_refused_before_new_notice: true,
       newer_generation: request.generation,
+      clock_observation: {
+        network_seconds: networkNow,
+        local_seconds: localNow,
+        offset_seconds: networkNow - localNow,
+        deadline: request.deadline,
+      },
       restricted,
       timeout_status: terminal.status,
       complete: true,
