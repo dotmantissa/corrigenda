@@ -68,3 +68,29 @@ def test_specialized_vector_cases(direct_vm,module,packet,evidence,impact,new_su
     _,m=module('impact_court','0x'+'11'*20);evidence(impact,new_support,material)
     assert m.assess_consensus(packet)['decisions'][0]['action']==action
     assert direct_vm.run_validator()
+
+
+def test_semantic_only_output_attaches_exact_locked_bindings(direct_vm,module,packet,evidence):
+    _,m=module('impact_court','0x'+'11'*20)
+    decision=evidence()
+    semantic={k:v for k,v in decision.items() if k not in ('rule_ids','witness_ids')}
+    direct_vm.clear_mocks()
+    for manifest,text in zip(packet['manifests'],packet['texts']):
+        direct_vm.mock_web(manifest['url'],{'status':200,'body':text})
+    direct_vm.mock_llm('CORRIGENDA_INDEPENDENT_ASSESSMENT',json.dumps({'decisions':[semantic]}))
+    result=m.assess_consensus(packet)
+    assert result['decisions'][0]['rule_ids']==sorted(packet['propositions'][0]['rule_ids'])
+    assert result['decisions'][0]['witness_ids']==sorted(manifest['byte_digest']+':critical' for manifest in packet['manifests'])
+    assert result['decisions'][0]['action']=='QUARANTINE'
+    assert direct_vm.run_validator()
+    wrong=copy.deepcopy(result);wrong['decisions'][0]['witness_ids']=['forged:critical']
+    assert not direct_vm.run_validator(leader_result=wrong)
+
+
+def test_partial_model_binding_fields_are_rejected(direct_vm,module,packet,evidence):
+    _,m=module('impact_court','0x'+'11'*20);decision=evidence();decision.pop('witness_ids')
+    direct_vm.clear_mocks()
+    for manifest,text in zip(packet['manifests'],packet['texts']):
+        direct_vm.mock_web(manifest['url'],{'status':200,'body':text})
+    direct_vm.mock_llm('CORRIGENDA_INDEPENDENT_ASSESSMENT',json.dumps({'decisions':[decision]}))
+    with pytest.raises(Exception,match='LLM_ERROR'):m.assess_consensus(packet)
