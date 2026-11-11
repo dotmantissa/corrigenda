@@ -10,17 +10,20 @@
     "dev": "next dev --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start --hostname 0.0.0.0",
-    "lint": "eslint . && tsc --noEmit && python3 scripts/contracts.py lint",
-    "test": "vitest run && python3 -m pytest tests/direct tests/probes -q",
+    "lint": "eslint . && tsc --noEmit && PATH=\"$PWD/.venv/bin:$PATH\" python3 scripts/contracts.py lint",
+    "test": "vitest run && PATH=\"$PWD/.venv/bin:$PATH\" python3 -m pytest tests/direct tests/probes -q",
     "test:network": "node --env-file=.env --import=tsx scripts/network.ts",
     "db:migrate": "node --env-file=.env --import=tsx scripts/migrate.ts",
     "worker": "node --env-file=.env --import=tsx scripts/worker.ts",
     "index:rebuild": "node --env-file=.env --import=tsx scripts/rebuild.ts",
     "deploy:contracts": "node --env-file=.env --import=tsx scripts/deploy.ts",
+    "deploy:consumers": "node --env-file=.env --import=tsx scripts/network.ts --deploy-only",
+    "activate:network": "node --env-file=.env --import=tsx scripts/activate-network.ts",
     "setup": "bash scripts/setup.sh",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test:restoration": "node --env-file=.env --import=tsx scripts/restoration.ts"
+    "test:restoration": "node --env-file=.env --import=tsx scripts/restoration.ts",
+    "test:security": "node --env-file=.env --import=tsx scripts/security-network.ts"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "5.2.8",

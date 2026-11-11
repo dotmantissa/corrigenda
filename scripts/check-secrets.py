@@ -5,8 +5,9 @@ import subprocess
 from pathlib import Path
 
 secrets: set[bytes] = set()
-environment = Path('.env')
-if environment.exists():
+for environment in (Path('.env'), Path('.env.local')):
+    if not environment.exists():
+        continue
     for line in environment.read_text().splitlines():
         key, _, value = line.partition('=')
         if re.search(r'SECRET|PRIVATE_KEY|ENCRYPTION_KEY|DATABASE_URL', key):
@@ -16,6 +17,9 @@ if environment.exists():
 consumer_keys = Path('.env.consumer-keys')
 if consumer_keys.exists():
     secrets.update(value.encode() for value in json.loads(consumer_keys.read_text()).values())
+session = Path('.env.email-session')
+if session.exists():
+    secrets.update(value.encode() for value in json.loads(session.read_text()).values() if isinstance(value, str) and len(value) >= 16)
 credentials = Path('.git/credentials')
 if credentials.exists():
     for token in re.findall(r'ghp_[A-Za-z0-9]+', credentials.read_text()):

@@ -66,14 +66,14 @@ export async function projectEvent(event: Record<string, unknown>) {
     await refreshRecord('notice', String(event.notice_id), contracts.dispatcher, 'get_notice');
 }
 
-export async function indexPage(contract: string, pauseBetweenRecordsMs = 0) {
+export async function indexPage(contract: string, pauseBetweenRecordsMs = 0, limit = 20) {
   const sql = db(),
     cursors = await sql`SELECT cursor FROM index_cursors WHERE contract=${contract}`;
   const cursor = Number(cursors[0]?.cursor ?? 0);
   const page = await read<{ items: Record<string, unknown>[]; next: number; total: number }>(
     contract as `0x${string}`,
     'get_history',
-    [cursor, 20],
+    [cursor, limit],
   );
   if (page.next < cursor || page.next !== Math.min(cursor + page.items.length, page.total))
     throw new Error('Invalid history cursor');
@@ -97,7 +97,8 @@ export async function indexNetwork() {
     known.find((c) => !cursors.some((x) => x.contract === c)) ??
     cursors.find((x) => known.includes(x.contract))?.contract ??
     known[0];
-  const page = await indexPage(contract);
+  // Bound live worker RPC fanout; the offline rebuild still projects full twenty-event pages.
+  const page = await indexPage(contract, 0, 3);
   const stale =
     await sql`SELECT id FROM indexed_records WHERE kind='dependency' ORDER BY updated_at ASC LIMIT 2`;
   for (const row of stale)

@@ -4,4 +4,4 @@ networks:
   default: studionet
   studionet:
     accounts:
-      - "${GENLAYER_PRIVATE_KEY}"
+      - '${GENLAYER_PRIVATE_KEY}'

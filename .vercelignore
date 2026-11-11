@@ -1,0 +1,10 @@
+.env*
+.venv/
+.git/
+.impeccable/
+verification/
+TASKS.md
+AGENT.md
+AGENTS.md
+artifacts/
+tests/

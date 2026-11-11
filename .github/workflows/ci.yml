@@ -1,0 +1,28 @@
+name: Verification
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  deterministic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: npm ci
+      - run: pip install -r requirements.lock
+      - run: genvm-lint download --version v0.2.12
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_PRIVY_APP_ID: cmwbviw6y01jr0gl76f2ojcy9
