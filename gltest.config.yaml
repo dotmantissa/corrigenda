@@ -1,0 +1,5 @@
+contract_path: contracts/
+networks:
+  studionet:
+    accounts:
+      - "${GENLAYER_PRIVATE_KEY}"
