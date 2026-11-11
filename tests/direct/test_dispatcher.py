@@ -82,3 +82,13 @@ def test_delivery_confirmation_is_authenticated_and_paginated(direct_vm,graph):
     with direct_vm.expect_revert('Unauthorized'):c.confirm_delivery(notice_id)
     direct_vm.sender=m.Address(consumer);c.confirm_delivery(notice_id);c.confirm_delivery(notice_id)
     assert c.get_notice(notice_id)['status']=='DELIVERED'
+
+
+def test_nonmaterial_clear_still_requires_finalized_certificate(direct_vm,graph):
+    c,m,views,calls,flags,node,cert,court,consumer=graph
+    c.register_dependency(json.dumps(node(0)))
+    flags['r0/security']={'generation':1,'status':'CLEAR','request_id':'correction'}
+    assert not c.get_dependency('d0')['usable']
+    assert c.get_dependency('d0')['restrictions'][0]['status']=='AWAITING_FINALIZED_CERTIFICATE'
+    direct_vm.sender=m.Address(court);c.begin_quarantine(json.dumps(cert()))
+    assert c.get_dependency('d0')['usable']

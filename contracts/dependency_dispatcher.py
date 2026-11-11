@@ -349,7 +349,7 @@ class DependencyDispatcher(gl.Contract):
         key=ack['dependency_id']+'/'+source_ref(cert['old_revision'],notice['proposition_id'])
         prior=json.loads(self.accepted.get(key,'{}'))
         if prior.get('generation',0)>ack['generation']:fail('Old acknowledgement')
-        if prior.get('route')=='REFRESHED' and ack['route']=='QUARANTINED':fail('Refreshed route is terminal for this generation')
+        if prior.get('generation')==ack['generation'] and prior.get('route')=='REFRESHED' and ack['route']=='QUARANTINED':fail('Refreshed route is terminal for this generation')
         self.accepted[key]=canonical({'generation':ack['generation'],'route':ack['route'],'replacement_revision':replacement['new_revision'],'proposition':notice['proposition_id']})
         if ack['route']=='REFRESHED':self._reverse_add(source_ref(replacement['new_revision'],notice['proposition_id']),ack['dependency_id'])
         node['last_applied_generation']=max(node['last_applied_generation'],ack['generation']);self.nodes[ack['dependency_id']]=canonical(node)
@@ -387,7 +387,12 @@ class DependencyDispatcher(gl.Contract):
             revision=ancestor['revision'];proposition=ancestor['proposition']
             for step in range(8):
                 flag=gl.get_contract_at(self.court).view().get_flag(revision,proposition)
-                if flag['status']=='CLEAR':break
+                if flag['status']=='CLEAR':
+                    if flag.get('request_id'):
+                        boundary=json.loads(self.certificates.get(flag['request_id'],'{}'))
+                        if boundary.get('generation')!=flag['generation'] or boundary.get('unresolved',True):
+                            issues.append({'revision':revision,'proposition':proposition,'generation':flag['generation'],'status':'AWAITING_FINALIZED_CERTIFICATE'})
+                    break
                 accepted=json.loads(self.accepted.get(dependency_id+'/'+source_ref(revision,proposition),'{}'))
                 if accepted.get('generation',0)!=flag['generation'] or accepted.get('route')!='REFRESHED':
                     issues.append({'revision':revision,'proposition':proposition,'generation':flag['generation'],'status':flag['status']});break
