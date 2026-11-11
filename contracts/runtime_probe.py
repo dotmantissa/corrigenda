@@ -11,7 +11,7 @@ class RuntimeProbe(gl.Contract):
     @gl.public.write
     def ping(self, destination: str, operation: str) -> None:
         if gl.message.sender_address != self.owner:
-            raise gl.UserError("[EXPECTED] Owner required")
+            raise gl.vm.UserError("[EXPECTED] Owner required")
         gl.get_contract_at(Address(destination)).emit(on="finalized").receive(operation)
 
     @gl.public.write

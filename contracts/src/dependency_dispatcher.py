@@ -12,6 +12,7 @@ class DependencyDispatcher(gl.Contract):
     history: DynArray[str]
     operation_inputs: TreeMap[str,str]
     proposition_schemas: TreeMap[str,str]
+    delivered: TreeMap[str,str]
 
     def __init__(self, court: str, registry: str):
         self.court=Address(court);self.registry=Address(registry)
@@ -186,9 +187,24 @@ class DependencyDispatcher(gl.Contract):
     @gl.public.view
     def get_notice(self, operation_id: str) -> dict:
         value=json.loads(self.notices[operation_id]);node=json.loads(self.nodes[value['dependency_id']]);cert=value['certificate']
+        value['status']='DELIVERED' if self.delivered.get(operation_id,'') else 'BROADCAST'
         value['acknowledgement']=json.loads(self.accepted.get(value['dependency_id']+'/'+source_ref(cert['old_revision'],value['proposition_id']),'{}'))
         return value
 
     @gl.public.view
     def get_history(self, offset: int, limit: int) -> dict:
         return history_page(self.history,offset,limit)
+
+    @gl.public.write
+    def confirm_delivery(self, operation_id: str) -> None:
+        notice=json.loads(self.notices[operation_id]);node=json.loads(self.nodes[notice['dependency_id']])
+        require_sender(node['consumer'])
+        if not immutable_put(self.delivered,operation_id,{'consumer':node['consumer']}):return
+        history_append(self.history,{'event':'NOTICE_DELIVERED','operation_id':operation_id,'dependency_id':node['dependency_id']})
+
+    @gl.public.view
+    def get_delivery_page(self, request_id: str, proposition_id: str, offset: int, limit: int) -> dict:
+        bounded_int(offset,0,MAX_HISTORY);bounded_int(limit,1,MAX_PAGE)
+        cert=json.loads(self.certificates[request_id]);ref=source_ref(cert['old_revision'],proposition_id)
+        count=int(self.reverse_counts.get(ref,u64(0)));end=min(offset+limit,count)
+        return {'items':[self.get_notice(request_id+':'+proposition_id+':'+self.reverse_entries[ref+':'+str(i)]) for i in range(offset,min(end,int(self.cursors[request_id+':'+proposition_id])))],'next':end,'total':count}

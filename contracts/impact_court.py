@@ -275,6 +275,7 @@ class ImpactCourt(gl.Contract):
         manifests=[old,new]
         if value['source_manifest_digest']!=digest(manifests):fail('Manifest digest mismatch')
         if sum(m['byte_size'] for m in manifests)>MAX_PACKET_BYTES:fail('Complete packet byte limit')
+        if any(m['byte_size']>MAX_TEXT_BYTES for m in manifests) or sum(m['byte_size'] for m in manifests)+len(canonical(value).encode())+len(canonical(manifests).encode())+2500>MAX_PROMPT_BYTES:fail('Complete assessment context limit')
         policy=gl.get_contract_at(self.registry).view().get_policy(value['policy_id'],value['policy_revision'])
         rules={r['id'] for r in policy['rules']}
         seen=set()

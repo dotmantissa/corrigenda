@@ -40,7 +40,9 @@ class CONSUMER_CLASS(gl.Contract):
         binding=json.loads(self.bindings[value['dependency_id']]);cert=value['certificate']
         if binding['decision_digest']!=value['decision_digest'] or cert['policy_id']!=binding['policy_id'] or cert['policy_revision']!=binding['policy_revision']:
             fail('Notice policy or decision mismatch')
-        if not immutable_put(self.notices,value['operation_id'],value):return
+        fresh=immutable_put(self.notices,value['operation_id'],value)
+        gl.get_contract_at(self.dispatcher).emit(on='finalized').confirm_delivery(value['operation_id'])
+        if not fresh:return
         generation=cert['generation']
         previous=int(self.last_applied.get(value['dependency_id'],u64(0)))
         self.last_applied[value['dependency_id']]=u64(max(previous,generation))

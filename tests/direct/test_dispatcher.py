@@ -72,3 +72,13 @@ def test_unrelated_proposition_is_usable(direct_vm,graph,packet):
     value=node(0);value['references'][0]['proposition']='unrelated';value['references'][0]['definition']=dict(packet['propositions'][0],id='unrelated')
     c.register_dependency(json.dumps(value));flags['r0/security']={'generation':1,'status':'UNRESOLVED'}
     assert c.get_dependency('d0')['usable']
+
+def test_delivery_confirmation_is_authenticated_and_paginated(direct_vm,graph):
+    c,m,views,calls,flags,node,cert,court,consumer=graph
+    c.register_dependency(json.dumps(node(0)));direct_vm.sender=m.Address(court)
+    c.begin_quarantine(json.dumps(cert()));c.dispatch_page('correction','security',0,'page0')
+    notice_id='correction:security:d0'
+    assert c.get_delivery_page('correction','security',0,20)['items'][0]['status']=='BROADCAST'
+    with direct_vm.expect_revert('Unauthorized'):c.confirm_delivery(notice_id)
+    direct_vm.sender=m.Address(consumer);c.confirm_delivery(notice_id);c.confirm_delivery(notice_id)
+    assert c.get_notice(notice_id)['status']=='DELIVERED'
