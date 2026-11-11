@@ -30,8 +30,8 @@ async function submit(name: string, code: string, args: string[]) {
   const receipt = await client.waitForTransactionReceipt({
     hash: hash as TransactionHash,
     status: TransactionStatus.FINALIZED,
-    interval: 12000,
-    retries: 25,
+    interval: 20000,
+    retries: 60,
   });
   const address = receipt.to_address as Hex;
   if (!executionSucceeded(receipt)) {

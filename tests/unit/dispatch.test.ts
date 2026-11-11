@@ -4,6 +4,14 @@ const state = vi.hoisted(() => ({
   total: 21,
   certificate: true,
   queries: [] as { text: string; values: unknown[] }[],
+  reads: [] as string[],
+  payload: { request_id: 'timed.out', status: 'TIMEOUT', propositions: [{ id: 'assurance' }] } as {
+    request_id: string;
+    status: string;
+    propositions: { id: string }[];
+    dispatch_done?: string[];
+    dispatch_complete?: boolean;
+  },
 }));
 vi.mock('../../src/lib/server/db', () => ({
   db:
@@ -11,22 +19,13 @@ vi.mock('../../src/lib/server/db', () => ({
     async (strings: TemplateStringsArray, ...values: unknown[]) => {
       const text = strings.join('?');
       state.queries.push({ text, values });
-      return text.startsWith('SELECT payload')
-        ? [
-            {
-              payload: {
-                request_id: 'timed.out',
-                status: 'TIMEOUT',
-                propositions: [{ id: 'assurance' }],
-              },
-            },
-          ]
-        : [];
+      return text.startsWith('SELECT payload') ? [{ payload: state.payload }] : [];
     },
 }));
 vi.mock('../../src/lib/server/chain', () => ({
   contracts: { dispatcher: 'dispatcher' },
-  read: async () => {
+  read: async (_contract: string, _method: string, args: string[]) => {
+    state.reads.push(args[1]);
     if (!state.certificate) throw new Error('Callback pending');
     return { cursor: state.cursor, total: state.total };
   },
@@ -37,6 +36,12 @@ beforeEach(() => {
   state.total = 21;
   state.certificate = true;
   state.queries = [];
+  state.reads = [];
+  state.payload = {
+    request_id: 'timed.out',
+    status: 'TIMEOUT',
+    propositions: [{ id: 'assurance' }],
+  };
 });
 it('schedules an expired request from its finalized certificate and actual dispatch cursor', async () => {
   state.cursor = 20;
@@ -59,5 +64,17 @@ it('does not invent a dispatch before the authenticated certificate arrives', as
 it('does not enqueue a completed delivery page', async () => {
   state.cursor = 21;
   await scheduleDispatch();
+  expect(state.queries.some((q) => q.text.startsWith('INSERT INTO operations'))).toBe(false);
+});
+it('progresses across eight completed propositions over bounded worker ticks', async () => {
+  state.payload.propositions = Array.from({ length: 8 }, (_, id) => ({ id: `p${id}` }));
+  state.cursor = state.total;
+  for (let tick = 0; tick < 3; tick++) {
+    const before = state.reads.length;
+    await scheduleDispatch();
+    expect(state.reads.length - before).toBeLessThanOrEqual(3);
+  }
+  expect(state.reads).toEqual(state.payload.propositions.map((p) => p.id));
+  expect(state.payload.dispatch_complete).toBe(true);
   expect(state.queries.some((q) => q.text.startsWith('INSERT INTO operations'))).toBe(false);
 });

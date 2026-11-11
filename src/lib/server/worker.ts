@@ -99,7 +99,8 @@ export async function workerTick(crashAfterBroadcast = false, operationId?: stri
     await indexNetwork();
     await scheduleDispatch();
   } finally {
-    await sql`UPDATE worker_leases SET lease_until=now() WHERE name='signer' AND lease_id=${leaseId}`;
+    // A shared cooldown bounds RPC bursts across persistent workers and authenticated HTTP wakeups.
+    await sql`UPDATE worker_leases SET lease_until=now()+interval '20 seconds' WHERE name='signer' AND lease_id=${leaseId}`;
   }
 }
 export async function waitFinalized(hash: Hex) {

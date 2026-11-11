@@ -19,6 +19,7 @@
     "deploy:contracts": "node --env-file=.env --import=tsx scripts/deploy.ts",
     "deploy:consumers": "node --env-file=.env --import=tsx scripts/network.ts --deploy-only",
     "activate:network": "node --env-file=.env --import=tsx scripts/activate-network.ts",
+    "migrate:adapters": "node --env-file=.env --import=tsx scripts/migrate-adapters.ts",
     "setup": "bash scripts/setup.sh",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
