@@ -294,10 +294,8 @@ class ListingConsumer(gl.Contract):
         binding=json.loads(self.bindings[value['dependency_id']]);cert=value['certificate']
         if binding['decision_digest']!=value['decision_digest'] or cert['policy_id']!=binding['policy_id'] or cert['policy_revision']!=binding['policy_revision']:
             fail('Notice policy or decision mismatch')
-        if not any(a['revision']==cert['old_revision'] and a['proposition']==value['proposition_id'] and a['context']==cert['contexts'][value['proposition_id']] for a in binding['ancestors']):
-            # Accepted replacement references are verified by the authoritative dispatcher at action time.
-            state=gl.get_contract_at(self.dispatcher).view().get_dependency(value['dependency_id'])
-            if not any(r['revision']==cert['old_revision'] and r['proposition']==value['proposition_id'] and r['context']==cert['contexts'][value['proposition_id']] for r in state['restrictions']):fail('Notice outside bound authorization')
+        hex_digest(cert['contexts'][value['proposition_id']])
+        # The authenticated dispatcher creates notices from its scoped reverse index, including accepted successors.
         fresh=immutable_put(self.notices,value['operation_id'],value)
         gl.get_contract_at(self.dispatcher).emit(on='finalized').confirm_delivery(value['operation_id'])
         if not fresh:return

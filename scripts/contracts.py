@@ -16,8 +16,13 @@ def build():
         else:source=(ROOT/f'contracts/src/{name}.py').read_text()
         (ROOT/f'contracts/{name}.py').write_text(HEADER+common+'\n'+source)
 
+    fixture=(ROOT/'contracts/listing_consumer.py').read_text().replace('class ListingConsumer','class ReviewConsumer').replace('    owner: Address\n    dispatcher:', '    callback_fault: bool\n    owner: Address\n    dispatcher:').replace('        self.owner=Address(owner);','        self.callback_fault=True\n        self.owner=Address(owner);').replace('        require_sender(str(self.dispatcher));ack=record(acknowledgement)',"        require_sender(str(self.dispatcher))\n        if self.callback_fault:fail('Injected acknowledgement delivery failure')\n        ack=record(acknowledgement)")
+    fixture+='\n    @gl.public.write\n    def set_callback_fault(self, enabled: bool) -> None:\n        require_sender(str(self.owner))\n        self.callback_fault=enabled\n'
+    (ROOT/'tests/fixtures/review_consumer.py').write_text(fixture)
+
 def lint():
     build()
+    subprocess.run(['genvm-lint','check',str(ROOT/'tests/fixtures/review_consumer.py'),'--json'],check=True)
     for name in NAMES:
         subprocess.run(['genvm-lint','check',str(ROOT/f'contracts/{name}.py'),'--json'],check=True)
 

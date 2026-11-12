@@ -127,3 +127,12 @@ def test_colon_identifiers_never_collide(module):
     assert m.tuple_key('cursor.v2','alpha:beta','gamma')!=m.tuple_key('cursor.v2','alpha','beta:gamma')
     assert m.tuple_key('notice.v2','a:b','c','d')!=m.tuple_key('notice.v2','a','b:c','d')
     assert m.tuple_key('acknowledgement.v2','a','b','c')!=m.tuple_key('notice.v2','a','b','c')
+
+def test_authenticated_successor_keep_notice_is_deliverable(direct_vm,consumer):
+    c,m,views,calls,config,binding,state,owner,dispatcher,action,status=consumer
+    context=m.authorization_context(config,config['references'][0]['definition'])
+    cert=dict(config,generation=3,old_revision='r2',contexts={'security':context},certificate_digest='c'*64,unresolved=False)
+    notice={'operation_id':'successor.keep','dependency_id':'decision','decision_digest':binding['decision_digest'],'certificate':cert,'proposition_id':'security','action':'KEEP'}
+    direct_vm.sender=m.Address(dispatcher);c.receive_notice(json.dumps(notice))
+    assert calls[-1]['calldata']['method']=='confirm_delivery'
+    assert c.get_decision('decision')['last_applied_generation']==3
