@@ -174,7 +174,6 @@
       ],
       "effects": [
         "@reown/appkit",
-        "@reown/appkit-pay",
         "@reown/appkit-scaffold-ui",
         "@reown/appkit-utils"
       ],
@@ -240,6 +239,7 @@
       ],
       "effects": [
         "@reown/appkit",
+        "@reown/appkit-pay",
         "@reown/appkit-scaffold-ui"
       ],
       "range": ">=1.7.1-449657bc8f95adcfd295a2e883c4bcd439045044.0",
@@ -334,9 +334,7 @@
         "@typescript-eslint/typescript-estree",
         "@typescript-eslint/utils"
       ],
-      "effects": [
-        "@typescript-eslint/eslint-plugin"
-      ],
+      "effects": [],
       "range": "6.16.0 - 8.72.2",
       "nodes": [
         "node_modules/@typescript-eslint/type-utils"
@@ -368,7 +366,9 @@
       "via": [
         "@typescript-eslint/typescript-estree"
       ],
-      "effects": [],
+      "effects": [
+        "@typescript-eslint/eslint-plugin"
+      ],
       "range": "6.16.0 - 8.72.2",
       "nodes": [
         "node_modules/@typescript-eslint/utils"
@@ -417,40 +417,6 @@
         "name": "@privy-io/react-auth",
         "version": "3.6.1",
         "isSemVerMajor": true
-      }
-    },
-    "diff": {
-      "name": "diff",
-      "severity": "low",
-      "isDirect": true,
-      "via": [
-        {
-          "source": 1112706,
-          "name": "diff",
-          "dependency": "diff",
-          "title": "jsdiff has a Denial of Service vulnerability in parsePatch and applyPatch",
-          "url": "https://github.com/advisories/GHSA-73rr-hh4g-fpgx",
-          "severity": "low",
-          "cwe": [
-            "CWE-400",
-            "CWE-1333"
-          ],
-          "cvss": {
-            "score": 0,
-            "vectorString": null
-          },
-          "range": ">=6.0.0 <8.0.3"
-        }
-      ],
-      "effects": [],
-      "range": "6.0.0 - 8.0.2",
-      "nodes": [
-        "node_modules/diff"
-      ],
-      "fixAvailable": {
-        "name": "diff",
-        "version": "8.0.4",
-        "isSemVerMajor": false
       }
     },
     "esbuild": {
@@ -644,11 +610,11 @@
   "metadata": {
     "vulnerabilities": {
       "info": 0,
-      "low": 2,
+      "low": 1,
       "moderate": 13,
       "high": 13,
       "critical": 0,
-      "total": 28
+      "total": 27
     },
     "dependencies": {
       "prod": 1002,

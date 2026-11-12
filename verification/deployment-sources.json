@@ -1,0 +1,43 @@
+{
+  "source_commit": "3c61d1503e3522f90b39fb66bb2f4599eb0d5335",
+  "runner": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6",
+  "deployments": [
+    {
+      "name": "registry",
+      "address": "0x672060B1d38339DCbB1bC533863c200c0Dc2c2a6",
+      "hash": "0xb805d7c814006d1df5b97f7d971d28825f9d278c42c4faca4c84eef630758457",
+      "source_digest": "95b3cd080d84cd8f7b7c9b302d7f034f3a272bc1c2f0186689d37af613f46207",
+      "execution": "SUCCESS"
+    },
+    {
+      "name": "court",
+      "address": "0x9901D83BBbc55cc5eC8d18D9fA983D186727DC73",
+      "hash": "0x1165eb7c3c81519873da8d436cb955985c6fe418727f6a460057347963fd6e9f",
+      "source_digest": "4dc6992cb7b168dd37d278371ab93783d44693da866d5a2e0323cf9c127e16e9",
+      "execution": "SUCCESS"
+    },
+    {
+      "name": "dispatcher",
+      "address": "0x4D4AeEe458228e1f291275C912C0Ca0BFf94370F",
+      "hash": "0x3b6a04c82911e38809d1780ef11aba071b6246464b55a7025161a2df53744815",
+      "source_digest": "9ccfb952ee0a0065953ecf502ea79891537ff74e8b7e043efc37b152316c5c27",
+      "execution": "SUCCESS"
+    },
+    {
+      "name": "listing_consumer",
+      "address": "0xe1225306aa9D8D2aD047F7EC7ecEB8BfdFAab5dc",
+      "hash": "0x58c28f882f304ef9570a09d646dc5b546494b1b7b65f3b88de7568c9696dbdd4",
+      "source_digest": "e59329907c5b31565a2372931494f107880a6171964c34406854973f9faa3c59",
+      "execution": "SUCCESS"
+    },
+    {
+      "name": "deployment_consumer",
+      "address": "0x7d37A19663eE13258ec67Cfb1eE6f392E34c9c3A",
+      "hash": "0x427b621d240c031d1820193e63430d6bf440cf00110e5486c6212d6b93f84a66",
+      "source_digest": "b440bf4cd492cf2e81ecd7e1a8d0c8b0634eb0bdcbc9061ce2fc889f78e5d86d",
+      "execution": "SUCCESS"
+    }
+  ],
+  "saved_receipts_match_maintained_generated_sources": true,
+  "live_code_independent_comparison_pending": true
+}

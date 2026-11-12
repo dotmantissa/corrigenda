@@ -3,11 +3,11 @@
   "chain_id": 61999,
   "runner": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6",
   "contracts": {
-    "registry": "0xD4365fe5a717C15dAd92Dd6d2834EB58827C0a22",
-    "court": "0x49FA1997beDE4D41C120E9ea06E7D2146577cb9a",
-    "dispatcher": "0x8e7E18C7Aca8F5172216F66bf2218FD77F80ad87",
-    "listing_consumer": "0xA6EbE57a9911F55d1d7765897051271f68D1f4b2",
-    "deployment_consumer": "0xE78936C4452BE4a734870A9028b8f4259787E025"
+    "registry": "0x672060B1d38339DCbB1bC533863c200c0Dc2c2a6",
+    "court": "0x9901D83BBbc55cc5eC8d18D9fA983D186727DC73",
+    "dispatcher": "0x4D4AeEe458228e1f291275C912C0Ca0BFf94370F",
+    "listing_consumer": "0xe1225306aa9D8D2aD047F7EC7ecEB8BfdFAab5dc",
+    "deployment_consumer": "0x7d37A19663eE13258ec67Cfb1eE6f392E34c9c3A"
   },
-  "source_commit": "7cda403"
+  "source_commit": "3c61d1503e3522f90b39fb66bb2f4599eb0d5335"
 }
