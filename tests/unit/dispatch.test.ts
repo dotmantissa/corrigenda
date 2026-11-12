@@ -9,6 +9,7 @@ const state = vi.hoisted(() => ({
     request_id: string;
     status: string;
     propositions: { id: string }[];
+    dispatch_scan?: number;
     dispatch_done?: string[];
     dispatch_complete?: boolean;
   },
@@ -74,7 +75,18 @@ it('progresses across eight completed propositions over bounded worker ticks', a
     await scheduleDispatch();
     expect(state.reads.length - before).toBeLessThanOrEqual(3);
   }
-  expect(state.reads).toEqual(state.payload.propositions.map((p) => p.id));
+  expect(new Set(state.reads)).toEqual(new Set(state.payload.propositions.map((p) => p.id)));
   expect(state.payload.dispatch_complete).toBe(true);
   expect(state.queries.some((q) => q.text.startsWith('INSERT INTO operations'))).toBe(false);
+});
+
+it('reopens completed incidents when the live reverse index grows', async () => {
+  state.payload.dispatch_done = ['assurance'];
+  state.payload.dispatch_complete = true;
+  state.cursor = 21;
+  state.total = 22;
+  await scheduleDispatch();
+  expect(state.payload.dispatch_complete).toBe(false);
+  expect(state.queries.some((q) => q.text.startsWith('INSERT INTO operations'))).toBe(true);
+  expect(state.queries[0].text).not.toContain('dispatch_complete');
 });

@@ -4,7 +4,8 @@ const state = vi.hoisted(() => ({
   op: {} as Record<string, unknown>,
   signCalls: 0,
   rebroadcasts: [] as string[],
-  receipt: { status: 1, success: false },
+  receipt: { status: 1, success: false } as { status: number; success: boolean } | null,
+  extra: [] as Record<string, unknown>[],
 }));
 vi.mock('../../src/lib/server/db', () => ({
   db:
@@ -13,7 +14,7 @@ vi.mock('../../src/lib/server/db', () => ({
       const query = strings.join('?');
       state.queries.push({ query, values });
       if (query.startsWith('INSERT INTO worker_leases')) return [{ lease_id: 'lease' }];
-      if (query.startsWith('SELECT o.*')) return [state.op];
+      if (query.startsWith('SELECT o.*')) return [state.op, ...state.extra];
       return [];
     },
 }));
@@ -40,6 +41,7 @@ vi.mock('../../src/lib/server/chain', () => ({
 import { workerTick } from '../../src/lib/server/worker';
 beforeEach(() => {
   state.queries = [];
+  state.extra = [];
   state.signCalls = 0;
   state.rebroadcasts = [];
   state.receipt = { status: 1, success: false };
@@ -97,4 +99,40 @@ it('records canceled and finalized failed executions as delivery failures', asyn
     'DELIVERY_FAILED',
   );
   expect(state.signCalls).toBe(0);
+});
+
+it('reconciles a missing receipt without starving another identity submission', async () => {
+  state.op = {
+    ...state.op,
+    identity_id: 'old',
+    transaction_hash: 'lost_hash',
+    status: 'SUBMITTED',
+    receipt_checks: 30,
+  };
+  state.extra = [
+    {
+      id: 'new',
+      identity_id: 'new',
+      kind: 'dispatch_page',
+      status: 'PENDING',
+      attempts: 0,
+      target: 'dispatcher',
+      method: 'dispatch_page',
+      args: [],
+    },
+  ];
+  state.receipt = null;
+  await workerTick();
+  expect(state.signCalls).toBe(1);
+  expect(
+    state.queries.some(
+      (q) => q.query.includes('receipt_checks=receipt_checks+1') && q.values.includes('STRANDED'),
+    ),
+  ).toBe(true);
+  expect(state.queries.find((q) => q.query.startsWith('SELECT o.*'))?.query).toContain(
+    'PARTITION BY',
+  );
+  expect(state.queries.find((q) => q.query.startsWith('SELECT o.*'))?.query).toContain(
+    'candidate.reconcile_at<=now()',
+  );
 });

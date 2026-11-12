@@ -804,6 +804,12 @@ function DependencyMap({ dependencies }: { dependencies: Dependency[] }) {
                 </div>
                 <span className="mono">{d.dependency_id}</span>
                 <Status value={d.usable ? 'CLEAR' : 'QUARANTINED'} />
+                {d.usable && d.last_applied_generation === 0 && (
+                  <small>
+                    Initial authorization is the owner’s attestation. Consensus evaluates subsequent
+                    corrections.
+                  </small>
+                )}
                 {d.parents.length > 0 && (
                   <p>
                     <CornerDownRight size={14} />
@@ -968,6 +974,12 @@ function IncidentDetails({
               <small className="mono">{d.dependency_id}</small>
             </span>
             <Status value={d.usable ? 'CLEAR' : 'QUARANTINED'} />
+            {d.usable && d.last_applied_generation === 0 && (
+              <small>
+                Initial authorization is the owner’s attestation. Consensus evaluates subsequent
+                corrections.
+              </small>
+            )}
           </div>
         ))}
         {!affected.length && (
@@ -1029,6 +1041,12 @@ function ConsumerDecision({
           <span className="mono">{d.dependency_id}</span>
         </div>
         <Status value={d.usable ? 'CLEAR' : 'QUARANTINED'} />
+        {d.usable && d.last_applied_generation === 0 && (
+          <small>
+            Initial authorization is the owner’s attestation. Consensus evaluates subsequent
+            corrections.
+          </small>
+        )}
       </div>
       <p>
         {d.kind === 'PROVIDER_LISTING' ? 'Provider listing' : 'Deployment approval'}
@@ -1093,6 +1111,17 @@ function NoticeRemediation({
       i.status === 'FINALIZED' &&
       i.policy_id === n.certificate.policy_id &&
       i.policy_revision === n.certificate.policy_revision &&
+      !!i.contexts?.[n.proposition_id] &&
+      i.contexts[n.proposition_id] === n.certificate.contexts?.[n.proposition_id] &&
+      (() => {
+        let revision = i.new_revision;
+        for (let step = 0; step < 8; step++) {
+          if (revision === n.certificate.new_revision) return true;
+          revision = snapshot.revisions.find((r) => r.revision_id === revision)?.supersedes ?? '';
+          if (!revision) return false;
+        }
+        return false;
+      })() &&
       i.certificate?.decisions?.some(
         (v) => v.proposition_id === n.proposition_id && v.new_support === 'TRUE',
       ),
@@ -1112,7 +1141,24 @@ function NoticeRemediation({
         <Status value={n.status ?? 'BROADCAST'} />
       </div>
       {n.acknowledgement?.route === 'REFRESHED' ? (
-        <Status value="REFRESHED" />
+        <div>
+          <Status value="REFRESHED" />
+          {n.acknowledgement.operation_id && (
+            <button
+              className="secondary"
+              disabled={pending}
+              onClick={() =>
+                void send({
+                  kind: 'replay_acknowledgement',
+                  consumer: d.consumer,
+                  operation_id: n.acknowledgement!.operation_id!,
+                })
+              }
+            >
+              Retry acknowledgement delivery
+            </button>
+          )}
+        </div>
       ) : (
         <div className="remediation-controls">
           {n.acknowledgement?.route && <Status value={n.acknowledgement.route} />}

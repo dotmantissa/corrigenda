@@ -6,6 +6,7 @@ import { TransactionStatus, type TransactionHash } from 'genlayer-js/types';
 import { type Hex } from 'viem';
 import { chain, contracts, read, executionSucceeded, receiptStatus } from '../src/lib/server/chain';
 import { canonical } from '../src/lib/shared/canonical';
+import { networkTime } from './lib/studio';
 const digest = (v: unknown) => createHash('sha256').update(canonical(v)).digest('hex');
 const evidenceRoot = 'verification/receipts';
 await mkdir(evidenceRoot, { recursive: true });
@@ -278,7 +279,14 @@ const correction = {
   old_revision: 'pep724.r0',
   new_revision: 'pep724.r1',
   propositions: [proposition],
+  deadline: (await networkTime()) + 7200,
 };
+try {
+  const retained = await read<{ deadline: number }>(contracts.court, 'get_request', [
+    correction.request_id,
+  ]);
+  correction.deadline = retained.deadline;
+} catch {}
 await transact('public-open', main, contracts.court, 'open_correction', [canonical(correction)]);
 await transact(
   'stale-before-notification',

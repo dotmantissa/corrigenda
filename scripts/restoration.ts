@@ -5,7 +5,7 @@ import type { Hex } from 'viem';
 import type { Revision } from '../src/lib/shared/schema';
 import { contracts, read } from '../src/lib/server/chain';
 import { canonical } from '../src/lib/shared/canonical';
-import { transact, waitUntil } from './lib/studio';
+import { transact, waitUntil, networkTime } from './lib/studio';
 const keys = JSON.parse(await readFile('.env.consumer-keys', 'utf8')) as {
   listing: Hex;
   deployment: Hex;
@@ -126,157 +126,164 @@ for (const role of ['listing', 'deployment'] as const) {
     [config.dependency_id, `controlled.before.${role}`, config.consequence_digest],
   );
 }
-async function correct(i: number, name: string) {
-  const current = await read<number>(contracts.court, 'get_generation');
-  const original = binding('listing');
-  const request = {
-    request_id: name,
-    owner: operator,
-    parties: [operator, owners.listing, owners.deployment],
-    policy_id: policy.policy_id,
-    policy_revision: 1,
-    subject_id: original.subject_id,
-    subject_digest: original.subject_digest,
-    source_manifest_digest: hash([revisions[i], revisions[i + 1]]),
-    consumer: original.consumer,
-    consequence_digest: original.consequence_digest,
-    generation: current + 1,
-    deadline: 1893456000,
-    old_revision: `controlled.r${i}`,
-    new_revision: `controlled.r${i + 1}`,
-    propositions: [proposition],
-  };
-  // On resume reuse the exact locked generation from decisive state.
+async function correct(role: 'listing' | 'deployment', i: number, name: string) {
+  let request;
   try {
-    const existing = await read<{ generation: number }>(contracts.court, 'get_request', [name]);
-    request.generation = existing.generation;
-  } catch {}
+    const retained = await read<Record<string, unknown>>(contracts.court, 'get_request', [name]);
+    request = Object.fromEntries(
+      [
+        'request_id',
+        'owner',
+        'parties',
+        'policy_id',
+        'policy_revision',
+        'subject_id',
+        'subject_digest',
+        'source_manifest_digest',
+        'consumer',
+        'consequence_digest',
+        'generation',
+        'deadline',
+        'old_revision',
+        'new_revision',
+        'propositions',
+      ].map((k) => [k, retained[k]]),
+    );
+  } catch {
+    const original = binding(role);
+    request = {
+      ...original,
+      request_id: name,
+      owner: operator,
+      parties: [operator, owners[role]],
+      source_manifest_digest: hash([revisions[i], revisions[i + 1]]),
+      generation: (await read<number>(contracts.court, 'get_generation')) + 1,
+      deadline: (await networkTime()) + 7200,
+      old_revision: revisions[i].revision_id,
+      new_revision: revisions[i + 1].revision_id,
+      propositions: [proposition],
+    };
+    for (const k of [
+      'dependency_id',
+      'rank',
+      'parents',
+      'references',
+      'kind',
+      'unresolved_route',
+      'remediation_route',
+    ])
+      delete (request as Record<string, unknown>)[k];
+  }
   await transact(name + '-open', main, contracts.court, 'open_correction', [canonical(request)]);
-  return request;
+  return request as { request_id: string; generation: number };
 }
-const withdrawal = await correct(0, 'controlled.withdrawal');
+const results: Record<string, unknown> = {};
 for (const role of ['listing', 'deployment'] as const) {
+  const suffix = role === 'listing' ? '' : '.deployment';
   const config = binding(role);
+  const withdrawal = await correct(role, 0, 'controlled.withdrawal' + suffix);
   await transact(
-    `restoration-stale-${role}`,
+    'restoration-stale-' + role,
     keys[role],
     config.consumer,
     role === 'listing' ? 'authorize_listing' : 'approve_deployment',
-    [config.dependency_id, `controlled.stale.${role}`, config.consequence_digest],
+    [config.dependency_id, 'controlled.stale.' + role, config.consequence_digest],
     false,
   );
-}
-const withdrawalReceipt = await transact(
-  'controlled.withdrawal-assess',
-  main,
-  contracts.court,
-  'assess_impact',
-  [withdrawal.request_id],
-);
-if (Object.values(withdrawalReceipt.votes ?? {}).filter((v) => v === 'agree').length < 2)
-  throw new Error('Withdrawal lacks multi validator agreement');
-const first = await waitUntil(() =>
-  read<{ decisions: { action: string; new_support: string }[] }>(
-    contracts.dispatcher,
-    'get_certificate',
+  const withdrawalReceipt = await transact(
+    withdrawal.request_id + '-assess',
+    main,
+    contracts.court,
+    'assess_impact',
     [withdrawal.request_id],
-  ),
-);
-if (first.decisions[0].action !== 'QUARANTINE' || first.decisions[0].new_support !== 'FALSE')
-  throw new Error('Withdrawal was not material');
-await transact('controlled.withdrawal-page', main, contracts.dispatcher, 'dispatch_page', [
-  withdrawal.request_id,
-  proposition.id,
-  0,
-  'controlled.withdrawal.page',
-]);
-for (const role of ['listing', 'deployment'] as const)
-  await waitUntil(
-    () =>
-      read<{ last_applied_generation: number }>(contracts[role + '_consumer'], 'get_decision', [
-        `controlled.${role}`,
-      ]),
-    (v) => v.last_applied_generation >= withdrawal.generation,
   );
-const replacementConfig = binding('listing', 1, 'controlled.successor');
-await transact(
-  'restoration-register-successor',
-  keys.listing,
-  replacementConfig.consumer,
-  'configure',
-  [canonical(replacementConfig)],
-);
-await waitUntil(() =>
-  read(replacementConfig.consumer, 'get_decision', [replacementConfig.dependency_id]),
-);
-const replacement = await correct(1, 'controlled.replacement');
-const replacementReceipt = await transact(
-  'controlled.replacement-assess',
-  main,
-  contracts.court,
-  'assess_impact',
-  [replacement.request_id],
-);
-if (Object.values(replacementReceipt.votes ?? {}).filter((v) => v === 'agree').length < 2)
-  throw new Error('Replacement lacks multi validator agreement');
-const second = await waitUntil(() =>
-  read<{ decisions: { new_support: string }[] }>(contracts.dispatcher, 'get_certificate', [
-    replacement.request_id,
-  ]),
-);
-if (second.decisions[0].new_support !== 'TRUE')
-  throw new Error('Replacement not independently supported');
-for (const role of ['listing', 'deployment'] as const) {
-  const config = binding(role),
-    notice = `${withdrawal.request_id}:${proposition.id}:${config.dependency_id}`;
+  if (Object.values(withdrawalReceipt.votes ?? {}).filter((v) => v === 'agree').length < 2)
+    throw new Error('Independent withdrawal consensus missing');
+  const first = await waitUntil(() =>
+    read<{ decisions: { action: string; new_support: string }[] }>(
+      contracts.dispatcher,
+      'get_certificate',
+      [withdrawal.request_id],
+    ),
+  );
+  if (first.decisions[0].action !== 'QUARANTINE' || first.decisions[0].new_support !== 'FALSE')
+    throw new Error('Withdrawal support invariant failed');
+  await transact(withdrawal.request_id + '-page', main, contracts.dispatcher, 'dispatch_page', [
+    withdrawal.request_id,
+    proposition.id,
+    0,
+    withdrawal.request_id + '.page',
+  ]);
+  const notice = hash(['notice.v2', [withdrawal.request_id, proposition.id, config.dependency_id]]);
+  await waitUntil(
+    () => read<{ status: string }>(contracts.dispatcher, 'get_notice', [notice]),
+    (v) => v.status === 'DELIVERED',
+  );
+  const successor = binding(role, 1, 'controlled.successor.' + role);
+  await transact(
+    'restoration-register-successor-' + role,
+    keys[role],
+    successor.consumer,
+    'configure',
+    [canonical(successor)],
+  );
+  await waitUntil(() => read(successor.consumer, 'get_decision', [successor.dependency_id]));
+  const replacement = await correct(role, 1, 'controlled.replacement' + suffix);
+  const replacementReceipt = await transact(
+    replacement.request_id + '-assess',
+    main,
+    contracts.court,
+    'assess_impact',
+    [replacement.request_id],
+  );
+  if (Object.values(replacementReceipt.votes ?? {}).filter((v) => v === 'agree').length < 2)
+    throw new Error('Independent replacement consensus missing');
+  const second = await waitUntil(() =>
+    read<{ decisions: { new_support: string }[] }>(contracts.dispatcher, 'get_certificate', [
+      replacement.request_id,
+    ]),
+  );
+  if (second.decisions[0].new_support !== 'TRUE')
+    throw new Error('Replacement support invariant failed');
   const before = await read<{ usable: boolean }>(contracts.dispatcher, 'get_dependency', [
     config.dependency_id,
   ]);
   let accepted = false;
   try {
-    const saved = JSON.parse(
-      await readFile(`verification/receipts/restoration-accept-${role}.json`, 'utf8'),
-    );
-    accepted = saved.status === 'FINALIZED' && saved.execution === 'SUCCESS';
+    accepted =
+      JSON.parse(
+        await readFile('verification/receipts/restoration-accept-' + role + '.json', 'utf8'),
+      ).execution === 'SUCCESS';
   } catch {}
-  if (before.usable && !accepted)
-    throw new Error('Replacement cleared quarantine before owner acceptance');
+  if (before.usable && !accepted) throw new Error('Replacement bypassed owner acceptance');
   await transact(
-    `restoration-accept-${role}`,
+    'restoration-accept-' + role,
     keys[role],
     config.consumer,
     'acknowledge_generation',
     [notice, withdrawal.generation, 'REFRESHED', replacement.request_id],
   );
-  await waitUntil(
-    () => read<{ usable: boolean }>(contracts.dispatcher, 'get_dependency', [config.dependency_id]),
-    (v) => v.usable,
-  );
-  // Dispatcher acceptance precedes the authenticated callback to the consumer.
-  // Only that callback permits a future action; keep the same acceptance on resume.
-  const acknowledgementId = `${notice}:REFRESHED:${replacement.request_id}`;
-  await waitUntil(
-    async () => {
-      type Page = { total: number; items: { event: string; operation_id?: string }[] };
-      const first = await read<Page>(config.consumer, 'get_history', [0, 20]);
-      const last =
-        first.total > 20
-          ? await read<Page>(config.consumer, 'get_history', [first.total - 20, 20])
-          : first;
-      return last.items.some(
-        (event) =>
-          event.event === 'REMEDIATION_FINALIZED' && event.operation_id === acknowledgementId,
-      );
-    },
-    (finalized) => finalized,
-  );
+  const ackId = hash(['acknowledgement.v2', [notice, 'REFRESHED', replacement.request_id]]);
+  await waitUntil(async () => {
+    const page = await read<{ total: number; items: { event: string; operation_id?: string }[] }>(
+      config.consumer,
+      'get_history',
+      [0, 20],
+    );
+    const last =
+      page.total > 20
+        ? await read<typeof page>(config.consumer, 'get_history', [page.total - 20, 20])
+        : page;
+    return last.items.some((e) => e.event === 'REMEDIATION_FINALIZED' && e.operation_id === ackId);
+  }, Boolean);
   await transact(
-    `restoration-restored-${role}`,
+    'restoration-restored-' + role,
     keys[role],
     config.consumer,
     role === 'listing' ? 'authorize_listing' : 'approve_deployment',
-    [config.dependency_id, `controlled.restored.${role}`, config.consequence_digest],
+    [config.dependency_id, 'controlled.restored.' + role, config.consequence_digest],
   );
+  results[role] = { withdrawal, replacement, withdrawalReceipt, replacementReceipt };
 }
 await writeFile(
   'verification/restoration.json',
@@ -287,9 +294,8 @@ await writeFile(
       runner: 'py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6',
       classification: 'Controlled public integration fixtures, not real adoption',
       revisions,
-      withdrawal,
-      replacement,
       separate_owners: owners,
+      results,
       listing_suspended_and_restored: true,
       deployment_suspended_and_restored: true,
       replacement_acceptance_required: true,
@@ -299,4 +305,6 @@ await writeFile(
     2,
   ) + '\n',
 );
-console.log('Both consumers restored after finalized replacement acceptance.');
+console.log(
+  'Both authorization contexts restored after independently assessed, bound replacement acceptance.',
+);

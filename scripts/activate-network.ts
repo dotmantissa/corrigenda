@@ -19,7 +19,7 @@ if (saved?.dispatcher === contracts.dispatcher && saved.complete) {
   console.log('This dispatcher has already been activated.');
 } else {
   const pending =
-    await sql`SELECT count(*)::int AS total FROM operations WHERE status IN ('PENDING','SIGNED','SUBMITTED','ACCEPTED')`;
+    await sql`SELECT count(*)::int AS total FROM operations WHERE status IN ('PENDING','SIGNED','SUBMITTED','ACCEPTED','STRANDED')`;
   if (pending[0].total)
     throw new Error('Reconcile pending signed operations before activating the successor network.');
   if (saved?.dispatcher !== contracts.dispatcher) {

@@ -5,14 +5,18 @@ import { contracts, read } from './chain';
 export async function scheduleDispatch() {
   const sql = db();
   const rows =
-    await sql`SELECT payload FROM indexed_records WHERE kind='incident' AND payload->>'status' IN ('ASSESSED','UNRESOLVED','TIMEOUT') AND COALESCE((payload->>'dispatch_complete')::boolean,false)=false ORDER BY updated_at ASC LIMIT 4`;
+    await sql`SELECT payload FROM indexed_records WHERE kind='incident' AND payload->>'status' IN ('ASSESSED','UNRESOLVED','TIMEOUT') ORDER BY updated_at ASC LIMIT 4`;
   let remainingReads = 3;
   for (const row of rows) {
     const done = new Set<string>(row.payload.dispatch_done ?? []);
-    for (const proposition of row.payload.propositions) {
-      if (done.has(proposition.id)) continue;
+    const propositions = row.payload.propositions;
+    const start = Number(row.payload.dispatch_scan ?? 0) % propositions.length;
+    for (let step = 0; step < propositions.length; step++) {
+      const proposition = propositions[(start + step) % propositions.length];
       if (remainingReads === 0) return;
       remainingReads--;
+      row.payload.dispatch_scan = (start + step + 1) % propositions.length;
+      await sql`UPDATE indexed_records SET payload=${JSON.stringify(row.payload)},updated_at=now() WHERE kind='incident' AND id=${row.payload.request_id}`;
       let page;
       try {
         page = await read<{ cursor: number; total: number }>(contracts.dispatcher, 'get_dispatch', [
@@ -29,7 +33,21 @@ export async function scheduleDispatch() {
         await sql`UPDATE indexed_records SET payload=${JSON.stringify(row.payload)} WHERE kind='incident' AND id=${row.payload.request_id}`;
         continue;
       }
-      const operationId = `dispatch.${createHash('sha256').update(`${contracts.dispatcher.toLowerCase()}/${row.payload.request_id}/${proposition.id}/${page.cursor}`).digest('hex')}`;
+      done.delete(proposition.id);
+      row.payload.dispatch_done = [...done];
+      row.payload.dispatch_complete = false;
+      await sql`UPDATE indexed_records SET payload=${JSON.stringify(row.payload)} WHERE kind='incident' AND id=${row.payload.request_id}`;
+      const operationId = `dispatch.${createHash('sha256')
+        .update(
+          JSON.stringify([
+            'dispatch.v2',
+            contracts.dispatcher.toLowerCase(),
+            row.payload.request_id,
+            proposition.id,
+            page.cursor,
+          ]),
+        )
+        .digest('hex')}`;
       const payload = {
         kind: 'dispatch_page',
         request_id: row.payload.request_id,

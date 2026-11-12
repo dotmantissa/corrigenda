@@ -104,6 +104,7 @@ export const command = z.discriminatedUnion('kind', [
     consequence_digest: hash,
     consumer_kind: z.enum(['PROVIDER_LISTING', 'DEPLOYMENT_APPROVAL']),
   }),
+  z.object({ kind: z.literal('replay_acknowledgement'), consumer: address, operation_id: hash }),
   z.object({
     kind: z.literal('replay_notice'),
     operation_id: z.string().regex(/^[A-Za-z0-9_.:]{1,290}$/),
@@ -134,6 +135,7 @@ export interface Incident {
   source_manifest_digest: string;
   parties: string[];
   attempts: number;
+  contexts?: Record<string, string>;
 }
 export interface Certificate {
   status: string;
@@ -202,7 +204,7 @@ export interface Snapshot {
     action: string;
     certificate: Incident & Certificate;
     status?: string;
-    acknowledgement?: { route: string };
+    acknowledgement?: { route: string; operation_id?: string };
   }[];
   contracts: Record<string, string>;
   connection: 'connected' | 'unavailable';

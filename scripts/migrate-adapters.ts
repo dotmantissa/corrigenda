@@ -14,7 +14,7 @@ for (let attempt = 0; attempt < 90; attempt++) {
     await sql`SELECT o.id,o.status,o.transaction_hash AS hash,i.address,i.listing_consumer,i.deployment_consumer FROM operations o JOIN identities i ON i.id=o.identity_id WHERE o.id LIKE ${prefix} ORDER BY o.created_at`;
   if (!rows.length && activation.adapters.length)
     throw new Error('Historical adapters exist but their migration journal is missing.');
-  if (rows.some((row) => ['DELIVERY_FAILED', 'UNRESOLVED'].includes(row.status)))
+  if (rows.some((row) => ['DELIVERY_FAILED', 'UNRESOLVED', 'STRANDED'].includes(row.status)))
     throw new Error('Adapter migration failed; retained journal requires reconciliation.');
   if (
     rows.every(

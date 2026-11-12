@@ -21,6 +21,7 @@ vi.mock('../../src/lib/server/db', () => ({
           payload_digest: digest,
           identity_id: 'email_identity',
         }));
+      if (q.startsWith('WITH personal')) return [{ used: 1 }];
       if (q.startsWith('SELECT count')) return [{ total: 0 }];
       if (q.startsWith('INSERT INTO operations')) {
         state.writes.push(values);

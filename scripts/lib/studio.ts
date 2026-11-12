@@ -7,7 +7,7 @@ export async function transact(
   key: Hex,
   target: Hex,
   method: string,
-  args: (string | number)[],
+  args: (string | number | boolean)[],
   expectedSuccess = true,
 ) {
   await mkdir('verification/receipts', { recursive: true });
@@ -16,6 +16,11 @@ export async function transact(
   try {
     saved = JSON.parse(await readFile(path, 'utf8'));
   } catch {}
+  if (saved?.status === 'FINALIZED' && saved.execution) {
+    if ((saved.execution === 'SUCCESS') !== expectedSuccess)
+      throw new Error(`Unexpected saved result in ${name}`);
+    return saved;
+  }
   const client = chain(key),
     hash =
       saved?.hash ??
@@ -82,4 +87,17 @@ export async function finalizedCallbacks(name: string, parent: { triggered: stri
     results.push(result);
   }
   return results;
+}
+
+let networkOffset: number | undefined;
+export async function networkTime() {
+  if (networkOffset === undefined) {
+    const saved = JSON.parse(await readFile('verification/receipts/deploy-registry.json', 'utf8'));
+    const receipt = await chain().getTransaction({ hash: saved.hash as TransactionHash });
+    const seconds = Number((receipt as unknown as Record<string, unknown>).current_timestamp);
+    if (!Number.isSafeInteger(seconds) || seconds <= 0)
+      throw new Error('Network clock unavailable');
+    networkOffset = seconds - Math.floor(Date.now() / 1000);
+  }
+  return Math.floor(Date.now() / 1000) + networkOffset;
 }

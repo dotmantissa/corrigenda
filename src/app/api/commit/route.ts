@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { authenticate, assertOrigin, ApiError } from '@/lib/server/auth';
+import { admitWork } from '@/lib/server/admission';
 import { db } from '@/lib/server/db';
 import { contracts } from '@/lib/server/chain';
 import { canonical } from '@/lib/shared/canonical';
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
         422,
         'Use the full commit hash in the raw GitHub URL so the exact revision is clear.',
       );
+    await admitWork(identity.id);
     const response = await fetch(url, {
       redirect: 'error',
       cache: 'no-store',
@@ -78,7 +80,7 @@ export async function POST(request: Request) {
       public_evidence_url: input.public_evidence_url,
     };
     const sql = db(),
-      operationId = `authority.${authorityId}`,
+      operationId = `${contracts.registry.toLowerCase()}.authority.${authorityId}`,
       payloadDigest = createHash('sha256').update(canonical(authority)).digest('hex');
     const existing = await sql`SELECT payload_digest FROM operations WHERE id=${operationId}`;
     if (existing.length && existing[0].payload_digest !== payloadDigest)

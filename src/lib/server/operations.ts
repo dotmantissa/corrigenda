@@ -4,6 +4,7 @@ import { canonical } from '../shared/canonical';
 import { type Identity, ApiError } from './auth';
 import { contracts } from './chain';
 import { db } from './db';
+import { admitWork } from './admission';
 export async function queueCommand(identity: Identity, input: Command) {
   let target: string | null = null,
     method: string | null = null,
@@ -54,6 +55,13 @@ export async function queueCommand(identity: Identity, input: Command) {
         input.replacement_certificate_id ?? '',
       ];
       break;
+    case 'replay_acknowledgement':
+      if (![identity.listing_consumer, identity.deployment_consumer].includes(input.consumer))
+        throw new ApiError(403, 'Only the application owner can replay remediation.');
+      target = input.consumer;
+      method = input.kind;
+      args = [input.operation_id];
+      break;
     case 'replay_notice':
       target = contracts.dispatcher;
       method = input.kind;
@@ -81,7 +89,7 @@ export async function queueCommand(identity: Identity, input: Command) {
   let id =
     input.kind === 'acknowledge_generation'
       ? `ack.${payloadDigest}`
-      : input.kind === 'replay_notice'
+      : ['replay_notice', 'replay_acknowledgement'].includes(input.kind)
         ? `replay.${payloadDigest}`
         : 'payload' in input
           ? input.payload.request_id
@@ -98,29 +106,31 @@ export async function queueCommand(identity: Identity, input: Command) {
   )
     throw new ApiError(409, 'That request name is already used for a different operation.');
   if (prior.length) {
-    if (input.kind !== 'assess_impact')
-      return { id, status: (await sql`SELECT status FROM operations WHERE id=${id}`)[0].status };
-    const base = id;
-    const attempts =
-      await sql`SELECT id,status,payload_digest,identity_id FROM operations WHERE id IN (${base},${base + '.attempt.2'},${base + '.attempt.3'}) ORDER BY created_at`;
     if (
-      attempts.some((op) => op.payload_digest !== payloadDigest || op.identity_id !== identity.id)
-    )
-      throw new ApiError(409, 'That assessment belongs to a different signed request.');
-    const retained = attempts.find((op) => op.status !== 'DELIVERY_FAILED');
-    if (retained) return { id: retained.id, status: retained.status };
-    if (attempts.length >= 3)
-      throw new ApiError(
-        409,
-        'Three assessment attempts failed. The evidence remains quarantined; review the source and recovery path.',
-      );
-    id = `${base}.attempt.${attempts.length + 1}`;
+      ['replay_notice', 'replay_acknowledgement', 'acknowledge_generation'].includes(input.kind)
+    ) {
+      id += `.replay.${randomUUID()}`;
+    } else if (input.kind !== 'assess_impact')
+      return { id, status: (await sql`SELECT status FROM operations WHERE id=${id}`)[0].status };
+    if (input.kind === 'assess_impact') {
+      const base = id;
+      const attempts =
+        await sql`SELECT id,status,payload_digest,identity_id FROM operations WHERE id IN (${base},${base + '.attempt.2'},${base + '.attempt.3'}) ORDER BY created_at`;
+      if (
+        attempts.some((op) => op.payload_digest !== payloadDigest || op.identity_id !== identity.id)
+      )
+        throw new ApiError(409, 'That assessment belongs to a different signed request.');
+      const retained = attempts.find((op) => op.status !== 'DELIVERY_FAILED');
+      if (retained) return { id: retained.id, status: retained.status };
+      if (attempts.length >= 3)
+        throw new ApiError(
+          409,
+          'Three assessment attempts failed. The evidence remains quarantined; review the source and recovery path.',
+        );
+      id = `${base}.attempt.${attempts.length + 1}`;
+    }
   }
-  // A bounded quota prevents a session from exhausting the signing queue.
-  const count =
-    await sql`SELECT count(*)::int AS total FROM operations WHERE identity_id=${identity.id} AND created_at>now()-interval '1 minute'`;
-  if (count[0].total >= 10)
-    throw new ApiError(429, 'There is a lot in flight. Give your requests a moment to settle.');
+  await admitWork(identity.id);
   const inserted =
     await sql`INSERT INTO operations(id,identity_id,kind,payload,payload_digest,target,method,args) VALUES(${id},${identity.id},${input.kind},${JSON.stringify(input)},${payloadDigest},${target},${method},${JSON.stringify(args)}) ON CONFLICT(id) DO NOTHING RETURNING id`;
   if (!inserted.length) {

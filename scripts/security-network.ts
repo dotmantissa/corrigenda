@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createAccount } from 'genlayer-js';
 import type { Hex } from 'viem';
@@ -19,7 +20,11 @@ const original = await read<Record<string, unknown>>(contracts.court, 'get_reque
 const certificate = await read<Record<string, unknown>>(contracts.dispatcher, 'get_certificate', [
   'controlled.withdrawal',
 ]);
-const noticeId = 'controlled.withdrawal:critical_resolved:controlled.listing';
+const noticeId = createHash('sha256')
+  .update(
+    canonical(['notice.v2', ['controlled.withdrawal', 'critical_resolved', 'controlled.listing']]),
+  )
+  .digest('hex');
 const notice = await read<Record<string, unknown>>(contracts.dispatcher, 'get_notice', [noticeId]);
 
 await transact(

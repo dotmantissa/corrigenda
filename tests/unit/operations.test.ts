@@ -20,6 +20,7 @@ vi.mock('../../src/lib/server/db', () => ({
           },
         ];
       if (query.startsWith('SELECT payload_digest')) return [];
+      if (query.startsWith('WITH personal')) return [{ used: 1 }];
       if (query.startsWith('SELECT count')) return [{ total: 0 }];
       if (query.startsWith('INSERT INTO operations')) {
         state.writes++;
