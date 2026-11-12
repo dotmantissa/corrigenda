@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { createAccount } from 'genlayer-js';
 import type { Hex } from 'viem';
+import type { Incident, Revision } from '../src/lib/shared/schema';
 import { contracts, read } from '../src/lib/server/chain';
 import { canonical } from '../src/lib/shared/canonical';
 import { networkTime, transact, waitUntil } from './lib/studio';
@@ -244,6 +245,135 @@ await transact('review-overlap-restored-action', keys.listing, consumer, 'author
   loss.consequence_digest,
 ]);
 output.overlap_recovery = { ack, restored_after_finalized_callback: true };
-output.complete = true;
 await persist();
 console.log('Bounded public recovery and overlapping generation ordering verified on GenVM.');
+
+// Owner acceptance alone must retain the successor claim for its next correction.
+const acceptedManifest = replacement.manifests[1];
+const withdrawnManifest = {
+  ...loss.manifests[1],
+  request_id: 'review.revision.loss3',
+  revision_id: 'review.loss3',
+  supersedes: acceptedManifest.revision_id,
+};
+await transact('review-revision-loss3', main, contracts.registry, 'register_revision', [
+  canonical(withdrawnManifest),
+]);
+const successorRequest = {
+  ...binding(replacement),
+  old_revision: acceptedManifest.revision_id,
+  new_revision: withdrawnManifest.revision_id,
+  source_manifest_digest: hash([acceptedManifest, withdrawnManifest]),
+};
+await open('review.accepted.successor.withdrawal', successorRequest);
+const deniedBeforeNotice = await read<{ usable: boolean; restrictions: { revision: string }[] }>(
+  contracts.dispatcher,
+  'get_dependency',
+  ['review.loss'],
+);
+if (
+  deniedBeforeNotice.usable ||
+  !deniedBeforeNotice.restrictions.some((r) => r.revision === withdrawnManifest.supersedes)
+)
+  throw new Error('Accepted successor restriction escaped original dependency before delivery');
+const successorAssessment = await assess('review.accepted.successor.withdrawal');
+await transact('review-accepted-successor-page', main, contracts.dispatcher, 'dispatch_page', [
+  'review.accepted.successor.withdrawal',
+  loss.propositions[0].id,
+  0,
+  'review.accepted.successor.page',
+]);
+const successorNotice = tuple(
+  'notice.v2',
+  'review.accepted.successor.withdrawal',
+  loss.propositions[0].id,
+  'review.loss',
+);
+await waitUntil(
+  () => read<{ status: string }>(contracts.dispatcher, 'get_notice', [successorNotice]),
+  (n) => n.status === 'DELIVERED',
+);
+output.accepted_successor_continuity = {
+  successorAssessment,
+  deniedBeforeNotice,
+  no_additional_dependency_registration: true,
+  delivered_to_original_dependency: true,
+};
+await persist();
+
+// A finalized KEEP must advance authorization continuity even before its own notice arrives.
+const stableProof = proof.checks.exhausted_opening_rejected_without_flags;
+if (!stableProof) throw new Error('Primary KEEP and budget regression missing');
+const keepCert = await read<Record<string, unknown> & Incident & { manifests: Revision[] }>(
+  contracts.dispatcher,
+  'get_certificate',
+  ['review.stable.3'],
+);
+const stableOld = keepCert.manifests[1];
+const { execFileSync } = await import('node:child_process');
+const stableFixtureCommit = execFileSync(
+  'git',
+  ['log', '-1', '--format=%H', '--', 'tests/fixtures/review/stable2.json'],
+  { encoding: 'utf8' },
+).trim();
+if (!/^[a-f0-9]{40}$/.test(stableFixtureCommit))
+  throw new Error('Commit and publish the same-subject KEEP withdrawal fixture first');
+const stableBytes = await readFile('tests/fixtures/review/stable2.json');
+const stableByteDigest = createHash('sha256').update(stableBytes).digest('hex');
+const stableWithdrawn = {
+  ...stableOld,
+  request_id: 'review.revision.stable2',
+  revision_id: 'review.stable2',
+  url: `https://raw.githubusercontent.com/dotmantissa/corrigenda/${stableFixtureCommit}/tests/fixtures/review/stable2.json`,
+  byte_size: stableBytes.length,
+  byte_digest: stableByteDigest,
+  spans: [{ id: 'record', start: 0, end: stableBytes.length, digest: stableByteDigest }],
+  supersedes: stableOld.revision_id,
+};
+await transact('review-revision-stable2', main, contracts.registry, 'register_revision', [
+  canonical(stableWithdrawn),
+]);
+await open('review.keep.successor.withdrawal', {
+  ...binding(keepCert),
+  old_revision: stableOld.revision_id,
+  new_revision: stableWithdrawn.revision_id,
+  source_manifest_digest: hash([stableOld, stableWithdrawn]),
+});
+const keepDeniedBeforeNotice = await read<{
+  usable: boolean;
+  restrictions: { revision: string }[];
+}>(contracts.dispatcher, 'get_dependency', ['review.stable']);
+if (
+  keepDeniedBeforeNotice.usable ||
+  !keepDeniedBeforeNotice.restrictions.some((r) => r.revision === stableOld.revision_id)
+)
+  throw new Error('KEEP successor restriction escaped original dependency');
+const keepAssessment = await assess('review.keep.successor.withdrawal');
+await transact('review-keep-successor-page', main, contracts.dispatcher, 'dispatch_page', [
+  'review.keep.successor.withdrawal',
+  keepCert.propositions[0].id,
+  0,
+  'review.keep.successor.page',
+]);
+const keepNotice = tuple(
+  'notice.v2',
+  'review.keep.successor.withdrawal',
+  keepCert.propositions[0].id,
+  'review.stable',
+);
+await waitUntil(
+  () => read<{ status: string }>(contracts.dispatcher, 'get_notice', [keepNotice]),
+  (n) => n.status === 'DELIVERED',
+);
+output.keep_successor_continuity = {
+  keepAssessment,
+  keepDeniedBeforeNotice,
+  no_additional_dependency_registration: true,
+  restricted_before_keep_notice_delivery: true,
+  delivered_to_original_dependency: true,
+};
+output.complete = true;
+await persist();
+console.log(
+  'Accepted replacements and KEEP successors retain future denial and propagation on GenVM.',
+);
