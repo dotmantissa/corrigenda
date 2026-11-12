@@ -1,0 +1,32 @@
+{
+  "network": "studionet",
+  "chain_id": 61999,
+  "checks": [
+    {
+      "contract": "0xD4365fe5a717C15dAd92Dd6d2834EB58827C0a22",
+      "cursor": 9,
+      "total": 9,
+      "events": 9
+    },
+    {
+      "contract": "0x49FA1997beDE4D41C120E9ea06E7D2146577cb9a",
+      "cursor": 8,
+      "total": 8,
+      "events": 8
+    },
+    {
+      "contract": "0x8e7E18C7Aca8F5172216F66bf2218FD77F80ad87",
+      "cursor": 56,
+      "total": 56,
+      "events": 56
+    }
+  ],
+  "public_notices": 21,
+  "all_public_notices_delivered": true,
+  "recovery": {
+    "interruption": "Observed standard RPC bucket limit of 500 requests per hour and transient Neon connection reset",
+    "dispatcher_cursor_before_resume": 40,
+    "resumed_without_reset": true
+  },
+  "complete": true
+}

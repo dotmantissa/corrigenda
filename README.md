@@ -47,7 +47,7 @@ The first three commands run without network signing credentials. The network ex
 
 The network example creates separate consumer owner keys in an ignored local file. Keep those keys private. Its dispatcher recovery test kills the worker after broadcast, then reconciles the same signed operation from the journal.
 
-Run network signing and index reconstruction sequentially: the observed Studio quota is 30 RPC requests per minute. Resume an interrupted rebuild with `npm run index:rebuild -- --resume`; it keeps the durable history cursors and replays an incomplete page.
+Run network signing and index reconstruction sequentially: the observed Studio quotas are 30 RPC requests per minute and 500 per hour. The offline rebuild spaces records by 15 seconds and retries quota and transient transport failures within a bounded window. Resume an interrupted rebuild with `npm run index:rebuild -- --resume`; it keeps the durable history cursors and replays an incomplete page.
 
 When deploying changed contracts, archive the old manifest, source and receipts before resetting the current manifest. Run `npm run deploy:contracts`, then `npm run deploy:consumers`, and deploy the new manifest with the server. Reconcile all pending signed operations before `npm run activate:network`, which clears only historical adapter caches and queues replacement adapters through the existing journal while retaining identity keys and operation history. Run `npm run migrate:adapters` to reconcile those queued replacements and capture their public receipts. Historical adapters remain bound to their historical dispatcher.
 
