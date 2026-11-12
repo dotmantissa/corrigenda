@@ -1,0 +1,38 @@
+{
+  "network": "studionet",
+  "chain_id": 61999,
+  "method": "Independent gen_getContractCode RPC retrieval compared byte-for-byte with maintained generated source",
+  "contracts": [
+    {
+      "name": "registry",
+      "address": "0x672060B1d38339DCbB1bC533863c200c0Dc2c2a6",
+      "source_digest": "95b3cd080d84cd8f7b7c9b302d7f034f3a272bc1c2f0186689d37af613f46207",
+      "exact_match": true
+    },
+    {
+      "name": "court",
+      "address": "0x9901D83BBbc55cc5eC8d18D9fA983D186727DC73",
+      "source_digest": "4dc6992cb7b168dd37d278371ab93783d44693da866d5a2e0323cf9c127e16e9",
+      "exact_match": true
+    },
+    {
+      "name": "dispatcher",
+      "address": "0x4D4AeEe458228e1f291275C912C0Ca0BFf94370F",
+      "source_digest": "9ccfb952ee0a0065953ecf502ea79891537ff74e8b7e043efc37b152316c5c27",
+      "exact_match": true
+    },
+    {
+      "name": "listing_consumer",
+      "address": "0xe1225306aa9D8D2aD047F7EC7ecEB8BfdFAab5dc",
+      "source_digest": "e59329907c5b31565a2372931494f107880a6171964c34406854973f9faa3c59",
+      "exact_match": true
+    },
+    {
+      "name": "deployment_consumer",
+      "address": "0x7d37A19663eE13258ec67Cfb1eE6f392E34c9c3A",
+      "source_digest": "b440bf4cd492cf2e81ecd7e1a8d0c8b0634eb0bdcbc9061ce2fc889f78e5d86d",
+      "exact_match": true
+    }
+  ],
+  "complete": true
+}

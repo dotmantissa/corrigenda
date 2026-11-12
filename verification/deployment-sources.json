@@ -39,5 +39,6 @@
     }
   ],
   "saved_receipts_match_maintained_generated_sources": true,
-  "live_code_independent_comparison_pending": true
+  "live_code_independent_comparison_pending": false,
+  "live_code_comparison": "source-comparison.json"
 }

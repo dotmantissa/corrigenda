@@ -385,8 +385,8 @@ const after = await read(contracts.court, 'get_flag', [
 ]);
 if (canonical(before) !== canonical(after))
   throw new Error('Rejected opening changed restrictions');
-await transact(
-  'review-deadline-reject',
+const deadlineRejected = await transact(
+  'review-deadline-future-bound-reject',
   keys.deployment,
   contracts.court,
   'open_correction',
@@ -394,12 +394,18 @@ await transact(
     canonical({
       ...rejected,
       request_id: 'review.hostile.deadline',
-      deadline: (await networkTime()) + 86401,
+      deadline: (await networkTime()) + 365 * 86400,
     }),
   ],
   false,
 );
-checks.exhausted_opening_and_deadline_rejected_without_flags = true;
+if (!JSON.stringify(deadlineRejected.leader_receipts).includes('Correction deadline'))
+  throw new Error('Deadline probe failed for a different reason');
+checks.exhausted_opening_rejected_without_flags = true;
+checks.deadline_bound_rejected = {
+  hash: deadlineRejected.hash,
+  expected_reason_verified: true,
+};
 await save();
 // A correctly assessed but differently bound replacement cannot repair the original decision.
 const unrelated = {

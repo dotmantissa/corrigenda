@@ -1,0 +1,13 @@
+{
+  "classification": "Superseded unsigned automatic dispatch to the historical dispatcher; retained journal, no signed transaction canceled",
+  "operations": [
+    {
+      "id": "dispatch.0852cacae94d75831fbeb7fd7eb5300a5b3d458f439c7e5a3bef22e31b4e9f69",
+      "kind": "dispatch_page",
+      "status": "DELIVERY_FAILED",
+      "hash": null,
+      "target": "0x8e7E18C7Aca8F5172216F66bf2218FD77F80ad87",
+      "error_code": "SUCCESSOR_NETWORK_ACTIVATED"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "network": "studionet",
+  "chain_id": 61999,
+  "dispatcher": "0x4D4AeEe458228e1f291275C912C0Ca0BFf94370F",
+  "classification": "Authorized successor deployment using the previously authenticated identity and preserved custodial key; no fresh login is claimed.",
+  "operations": [
+    {
+      "id": "adapters.4D4AeEe458228e1f291275C912C0Ca0BFf94370F.320d7bf112eA05683436EebB1AA1234B1239c9A3",
+      "status": "FINALIZED",
+      "hash": "0xebf4baf41a286711f05c6537cfff96fd6289781ab3a7a05e4f83f7dd7deb4a60",
+      "address": "0x320d7bf112eA05683436EebB1AA1234B1239c9A3",
+      "listing_consumer": "0x650ddBc609bE5f7c2fAF05B45fBc1106A6C6c630",
+      "deployment_consumer": "0x287a5b0Dc66dBc5E7d3BA18ad122BB66f1c7f5d6"
+    },
+    {
+      "id": "adapters.4D4AeEe458228e1f291275C912C0Ca0BFf94370F.320d7bf112eA05683436EebB1AA1234B1239c9A3.deployment",
+      "status": "FINALIZED",
+      "hash": "0x6278798f9efb710edeac54e453825c3965072750e78e91ff05fe4b84c0753a84",
+      "address": "0x320d7bf112eA05683436EebB1AA1234B1239c9A3",
+      "listing_consumer": "0x650ddBc609bE5f7c2fAF05B45fBc1106A6C6c630",
+      "deployment_consumer": "0x287a5b0Dc66dBc5E7d3BA18ad122BB66f1c7f5d6"
+    }
+  ],
+  "complete": true
+}
