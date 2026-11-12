@@ -883,101 +883,103 @@ function IncidentDetails({
         <h2>What changed</h2>
         <Status value={incident.status} />
       </div>
-      <div className="revision-comparison">
-        <div className="revision-half">
-          <header>
-            <span>Before</span>
-            <span className="mono">{incident.old_revision}</span>
-          </header>
-          <div className="source-copy">
-            {loading
-              ? 'Retrieving the authentic record…'
-              : (error ??
-                diff
-                  .filter((d) => !d.added)
-                  .map((d, i) => (
-                    <span key={i} className={d.removed ? 'removed' : ''}>
-                      {d.value}
-                    </span>
-                  )))}
+      <div className="correction-proof">
+        <div className="revision-comparison">
+          <div className="revision-half">
+            <header>
+              <span>Before</span>
+              <span className="mono">{incident.old_revision}</span>
+            </header>
+            <div className="source-copy">
+              {loading
+                ? 'Retrieving the authentic record…'
+                : (error ??
+                  diff
+                    .filter((d) => !d.added)
+                    .map((d, i) => (
+                      <span key={i} className={d.removed ? 'removed' : ''}>
+                        {d.value}
+                      </span>
+                    )))}
+            </div>
+          </div>
+          <div className="revision-half">
+            <header>
+              <span>After</span>
+              <span className="mono">{incident.new_revision}</span>
+            </header>
+            <div className="source-copy">
+              {loading
+                ? 'Retrieving the authentic record…'
+                : (error ??
+                  diff
+                    .filter((d) => !d.removed)
+                    .map((d, i) => (
+                      <span key={i} className={d.added ? 'added' : ''}>
+                        {d.value}
+                      </span>
+                    )))}
+            </div>
           </div>
         </div>
-        <div className="revision-half">
-          <header>
-            <span>After</span>
-            <span className="mono">{incident.new_revision}</span>
-          </header>
-          <div className="source-copy">
-            {loading
-              ? 'Retrieving the authentic record…'
-              : (error ??
-                diff
-                  .filter((d) => !d.removed)
-                  .map((d, i) => (
-                    <span key={i} className={d.added ? 'added' : ''}>
-                      {d.value}
-                    </span>
-                  )))}
-          </div>
+        {texts && (
+          <p className="verified-source">
+            <ShieldCheck size={15} />
+            Both records match their committed bytes.
+          </p>
+        )}
+        <div className="decision-vector">
+          {incident.certificate?.decisions?.map((d) => (
+            <div key={d.proposition_id}>
+              <span className="mono">{d.proposition_id}</span>
+              <Status value={d.impact} />
+              <strong>{humanStatus(d.action)}</strong>
+              <details>
+                <summary>Controlling evidence</summary>
+                <p>Rules: {d.rule_ids.join(', ')}</p>
+                {d.witness_ids.map((w) => (
+                  <p className="mono" key={w}>
+                    {w}
+                  </p>
+                ))}
+              </details>
+            </div>
+          ))}
         </div>
-      </div>
-      {texts && (
-        <p className="verified-source">
-          <ShieldCheck size={15} />
-          Both records match their committed bytes.
-        </p>
-      )}
-      <div className="decision-vector">
-        {incident.certificate?.decisions?.map((d) => (
-          <div key={d.proposition_id}>
-            <span className="mono">{d.proposition_id}</span>
-            <Status value={d.impact} />
-            <strong>{humanStatus(d.action)}</strong>
-            <details>
-              <summary>Controlling evidence</summary>
-              <p>Rules: {d.rule_ids.join(', ')}</p>
-              {d.witness_ids.map((w) => (
-                <p className="mono" key={w}>
-                  {w}
-                </p>
-              ))}
-            </details>
+        <div className="section-top">
+          <h3>
+            Affected decisions<span className="count">{affected.length}</span>
+          </h3>
+          {incident.status === 'PENDING' && (
+            <button
+              className="secondary"
+              disabled={pending || incident.attempts >= 3}
+              onClick={() => void send({ kind: 'assess_impact', request_id: incident.request_id })}
+            >
+              {pending ? 'Sending request…' : 'Assess the impact'}
+            </button>
+          )}
+        </div>
+        {affected.map((d) => (
+          <div key={d.dependency_id} className="affected-row">
+            <CornerDownRight size={17} />
+            <span>
+              {d.subject_id}
+              <small className="mono">{d.dependency_id}</small>
+            </span>
+            <Status value={d.usable ? 'CLEAR' : 'QUARANTINED'} />
           </div>
         ))}
-      </div>
-      <div className="section-top">
-        <h3>
-          Affected decisions<span className="count">{affected.length}</span>
-        </h3>
-        {incident.status === 'PENDING' && (
-          <button
-            className="secondary"
-            disabled={pending || incident.attempts >= 3}
-            onClick={() => void send({ kind: 'assess_impact', request_id: incident.request_id })}
-          >
-            {pending ? 'Sending request…' : 'Assess the impact'}
-          </button>
+        {!affected.length && (
+          <p className="muted">No registered decisions match these proposition references.</p>
+        )}
+        {incident.certificate?.unresolved && (
+          <p className="unresolved-note">
+            The evidence did not settle the question. Quarantine stays in place while this is
+            unresolved.
+          </p>
         )}
       </div>
-      {affected.map((d) => (
-        <div key={d.dependency_id} className="affected-row">
-          <CornerDownRight size={17} />
-          <span>
-            {d.subject_id}
-            <small className="mono">{d.dependency_id}</small>
-          </span>
-          <Status value={d.usable ? 'CLEAR' : 'QUARANTINED'} />
-        </div>
-      ))}
-      {!affected.length && (
-        <p className="muted">No registered decisions match these proposition references.</p>
-      )}
-      {incident.certificate?.unresolved && (
-        <p className="unresolved-note">
-          The evidence did not settle the question. Quarantine stays in place while this is
-          unresolved.
-        </p>
-      )}
       {['UNRESOLVED', 'TIMEOUT'].includes(incident.status) && (
         <RecoveryPanel
           incident={incident}

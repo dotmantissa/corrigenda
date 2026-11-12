@@ -1050,6 +1050,19 @@ summary {
   padding-top: 26px;
   border-top: 1px solid var(--border);
 }
+.correction-proof {
+  position: relative;
+}
+.correction-proof::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -11px;
+  width: 7px;
+  border: solid var(--text);
+  border-width: 1px 0 1px 1px;
+  pointer-events: none;
+}
 .revision-comparison {
   display: grid;
   grid-template-columns: 1fr 1fr;
