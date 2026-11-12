@@ -49,6 +49,35 @@ export async function transact(
     throw new Error(`Unexpected result in ${name}`);
   return result;
 }
+
+/** Preserve failed consensus rounds and retry the same immutable request at most three times. */
+export async function assessWithConsensus(name: string, key: Hex, court: Hex, requestId: string) {
+  const failedAttempts = [];
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const operation = name + (attempt === 1 ? '' : `.attempt${attempt}`);
+    try {
+      const receipt = await transact(operation, key, court, 'assess_impact', [requestId]);
+      return { ...receipt, prior_failed_attempts: failedAttempts };
+    } catch (error) {
+      let saved;
+      try {
+        saved = JSON.parse(await readFile(`verification/receipts/${operation}.json`, 'utf8'));
+      } catch {
+        throw error;
+      }
+      if (
+        saved.status !== 'FINALIZED' ||
+        saved.execution !== 'FAILED' ||
+        (!['MAJORITY_DISAGREE', 'NO_MAJORITY', 7, 5].includes(saved.consensus_outcome) &&
+          !JSON.stringify(saved.leader_receipts).includes('[LLM_ERROR]'))
+      )
+        throw error;
+      failedAttempts.push(saved);
+      console.log('Assessment failed closed; retrying the same locked request', saved.hash);
+    }
+  }
+  throw new Error('Three assessment rounds failed; original request and restrictions retained');
+}
 export async function waitUntil<T>(
   read: () => Promise<T>,
   predicate: (value: T) => boolean = () => true,

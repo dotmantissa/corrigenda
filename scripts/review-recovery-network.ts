@@ -5,7 +5,7 @@ import type { Hex } from 'viem';
 import type { Incident, Revision } from '../src/lib/shared/schema';
 import { contracts, read } from '../src/lib/server/chain';
 import { canonical } from '../src/lib/shared/canonical';
-import { networkTime, transact, waitUntil } from './lib/studio';
+import { assessWithConsensus, networkTime, transact, waitUntil } from './lib/studio';
 const main = process.env.GENLAYER_PRIVATE_KEY as Hex;
 const keys = JSON.parse(await readFile('.env.consumer-keys', 'utf8')) as {
   listing: Hex;
@@ -101,7 +101,7 @@ async function open(
   return { value, receipt };
 }
 async function assess(name: string) {
-  const receipt = await transact(name + '-assess', main, contracts.court, 'assess_impact', [name]);
+  const receipt = await assessWithConsensus(name + '-assess', main, contracts.court, name);
   if (Object.values(receipt.votes ?? {}).filter((v) => v === 'agree').length < 2)
     throw new Error('Independent agreement missing for ' + name);
   const cert = await waitUntil(() =>
