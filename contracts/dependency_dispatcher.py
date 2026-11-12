@@ -271,14 +271,18 @@ class DependencyDispatcher(gl.Contract):
     operation_inputs: TreeMap[str,str]
     proposition_schemas: TreeMap[str,str]
     delivered: TreeMap[str,str]
+    reverse_members: TreeMap[str,bool]
 
     def __init__(self, court: str, registry: str):
         self.court=Address(court);self.registry=Address(registry)
 
     def _reverse_add(self, ref, dependency):
+        member=tuple_key('reverse-member.v2',ref,dependency)
+        if self.reverse_members.get(member,False):return
         count=int(self.reverse_counts.get(ref,u64(0)))
         self.reverse_entries[tuple_key('reverse.v2',ref,count)]=dependency
         self.reverse_counts[ref]=u64(count+1)
+        self.reverse_members[member]=True
 
     @gl.public.write
     def register_dependency(self, request: str) -> None:
@@ -389,7 +393,15 @@ class DependencyDispatcher(gl.Contract):
             context=cert['contexts'][notice['proposition_id']]
             key=tuple_key('accepted.v2',ack['dependency_id'],source_ref(cert['old_revision'],notice['proposition_id'],context))
             self.accepted[key]=canonical({'operation_id':ack['operation_id'],'generation':ack['generation'],'route':ack['route'],'replacement_revision':replacement['new_revision'],'proposition':notice['proposition_id']})
-            if ack['route']=='REFRESHED':self._reverse_add(source_ref(replacement['new_revision'],notice['proposition_id'],context),ack['dependency_id'])
+            if ack['route']=='REFRESHED':
+                proposition=next(p for p in replacement['propositions'] if p['id']==notice['proposition_id'])
+                schema_key=tuple_key('schema.v2',replacement['new_revision'],proposition['id'],str(Address(node['consumer'])),context)
+                # Owner acceptance retains the same claim on its authentic successor, enabling future corrections.
+                # An already owned schema may choose another valid locator within that same revision and context.
+                if not self.proposition_schemas.get(schema_key,''):
+                    definition=dict(proposition,old_span=proposition['new_span'],new_span=proposition['new_span'])
+                    self.proposition_schemas[schema_key]=canonical({'definition':definition,'context':context,'policy_id':replacement['policy_id'],'policy_revision':replacement['policy_revision']})
+                self._reverse_add(source_ref(replacement['new_revision'],notice['proposition_id'],context),ack['dependency_id'])
             node['last_applied_generation']=max(node['last_applied_generation'],ack['generation']);self.nodes[ack['dependency_id']]=canonical(node)
             response=ack
         except gl.vm.UserError:

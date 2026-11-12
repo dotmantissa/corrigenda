@@ -74,6 +74,11 @@ def test_dispatcher_replays_lost_ack_callback_and_rejects_late_quarantine(direct
     direct_vm.sender=m.Address(consumer_address)
     ack={'notice_id':notice['operation_id'],'operation_id':'ack','dependency_id':'d0','decision_digest':notice['decision_digest'],'certificate_digest':'c'*64,'generation':1,'route':'REFRESHED','replacement_certificate_id':'correction'}
     c.acknowledge_generation(json.dumps(ack));first=calls[-1];calls.clear()
+    context=make_cert()['contexts']['security']
+    successor_schema=c.get_proposition('r1','security',consumer_address,context)
+    assert successor_schema['definition']['old_span']==make_cert()['propositions'][0]['new_span']
+    successor_ref=m.source_ref('r1','security',context)
+    assert int(c.reverse_counts[successor_ref])==1
     c.acknowledge_generation(json.dumps(ack));assert calls==[first]
     assert c.get_dispatch('correction','security')['total']==1
     late=dict(ack,operation_id='late',route='QUARANTINED')
@@ -136,3 +141,24 @@ def test_authenticated_successor_keep_notice_is_deliverable(direct_vm,consumer):
     direct_vm.sender=m.Address(dispatcher);c.receive_notice(json.dumps(notice))
     assert calls[-1]['calldata']['method']=='confirm_delivery'
     assert c.get_decision('decision')['last_applied_generation']==3
+
+def test_repeated_generations_keep_successor_definition_and_index_unique(direct_vm,graph):
+    c,m,views,calls,flags,node,make_cert,court_address,consumer_address=graph
+    c.register_dependency(json.dumps(node(0)))
+    for generation in (1,2):
+        direct_vm.sender=m.Address(court_address)
+        cert=make_cert(request_id='round'+str(generation),generation=generation)
+        c.begin_quarantine(json.dumps(cert));c.dispatch_page(cert['request_id'],'security',0,'page'+str(generation))
+        notice=c.get_notice(m.tuple_key('notice.v2',cert['request_id'],'security','d0'))
+        flags['r0/security']={'generation':generation,'status':'QUARANTINED'}
+        direct_vm.sender=m.Address(consumer_address)
+        ack={'notice_id':notice['operation_id'],'operation_id':'ack'+str(generation),'dependency_id':'d0','decision_digest':notice['decision_digest'],'certificate_digest':cert['certificate_digest'],'generation':generation,'route':'REFRESHED','replacement_certificate_id':cert['request_id']}
+        c.acknowledge_generation(json.dumps(ack))
+    context=cert['contexts']['security']
+    assert int(c.reverse_counts[m.source_ref('r1','security',context)])==1
+    assert c.get_proposition('r1','security',consumer_address,context)['definition']['old_span']==cert['propositions'][0]['new_span']
+    direct_vm.sender=m.Address(court_address)
+    following=make_cert(request_id='following',generation=3);following['old_revision']='r1';following['new_revision']='r2'
+    c.begin_quarantine(json.dumps(following));c.dispatch_page('following','security',0,'following.page')
+    assert c.get_dispatch('following','security')['total']==1
+    assert c.get_notice(m.tuple_key('notice.v2','following','security','d0'))['dependency_id']=='d0'
