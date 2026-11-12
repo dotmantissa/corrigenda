@@ -1,0 +1,425 @@
+{
+  "hash": "0xbc588635fad0d1289b3f66704496ecc6ec6c55ed5b14d97ac1afb27966d1c7b6",
+  "status": "FINALIZED",
+  "execution": "SUCCESS",
+  "consensus_outcome": "MAJORITY_AGREE",
+  "votes": {
+    "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C": "agree",
+    "0x435b49A3c8356E1B5eB4369d829510A7a004eCfC": "agree",
+    "0x5004AED07d19D8750DA8488EDa327A3A81c0Ec27": "agree",
+    "0xb6f925c91960bcB8a29C2c2108cC1ad42D519475": "agree",
+    "0xee496Cab6D4428e20DAa0f3C4011C0772503cE95": "idle"
+  },
+  "leader_receipts": [
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "leader",
+      "vote": null,
+      "node_config": {
+        "stake": 100,
+        "address": "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C",
+        "primary_model": {
+          "model": "openai/gpt-6.1-sol",
+          "config": {
+            "models": [
+              "openai/gpt-6.1-sol",
+              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3.5-flash-lite"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          },
+          "fallback_validator": "0xad5793D7AA725ccdE8Da6fAF3400de8067559D8c"
+        },
+        "secondary_model": {
+          "model": "policy:prd-mistral-large-2512",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "mistral-large-2512"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-oss-120b"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-6.1-sol"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "mistral-large-2512"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-oss-120b"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-6.1-sol"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "address": "0xad5793D7AA725ccdE8Da6fAF3400de8067559D8c",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"{\\\"consequence_digest\\\":\\\"cce818df6c9b4791d84d13501ae66e5ef31cccb146df16504a92693c53023ce2\\\",\\\"consumer\\\":\\\"0xcd4DAd30dA9d2f9A9ff85C84F21289C04c7967e0\\\",\\\"deadline\\\":1893456000,\\\"dependency_id\\\":\\\"review.wrong\\\",\\\"generation\\\":0,\\\"kind\\\":\\\"PROVIDER_LISTING\\\",\\\"owner\\\":\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\",\\\"parents\\\":[],\\\"parties\\\":[\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\"],\\\"policy_id\\\":\\\"review_policy\\\",\\\"policy_revision\\\":1,\\\"rank\\\":1,\\\"references\\\":[{\\\"definition\\\":{\\\"id\\\":\\\"completed_review\\\",\\\"materiality_question\\\":\\\"Does the completed review and authorization permit support continued authorization under every policy rule?\\\",\\\"new_span\\\":\\\"record\\\",\\\"old_span\\\":\\\"record\\\",\\\"rule_ids\\\":[\\\"completed\\\",\\\"permit\\\"],\\\"statement\\\":\\\"The named test application completed the review\\\"},\\\"proposition\\\":\\\"completed_review\\\",\\\"revision\\\":\\\"review.loss1\\\",\\\"span\\\":\\\"record\\\"}],\\\"remediation_route\\\":\\\"ACCEPT_REPLACEMENT\\\",\\\"request_id\\\":\\\"review.config.wrong\\\",\\\"source_manifest_digest\\\":\\\"cf9baeb232108958fc0a04cabd7de5c587e8d1670718d47cd949b47bee2684e7\\\",\\\"subject_digest\\\":\\\"059b76187d7f7d6dd2448fb8c1974e5025d8b4e859cd9b0dac6c16a57cc60013\\\",\\\"subject_id\\\":\\\"review_test_application\\\",\\\"unresolved_route\\\":\\\"QUARANTINED\\\"}\",]\"method\":\"configure\"}"
+      },
+      "eq_outputs": {},
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    },
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "validator",
+      "vote": "agree",
+      "node_config": {
+        "stake": 100,
+        "address": "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C",
+        "primary_model": {
+          "model": "openai/gpt-6.1-sol",
+          "config": {
+            "models": [
+              "openai/gpt-6.1-sol",
+              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3.5-flash-lite"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          },
+          "fallback_validator": "0xad5793D7AA725ccdE8Da6fAF3400de8067559D8c"
+        },
+        "secondary_model": {
+          "model": "policy:prd-mistral-large-2512",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "mistral-large-2512"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-oss-120b"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-6.1-sol"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "mistral-large-2512"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-oss-120b"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-6.1-sol"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "address": "0xad5793D7AA725ccdE8Da6fAF3400de8067559D8c",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"{\\\"consequence_digest\\\":\\\"cce818df6c9b4791d84d13501ae66e5ef31cccb146df16504a92693c53023ce2\\\",\\\"consumer\\\":\\\"0xcd4DAd30dA9d2f9A9ff85C84F21289C04c7967e0\\\",\\\"deadline\\\":1893456000,\\\"dependency_id\\\":\\\"review.wrong\\\",\\\"generation\\\":0,\\\"kind\\\":\\\"PROVIDER_LISTING\\\",\\\"owner\\\":\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\",\\\"parents\\\":[],\\\"parties\\\":[\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\"],\\\"policy_id\\\":\\\"review_policy\\\",\\\"policy_revision\\\":1,\\\"rank\\\":1,\\\"references\\\":[{\\\"definition\\\":{\\\"id\\\":\\\"completed_review\\\",\\\"materiality_question\\\":\\\"Does the completed review and authorization permit support continued authorization under every policy rule?\\\",\\\"new_span\\\":\\\"record\\\",\\\"old_span\\\":\\\"record\\\",\\\"rule_ids\\\":[\\\"completed\\\",\\\"permit\\\"],\\\"statement\\\":\\\"The named test application completed the review\\\"},\\\"proposition\\\":\\\"completed_review\\\",\\\"revision\\\":\\\"review.loss1\\\",\\\"span\\\":\\\"record\\\"}],\\\"remediation_route\\\":\\\"ACCEPT_REPLACEMENT\\\",\\\"request_id\\\":\\\"review.config.wrong\\\",\\\"source_manifest_digest\\\":\\\"cf9baeb232108958fc0a04cabd7de5c587e8d1670718d47cd949b47bee2684e7\\\",\\\"subject_digest\\\":\\\"059b76187d7f7d6dd2448fb8c1974e5025d8b4e859cd9b0dac6c16a57cc60013\\\",\\\"subject_id\\\":\\\"review_test_application\\\",\\\"unresolved_route\\\":\\\"QUARANTINED\\\"}\",]\"method\":\"configure\"}"
+      },
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    }
+  ],
+  "triggered": [
+    "0x664fad46e12c603efd47f2beba7c704420dd71d8394f86eeabb66892ff3c340b"
+  ]
+}

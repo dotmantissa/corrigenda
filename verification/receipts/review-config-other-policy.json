@@ -1,13 +1,14 @@
 {
-  "hash": "0xec53aecb2bcf392d6b17aec951c4e26f09f3bafb7326ca82501a609ba9a7c708",
+  "hash": "0xbf37a3ba5428b05292395e79372363b33257f7c8a1ca3c3de038dcf906420df8",
   "status": "FINALIZED",
   "execution": "SUCCESS",
+  "consensus_outcome": "MAJORITY_AGREE",
   "votes": {
-    "0x1Cd67946A11E6410a3DF1b27d35F4a511e93c882": "agree",
-    "0x29300188B54F5BFEE91542595611603b4B201008": "idle",
-    "0x37CD8552B86b2B662eCfb69C4A1253dBE41EB4C1": "agree",
-    "0x8644a8D2D08903cAFA1F0fb28E34E0ecA727e9ED": "agree",
-    "0xC65Ec56a1141866951B34D846be8EF433764A48B": "agree"
+    "0x0B9CD816E9135Fb84965Bad3b7A23228df6B4c80": "idle",
+    "0x8A36A66d49Bdf5E13e7Ed876AaC512aCa9FeaDCc": "agree",
+    "0xD6249E31E7e8b49B197A9e195578030a11A81Ea0": "idle",
+    "0xb51b1151F2461b0982DaaCbb1381fEfE15654ee3": "agree",
+    "0xe7F6e8af94EB5739861C3410AE6a88F74d585D9D": "agree"
   },
   "leader_receipts": [
     {
@@ -23,9 +24,9 @@
       "vote": null,
       "node_config": {
         "stake": 100,
-        "address": "0x37CD8552B86b2B662eCfb69C4A1253dBE41EB4C1",
+        "address": "0xe7F6e8af94EB5739861C3410AE6a88F74d585D9D",
         "primary_model": {
-          "model": "policy:prd-gpt-5-4",
+          "model": "policy:prd-gpt-6.1-sol",
           "config": {
             "policy_ir": [
               "policy",
@@ -51,11 +52,11 @@
                   "or",
                   [
                     "family_eq",
-                    "gpt-5.4"
+                    "gpt-6.1-sol"
                   ],
                   [
                     "family_eq",
-                    "gemini-3-flash-preview"
+                    "gemini-3.5-flash-lite"
                   ],
                   [
                     "family_eq",
@@ -72,7 +73,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "gpt-5.4"
+                      "gpt-6.1-sol"
                     ],
                     [
                       "lit",
@@ -87,7 +88,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "gemini-3-flash-preview"
+                      "gemini-3.5-flash-lite"
                     ],
                     [
                       "lit",
@@ -183,19 +184,19 @@
             "api_url": "https://router.ygr.ai",
             "api_key_env_var": "LLM_ROUTER_API_KEY"
           },
-          "fallback_validator": "0xC65Ec56a1141866951B34D846be8EF433764A48B"
+          "fallback_validator": "0x0B9CD816E9135Fb84965Bad3b7A23228df6B4c80"
         },
         "secondary_model": {
-          "model": "openai/gpt-5.4",
+          "model": "openai/gpt-6.1-sol",
           "config": {
             "models": [
-              "openai/gpt-5.4",
+              "openai/gpt-6.1-sol",
               "anthropic/claude-sonnet-4.6",
-              "google/gemini-3-flash-preview"
+              "google/gemini-3.5-flash-lite"
             ]
           },
           "plugin": "openai-compatible",
-          "address": "0xC65Ec56a1141866951B34D846be8EF433764A48B",
+          "address": "0x0B9CD816E9135Fb84965Bad3b7A23228df6B4c80",
           "provider": "openrouter",
           "plugin_config": {
             "api_url": "https://openrouter.ai/api",
@@ -204,7 +205,7 @@
         }
       },
       "calldata": {
-        "readable": "{\"args\":[\"{\\\"consequence_digest\\\":\\\"e465edbcfe7ca226a3fb0c85008e5fa93ca55ecef906be911618d7df9a4058ef\\\",\\\"consumer\\\":\\\"0x0900958B64cA725988915D2B3C023b8e11376057\\\",\\\"deadline\\\":1893456000,\\\"dependency_id\\\":\\\"review.other.policy\\\",\\\"generation\\\":0,\\\"kind\\\":\\\"PROVIDER_LISTING\\\",\\\"owner\\\":\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\",\\\"parents\\\":[],\\\"parties\\\":[\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\"],\\\"policy_id\\\":\\\"review_policy_other\\\",\\\"policy_revision\\\":1,\\\"rank\\\":1,\\\"references\\\":[{\\\"definition\\\":{\\\"id\\\":\\\"completed_review\\\",\\\"materiality_question\\\":\\\"Does the completed review and authorization permit support continued authorization under every policy rule?\\\",\\\"new_span\\\":\\\"record\\\",\\\"old_span\\\":\\\"record\\\",\\\"rule_ids\\\":[\\\"completed\\\",\\\"permit\\\"],\\\"statement\\\":\\\"The named test application completed the review\\\"},\\\"proposition\\\":\\\"completed_review\\\",\\\"revision\\\":\\\"review.loss0\\\",\\\"span\\\":\\\"record\\\"}],\\\"remediation_route\\\":\\\"ACCEPT_REPLACEMENT\\\",\\\"request_id\\\":\\\"review.config.other.policy\\\",\\\"source_manifest_digest\\\":\\\"0c6a411e17863724952b5509bc68cdd109e439c4cd26733eaae1eff3a9fa26be\\\",\\\"subject_digest\\\":\\\"3bbdd47893cf96266407ae23d82bcbe1b785d3ca902f00d8f824485683c86607\\\",\\\"subject_id\\\":\\\"review_test_application\\\",\\\"unresolved_route\\\":\\\"QUARANTINED\\\"}\",]\"method\":\"configure\"}"
+        "readable": "{\"args\":[\"{\\\"consequence_digest\\\":\\\"e465edbcfe7ca226a3fb0c85008e5fa93ca55ecef906be911618d7df9a4058ef\\\",\\\"consumer\\\":\\\"0xcd4DAd30dA9d2f9A9ff85C84F21289C04c7967e0\\\",\\\"deadline\\\":1893456000,\\\"dependency_id\\\":\\\"review.other.policy\\\",\\\"generation\\\":0,\\\"kind\\\":\\\"PROVIDER_LISTING\\\",\\\"owner\\\":\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\",\\\"parents\\\":[],\\\"parties\\\":[\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\"],\\\"policy_id\\\":\\\"review_policy_other\\\",\\\"policy_revision\\\":1,\\\"rank\\\":1,\\\"references\\\":[{\\\"definition\\\":{\\\"id\\\":\\\"completed_review\\\",\\\"materiality_question\\\":\\\"Does the completed review and authorization permit support continued authorization under every policy rule?\\\",\\\"new_span\\\":\\\"record\\\",\\\"old_span\\\":\\\"record\\\",\\\"rule_ids\\\":[\\\"completed\\\",\\\"permit\\\"],\\\"statement\\\":\\\"The named test application completed the review\\\"},\\\"proposition\\\":\\\"completed_review\\\",\\\"revision\\\":\\\"review.loss0\\\",\\\"span\\\":\\\"record\\\"}],\\\"remediation_route\\\":\\\"ACCEPT_REPLACEMENT\\\",\\\"request_id\\\":\\\"review.config.other.policy\\\",\\\"source_manifest_digest\\\":\\\"0c6a411e17863724952b5509bc68cdd109e439c4cd26733eaae1eff3a9fa26be\\\",\\\"subject_digest\\\":\\\"3bbdd47893cf96266407ae23d82bcbe1b785d3ca902f00d8f824485683c86607\\\",\\\"subject_id\\\":\\\"review_test_application\\\",\\\"unresolved_route\\\":\\\"QUARANTINED\\\"}\",]\"method\":\"configure\"}"
       },
       "eq_outputs": {},
       "result": {
@@ -227,9 +228,9 @@
       "vote": "agree",
       "node_config": {
         "stake": 100,
-        "address": "0x37CD8552B86b2B662eCfb69C4A1253dBE41EB4C1",
+        "address": "0xe7F6e8af94EB5739861C3410AE6a88F74d585D9D",
         "primary_model": {
-          "model": "policy:prd-gpt-5-4",
+          "model": "policy:prd-gpt-6.1-sol",
           "config": {
             "policy_ir": [
               "policy",
@@ -255,11 +256,11 @@
                   "or",
                   [
                     "family_eq",
-                    "gpt-5.4"
+                    "gpt-6.1-sol"
                   ],
                   [
                     "family_eq",
-                    "gemini-3-flash-preview"
+                    "gemini-3.5-flash-lite"
                   ],
                   [
                     "family_eq",
@@ -276,7 +277,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "gpt-5.4"
+                      "gpt-6.1-sol"
                     ],
                     [
                       "lit",
@@ -291,7 +292,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "gemini-3-flash-preview"
+                      "gemini-3.5-flash-lite"
                     ],
                     [
                       "lit",
@@ -387,19 +388,19 @@
             "api_url": "https://router.ygr.ai",
             "api_key_env_var": "LLM_ROUTER_API_KEY"
           },
-          "fallback_validator": "0xC65Ec56a1141866951B34D846be8EF433764A48B"
+          "fallback_validator": "0x0B9CD816E9135Fb84965Bad3b7A23228df6B4c80"
         },
         "secondary_model": {
-          "model": "openai/gpt-5.4",
+          "model": "openai/gpt-6.1-sol",
           "config": {
             "models": [
-              "openai/gpt-5.4",
+              "openai/gpt-6.1-sol",
               "anthropic/claude-sonnet-4.6",
-              "google/gemini-3-flash-preview"
+              "google/gemini-3.5-flash-lite"
             ]
           },
           "plugin": "openai-compatible",
-          "address": "0xC65Ec56a1141866951B34D846be8EF433764A48B",
+          "address": "0x0B9CD816E9135Fb84965Bad3b7A23228df6B4c80",
           "provider": "openrouter",
           "plugin_config": {
             "api_url": "https://openrouter.ai/api",
@@ -408,7 +409,7 @@
         }
       },
       "calldata": {
-        "readable": "{\"args\":[\"{\\\"consequence_digest\\\":\\\"e465edbcfe7ca226a3fb0c85008e5fa93ca55ecef906be911618d7df9a4058ef\\\",\\\"consumer\\\":\\\"0x0900958B64cA725988915D2B3C023b8e11376057\\\",\\\"deadline\\\":1893456000,\\\"dependency_id\\\":\\\"review.other.policy\\\",\\\"generation\\\":0,\\\"kind\\\":\\\"PROVIDER_LISTING\\\",\\\"owner\\\":\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\",\\\"parents\\\":[],\\\"parties\\\":[\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\"],\\\"policy_id\\\":\\\"review_policy_other\\\",\\\"policy_revision\\\":1,\\\"rank\\\":1,\\\"references\\\":[{\\\"definition\\\":{\\\"id\\\":\\\"completed_review\\\",\\\"materiality_question\\\":\\\"Does the completed review and authorization permit support continued authorization under every policy rule?\\\",\\\"new_span\\\":\\\"record\\\",\\\"old_span\\\":\\\"record\\\",\\\"rule_ids\\\":[\\\"completed\\\",\\\"permit\\\"],\\\"statement\\\":\\\"The named test application completed the review\\\"},\\\"proposition\\\":\\\"completed_review\\\",\\\"revision\\\":\\\"review.loss0\\\",\\\"span\\\":\\\"record\\\"}],\\\"remediation_route\\\":\\\"ACCEPT_REPLACEMENT\\\",\\\"request_id\\\":\\\"review.config.other.policy\\\",\\\"source_manifest_digest\\\":\\\"0c6a411e17863724952b5509bc68cdd109e439c4cd26733eaae1eff3a9fa26be\\\",\\\"subject_digest\\\":\\\"3bbdd47893cf96266407ae23d82bcbe1b785d3ca902f00d8f824485683c86607\\\",\\\"subject_id\\\":\\\"review_test_application\\\",\\\"unresolved_route\\\":\\\"QUARANTINED\\\"}\",]\"method\":\"configure\"}"
+        "readable": "{\"args\":[\"{\\\"consequence_digest\\\":\\\"e465edbcfe7ca226a3fb0c85008e5fa93ca55ecef906be911618d7df9a4058ef\\\",\\\"consumer\\\":\\\"0xcd4DAd30dA9d2f9A9ff85C84F21289C04c7967e0\\\",\\\"deadline\\\":1893456000,\\\"dependency_id\\\":\\\"review.other.policy\\\",\\\"generation\\\":0,\\\"kind\\\":\\\"PROVIDER_LISTING\\\",\\\"owner\\\":\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\",\\\"parents\\\":[],\\\"parties\\\":[\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\"],\\\"policy_id\\\":\\\"review_policy_other\\\",\\\"policy_revision\\\":1,\\\"rank\\\":1,\\\"references\\\":[{\\\"definition\\\":{\\\"id\\\":\\\"completed_review\\\",\\\"materiality_question\\\":\\\"Does the completed review and authorization permit support continued authorization under every policy rule?\\\",\\\"new_span\\\":\\\"record\\\",\\\"old_span\\\":\\\"record\\\",\\\"rule_ids\\\":[\\\"completed\\\",\\\"permit\\\"],\\\"statement\\\":\\\"The named test application completed the review\\\"},\\\"proposition\\\":\\\"completed_review\\\",\\\"revision\\\":\\\"review.loss0\\\",\\\"span\\\":\\\"record\\\"}],\\\"remediation_route\\\":\\\"ACCEPT_REPLACEMENT\\\",\\\"request_id\\\":\\\"review.config.other.policy\\\",\\\"source_manifest_digest\\\":\\\"0c6a411e17863724952b5509bc68cdd109e439c4cd26733eaae1eff3a9fa26be\\\",\\\"subject_digest\\\":\\\"3bbdd47893cf96266407ae23d82bcbe1b785d3ca902f00d8f824485683c86607\\\",\\\"subject_id\\\":\\\"review_test_application\\\",\\\"unresolved_route\\\":\\\"QUARANTINED\\\"}\",]\"method\":\"configure\"}"
       },
       "result": {
         "status": "return",
@@ -419,6 +420,6 @@
     }
   ],
   "triggered": [
-    "0x2f42239d92476a1f63ddab88e3d3dfb6c215d2eec4d263168a6cf543d05522c8"
+    "0x8a11086960427d7010797b32bafe3f57cbca00fd910541fbd002d348c9cab559"
   ]
 }

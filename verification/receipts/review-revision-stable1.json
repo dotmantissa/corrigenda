@@ -1,13 +1,14 @@
 {
-  "hash": "0xc891528a67badf457301984b0402b0e6f99c0a9534fc4297ddc04464335e49fd",
+  "hash": "0x9dd50e30d664ce52c0d17290db8c7577df3c0096cd1908ebc551e26fa8c4e5de",
   "status": "FINALIZED",
   "execution": "SUCCESS",
+  "consensus_outcome": "MAJORITY_AGREE",
   "votes": {
-    "0x560FBD37a10bC2B96F118071e922c9106c12Ba1d": "idle",
-    "0x8ADae333478F9D037c78b0E3E8279DdAAb20a1B3": "idle",
-    "0xC65Ec56a1141866951B34D846be8EF433764A48B": "agree",
-    "0xe1626534791FC675ED813Cc2C89C427866526113": "agree",
-    "0xf1EAD5E5f876eae701eF1881b42861079cd9A287": "agree"
+    "0x1Cd67946A11E6410a3DF1b27d35F4a511e93c882": "idle",
+    "0x29300188B54F5BFEE91542595611603b4B201008": "idle",
+    "0x722474B013fA39E5aA8785f927dCeB0e3F89815B": "agree",
+    "0x8ADae333478F9D037c78b0E3E8279DdAAb20a1B3": "agree",
+    "0xe1626534791FC675ED813Cc2C89C427866526113": "agree"
   },
   "leader_receipts": [
     {
@@ -23,9 +24,9 @@
       "vote": null,
       "node_config": {
         "stake": 100,
-        "address": "0xf1EAD5E5f876eae701eF1881b42861079cd9A287",
+        "address": "0xe1626534791FC675ED813Cc2C89C427866526113",
         "primary_model": {
-          "model": "policy:prd-kimi",
+          "model": "policy:prd-mistral",
           "config": {
             "policy_ir": [
               "policy",
@@ -51,11 +52,11 @@
                   "or",
                   [
                     "family_eq",
-                    "kimi-k2.7-code"
+                    "mistral-large"
                   ],
                   [
                     "family_eq",
-                    "claude-sonnet-4-6"
+                    "gpt-oss-120b"
                   ],
                   [
                     "family_eq",
@@ -72,7 +73,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "kimi-k2.7-code"
+                      "mistral-large"
                     ],
                     [
                       "lit",
@@ -87,7 +88,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "claude-sonnet-4-6"
+                      "gpt-oss-120b"
                     ],
                     [
                       "lit",
@@ -227,9 +228,9 @@
       "vote": "agree",
       "node_config": {
         "stake": 100,
-        "address": "0xf1EAD5E5f876eae701eF1881b42861079cd9A287",
+        "address": "0xe1626534791FC675ED813Cc2C89C427866526113",
         "primary_model": {
-          "model": "policy:prd-kimi",
+          "model": "policy:prd-mistral",
           "config": {
             "policy_ir": [
               "policy",
@@ -255,11 +256,11 @@
                   "or",
                   [
                     "family_eq",
-                    "kimi-k2.7-code"
+                    "mistral-large"
                   ],
                   [
                     "family_eq",
-                    "claude-sonnet-4-6"
+                    "gpt-oss-120b"
                   ],
                   [
                     "family_eq",
@@ -276,7 +277,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "kimi-k2.7-code"
+                      "mistral-large"
                     ],
                     [
                       "lit",
@@ -291,7 +292,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "claude-sonnet-4-6"
+                      "gpt-oss-120b"
                     ],
                     [
                       "lit",
