@@ -4,7 +4,7 @@ import subprocess
 import sys
 ROOT=Path(__file__).resolve().parents[1]
 HEADER='# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }\n'
-NAMES=['revision_registry','impact_court','dependency_dispatcher','listing_consumer','deployment_consumer']
+NAMES=['revision_registry','impact_court','dependency_dispatcher','listing_consumer','deployment_consumer','assessment_probe']
 
 def build():
     common=(ROOT/'contracts/src/common.py').read_text()

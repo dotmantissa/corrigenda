@@ -305,10 +305,10 @@ class ImpactCourt(gl.Contract):
         policy=gl.get_contract_at(self.registry).view().get_policy(value['policy_id'],value['policy_revision'])
         rules={r['id'] for r in policy['rules']}
         contexts={p['id']:authorization_context(value,p) for p in props}
-        budget_key=tuple_key('assessment-budget.v2',value['source_manifest_digest'],sorted(contexts.values()))
-        if int(self.packet_digests.get(budget_key,'0'))>=3:fail('Evidence retry limit; register successor evidence')
-        # Reserve eligibility before any restriction; concurrent openings cannot steal this slot.
-        value['contexts']=contexts;value['budget_key']=budget_key
+        budget_keys=[tuple_key('assessment-budget.v2',value['source_manifest_digest'],context) for context in contexts.values()]
+        if any(int(self.packet_digests.get(key,'0'))>=3 for key in budget_keys):fail('Evidence retry limit; register successor evidence')
+        # Reserve each claim independently so changing proposition subsets cannot evade admission.
+        value['contexts']=contexts;value['budget_keys']=budget_keys
         message_json(dict(value,manifests=manifests,policy=policy))
         if len(canonical(dict(value,manifests=manifests)).encode())+6000>MAX_MESSAGE_BYTES:fail('Complete certificate message limit')
         seen=set()
@@ -329,7 +329,7 @@ class ImpactCourt(gl.Contract):
             prior_request['status']='SUPERSEDED';prior_request['superseded_by']=value['request_id']
             self.requests[predecessor]=canonical(prior_request)
             history_append(self.history,{'event':'REQUEST_SUPERSEDED','request_id':predecessor,'superseded_by':value['request_id']})
-        self.packet_digests[budget_key]=str(int(self.packet_digests.get(budget_key,'0'))+1)
+        for key in budget_keys:self.packet_digests[key]=str(int(self.packet_digests.get(key,'0'))+1)
         value=dict(value,original_digest=digest(envelope(record(request))),status='PENDING',superseded_by='',manifests=manifests,policy=policy)
         self.requests[value['request_id']]=canonical(value)
         self.generation=u64(value['generation'])
