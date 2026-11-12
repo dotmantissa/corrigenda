@@ -28,6 +28,7 @@ import { diffWordsWithSpace } from 'diff';
 import { Logo } from './logo';
 import { RequestForm } from './request-form';
 import { type Snapshot, type Incident, type Command, type Dependency } from '@/lib/shared/schema';
+import { affectedDependencies } from '@/lib/shared/affected';
 import { humanStatus } from '@/lib/shared/canonical';
 import { assessmentDeadline } from '@/lib/shared/assessment-window';
 const tabs = [
@@ -455,6 +456,7 @@ export function Workspace() {
                       <IncidentDetails
                         incident={incident}
                         dependencies={snapshot?.dependencies ?? []}
+                        notices={snapshot?.notices ?? []}
                         accountAddress={snapshot?.user?.address}
                         send={send}
                         pending={pending}
@@ -837,6 +839,7 @@ function DependencyMap({ dependencies }: { dependencies: Dependency[] }) {
 function IncidentDetails({
   incident,
   dependencies,
+  notices,
   accountAddress,
   send,
   pending,
@@ -844,6 +847,7 @@ function IncidentDetails({
   incident: Incident;
   accountAddress?: string;
   dependencies: Dependency[];
+  notices: Snapshot['notices'];
   send: (c: Command) => Promise<boolean>;
   pending: boolean;
 }) {
@@ -876,13 +880,7 @@ function IncidentDetails({
       active = false;
     };
   }, [incident.old_revision, incident.new_revision]);
-  const affected = dependencies.filter((d) =>
-    d.ancestors.some(
-      (a) =>
-        a.revision === incident.old_revision &&
-        incident.propositions.some((p) => p.id === a.proposition),
-    ),
-  );
+  const affected = affectedDependencies(incident, dependencies, notices);
   const diff = texts ? diffWordsWithSpace(texts.old, texts.next) : [];
   return (
     <section className="incident-details">

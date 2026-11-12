@@ -165,8 +165,14 @@ export interface Dependency {
   consumer: string;
   owner: string;
   usable: boolean;
-  restrictions: { status: string; generation: number; proposition: string; revision: string }[];
-  ancestors: { revision: string; proposition: string }[];
+  restrictions: {
+    status: string;
+    generation: number;
+    proposition: string;
+    revision: string;
+    context?: string;
+  }[];
+  ancestors: { revision: string; proposition: string; context?: string }[];
   consequence_digest: string;
   last_applied_generation: number;
 }

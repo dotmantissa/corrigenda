@@ -50,6 +50,10 @@ export async function projectEvent(event: Record<string, unknown>) {
       contracts.dispatcher,
       'get_dependency',
     );
+  if (event.event === 'CERTIFICATE_FINALIZED') {
+    const sql = db();
+    await sql`UPDATE indexed_records SET payload=jsonb_set(payload,'{dispatcher_finalized}','true'::jsonb) WHERE kind='incident' AND id=${String(event.request_id)}`;
+  }
   if (event.event === 'PAGE_BROADCAST') {
     const page = await read<{ items: Snapshot['notices'] }>(
       contracts.dispatcher,
@@ -124,15 +128,29 @@ export async function snapshot(identityId?: string): Promise<Snapshot> {
       const incident = { ...x.payload } as Incident;
       // The court represents a pending certificate as {}. Expose absence until a decision vector exists.
       if (!Array.isArray(incident.certificate?.decisions)) delete incident.certificate;
+      if (incident.status === 'ASSESSED' && x.payload.dispatcher_finalized)
+        incident.status = 'FINALIZED';
       return incident;
     });
+  let remainingReads = 3;
   for (const incident of incidents) {
     if (incident.status === 'ASSESSED') {
+      if (!remainingReads) break;
+      remainingReads--;
       try {
-        const cert = await read<{ status: string }>(contracts.dispatcher, 'get_certificate', [
-          incident.request_id,
-        ]);
-        if (cert.status === 'FINALIZED') incident.status = 'FINALIZED';
+        const cert = await read<{ status: string; certificate_digest: string }>(
+          contracts.dispatcher,
+          'get_certificate',
+          [incident.request_id],
+        );
+        if (
+          cert.status === 'FINALIZED' &&
+          !!incident.certificate?.certificate_digest &&
+          cert.certificate_digest === incident.certificate?.certificate_digest
+        ) {
+          incident.status = 'FINALIZED';
+          await sql`UPDATE indexed_records SET payload=jsonb_set(payload,'{dispatcher_finalized}','true'::jsonb) WHERE kind='incident' AND id=${incident.request_id}`;
+        }
       } catch {
         /* An assessed result is still waiting for its authenticated callback. */
       }

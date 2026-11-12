@@ -162,3 +162,53 @@ def test_repeated_generations_keep_successor_definition_and_index_unique(direct_
     c.begin_quarantine(json.dumps(following));c.dispatch_page('following','security',0,'following.page')
     assert c.get_dispatch('following','security')['total']==1
     assert c.get_notice(m.tuple_key('notice.v2','following','security','d0'))['dependency_id']=='d0'
+
+
+def test_keep_follows_successor_restriction_before_notice_delivery(direct_vm,graph):
+    c,m,views,calls,flags,node,make_cert,court,consumer=graph
+    c.register_dependency(json.dumps(node(0)))
+    keep=make_cert();keep['decisions'][0].update(action='KEEP',impact='NONMATERIAL',material=False)
+    flags['r0/security']={'generation':1,'status':'CLEAR','request_id':'correction'}
+    direct_vm.sender=m.Address(court);c.begin_quarantine(json.dumps(keep))
+    assert c.get_dependency('d0')['usable']
+    flags['r1/security']={'generation':2,'status':'UNRESOLVED','request_id':'withdrawal'}
+    result=c.get_dependency('d0')
+    assert not result['usable'] and result['last_applied_generation']==2
+    assert result['restrictions'][0]['revision']=='r1'
+    assert len(c.notices)==0
+
+
+def test_keep_retains_successor_schema_and_later_dispatch_membership(direct_vm,graph):
+    c,m,views,calls,flags,node,make_cert,court,consumer=graph
+    c.register_dependency(json.dumps(node(0)))
+    keep=make_cert();keep['decisions'][0].update(action='KEEP',impact='NONMATERIAL',material=False)
+    direct_vm.sender=m.Address(court);c.begin_quarantine(json.dumps(keep))
+    c.dispatch_page('correction','security',0,'keep.page')
+    context=keep['contexts']['security']
+    assert c.get_proposition('r1','security',consumer,context)['definition']['old_span']==keep['propositions'][0]['new_span']
+    successor=dict(make_cert(2,'withdrawal','FALSE'),old_revision='r1',new_revision='r2')
+    c.begin_quarantine(json.dumps(successor));c.dispatch_page('withdrawal','security',0,'withdrawal.page')
+    assert c.get_dispatch('withdrawal','security')['total']==1
+    notice=c.get_notice(m.tuple_key('notice.v2','withdrawal','security','d0'))
+    assert notice['dependency_id']=='d0' and notice['certificate']['new_revision']=='r2'
+
+
+def test_explicit_owner_replacement_precedes_keep_link_and_remains_restricted(direct_vm,graph):
+    c,m,views,calls,flags,node,make_cert,court,consumer=graph
+    c.register_dependency(json.dumps(node(0)))
+    keep=make_cert();keep['decisions'][0].update(action='KEEP',impact='NONMATERIAL',material=False)
+    direct_vm.sender=m.Address(court);c.begin_quarantine(json.dumps(keep));c.dispatch_page('correction','security',0,'keep.page')
+    selected=dict(make_cert(2,'selected'),old_revision='r1',new_revision='r2')
+    c.begin_quarantine(json.dumps(selected))
+    views['get_revision']=lambda revision:{'supersedes':'r1'}
+    flags['r0/security']={'generation':1,'status':'CLEAR','request_id':'correction'}
+    notice=c.get_notice(m.tuple_key('notice.v2','correction','security','d0'))
+    direct_vm.sender=m.Address(consumer)
+    ack={'notice_id':notice['operation_id'],'operation_id':'selected.ack','dependency_id':'d0','decision_digest':notice['decision_digest'],'certificate_digest':keep['certificate_digest'],'generation':1,'route':'REFRESHED','replacement_certificate_id':'selected'}
+    c.acknowledge_generation(json.dumps(ack))
+    flags['r1/security']={'generation':3,'status':'QUARANTINED'}
+    assert c.get_dependency('d0')['usable']
+    flags['r2/security']={'generation':4,'status':'UNRESOLVED'}
+    result=c.get_dependency('d0')
+    assert not result['usable'] and result['restrictions'][0]['revision']=='r2'
+    assert result['last_applied_generation']==4

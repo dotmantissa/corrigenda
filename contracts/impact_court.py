@@ -368,8 +368,6 @@ class ImpactCourt(gl.Contract):
                 new_ref=source_ref(value['new_revision'],decision['proposition_id'],value['contexts'][decision['proposition_id']])
                 previous=json.loads(self.flags.get(new_ref,'{}'))
                 if previous.get('generation',0)<=value['generation']:
-                    previous=json.loads(self.flags.get(new_ref,'{}'))
-                if previous.get('generation',0)<=value['generation']:
                     self.flags[new_ref]=canonical({'request_id':value['request_id'],'generation':value['generation'],'status':'UNRESOLVED' if decision['new_support']=='UNRESOLVED' else 'QUARANTINED','sticky':True})
         for decision in result['decisions']:
             if decision['new_support']=='TRUE':

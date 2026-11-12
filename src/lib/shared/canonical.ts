@@ -24,7 +24,8 @@ export function humanStatus(status: string) {
     RETRACTION: 'Retraction',
     QUALIFICATION: 'Qualification',
     CONTRADICTION: 'Contradiction',
-    NONMATERIAL: 'No material change',
+    NONMATERIAL: 'Assertion unchanged',
+    RESTORATION: 'Support restored',
   };
   return names[status] ?? status.toLowerCase().replaceAll('_', ' ');
 }

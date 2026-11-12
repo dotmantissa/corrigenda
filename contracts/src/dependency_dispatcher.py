@@ -26,6 +26,14 @@ class DependencyDispatcher(gl.Contract):
         self.reverse_counts[ref]=u64(count+1)
         self.reverse_members[member]=True
 
+    def _retain_successor(self, node, certificate, proposition_id, context):
+        proposition=next(p for p in certificate['propositions'] if p['id']==proposition_id)
+        schema_key=tuple_key('schema.v2',certificate['new_revision'],proposition_id,str(Address(node['consumer'])),context)
+        if not self.proposition_schemas.get(schema_key,''):
+            definition=dict(proposition,old_span=proposition['new_span'],new_span=proposition['new_span'])
+            self.proposition_schemas[schema_key]=canonical({'definition':definition,'context':context,'policy_id':certificate['policy_id'],'policy_revision':certificate['policy_revision']})
+        self._reverse_add(source_ref(certificate['new_revision'],proposition_id,context),node['dependency_id'])
+
     @gl.public.write
     def register_dependency(self, request: str) -> None:
         value=envelope(record(request));require_sender(value['consumer']);require_live(value)
@@ -103,6 +111,8 @@ class DependencyDispatcher(gl.Contract):
             node=json.loads(self.nodes[dependency_id])
             notice_id=tuple_key('notice.v2',request_id,proposition_id,dependency_id)
             decision=next((d for d in cert['decisions'] if d['proposition_id']==proposition_id),None)
+            if decision and decision['action']=='KEEP':
+                self._retain_successor(node,cert,proposition_id,cert['contexts'][proposition_id])
             notice={'operation_id':notice_id,'dependency_id':dependency_id,'decision_digest':node['decision_digest'],'certificate':cert,'proposition_id':proposition_id,'action':decision['action'] if decision else 'UNRESOLVED','status':'BROADCAST'}
             self.notices[notice_id]=canonical(notice)
             # Persist the outbox before emission. Replay by operation ID is safe after a worker crash.
@@ -136,14 +146,7 @@ class DependencyDispatcher(gl.Contract):
             key=tuple_key('accepted.v2',ack['dependency_id'],source_ref(cert['old_revision'],notice['proposition_id'],context))
             self.accepted[key]=canonical({'operation_id':ack['operation_id'],'generation':ack['generation'],'route':ack['route'],'replacement_revision':replacement['new_revision'],'proposition':notice['proposition_id']})
             if ack['route']=='REFRESHED':
-                proposition=next(p for p in replacement['propositions'] if p['id']==notice['proposition_id'])
-                schema_key=tuple_key('schema.v2',replacement['new_revision'],proposition['id'],str(Address(node['consumer'])),context)
-                # Owner acceptance retains the same claim on its authentic successor, enabling future corrections.
-                # An already owned schema may choose another valid locator within that same revision and context.
-                if not self.proposition_schemas.get(schema_key,''):
-                    definition=dict(proposition,old_span=proposition['new_span'],new_span=proposition['new_span'])
-                    self.proposition_schemas[schema_key]=canonical({'definition':definition,'context':context,'policy_id':replacement['policy_id'],'policy_revision':replacement['policy_revision']})
-                self._reverse_add(source_ref(replacement['new_revision'],notice['proposition_id'],context),ack['dependency_id'])
+                self._retain_successor(node,replacement,notice['proposition_id'],context)
             node['last_applied_generation']=max(node['last_applied_generation'],ack['generation']);self.nodes[ack['dependency_id']]=canonical(node)
             response=ack
         except gl.vm.UserError:
@@ -183,25 +186,30 @@ class DependencyDispatcher(gl.Contract):
 
     @gl.public.view
     def get_dependency(self, dependency_id: str) -> dict:
-        node=json.loads(self.nodes[dependency_id]);issues=[]
+        node=json.loads(self.nodes[dependency_id]);issues=[];observed_generation=node['last_applied_generation']
         # Replacement chains are bounded. No recursive graph traversal and no scan of all nodes.
         for ancestor in node['ancestors']:
             revision=ancestor['revision'];proposition=ancestor['proposition'];context=ancestor['context']
             for step in range(8):
                 flag=gl.get_contract_at(self.court).view().get_flag(revision,proposition,context)
+                observed_generation=max(observed_generation,flag['generation'])
+                accepted=json.loads(self.accepted.get(tuple_key('accepted.v2',dependency_id,source_ref(revision,proposition,context)),'{}'))
+                if accepted.get('generation',0)==flag['generation'] and accepted.get('route')=='REFRESHED':
+                    revision=accepted['replacement_revision'];continue
                 if flag['status']=='CLEAR':
                     if flag.get('request_id'):
                         boundary=json.loads(self.certificates.get(flag['request_id'],'{}'))
                         if boundary.get('generation')!=flag['generation'] or boundary.get('unresolved',True):
-                            issues.append({'revision':revision,'proposition':proposition,'generation':flag['generation'],'status':'AWAITING_FINALIZED_CERTIFICATE'})
+                            issues.append({'revision':revision,'proposition':proposition,'generation':flag['generation'],'status':'AWAITING_FINALIZED_CERTIFICATE','context':context})
+                            break
+                        decision=next((d for d in boundary.get('decisions',[]) if d['proposition_id']==proposition),None)
+                        if boundary.get('old_revision')==revision and decision and decision['action']=='KEEP':
+                            revision=boundary['new_revision'];continue
                     break
-                accepted=json.loads(self.accepted.get(tuple_key('accepted.v2',dependency_id,source_ref(revision,proposition,context)),'{}'))
-                if accepted.get('generation',0)!=flag['generation'] or accepted.get('route')!='REFRESHED':
-                    issues.append({'revision':revision,'proposition':proposition,'generation':flag['generation'],'status':flag['status'],'context':context});break
-                revision=accepted['replacement_revision']
+                issues.append({'revision':revision,'proposition':proposition,'generation':flag['generation'],'status':flag['status'],'context':context});break
             else:
-                issues.append({'revision':revision,'proposition':proposition,'status':'REPLACEMENT_CHAIN_LIMIT','generation':0})
-        node['usable']=not issues;node['restrictions']=issues
+                issues.append({'revision':revision,'proposition':proposition,'status':'REPLACEMENT_CHAIN_LIMIT','generation':observed_generation,'context':context})
+        node['usable']=not issues;node['restrictions']=issues;node['last_applied_generation']=observed_generation
         return node
 
     @gl.public.view
