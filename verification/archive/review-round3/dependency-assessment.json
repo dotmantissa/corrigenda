@@ -1,0 +1,62 @@
+{
+  "audit_command": "npm audit --json",
+  "reported_entries": {
+    "info": 0,
+    "low": 0,
+    "moderate": 13,
+    "high": 13,
+    "critical": 0,
+    "total": 26
+  },
+  "distinct_advisory_records": [
+    {
+      "name": "minimatch",
+      "severity": "moderate",
+      "title": "minimatch has potential denial of service via globparts amplification",
+      "url": "https://github.com/advisories/GHSA-g3hv-75wg-m249",
+      "affected_range": ">=7.0.0 <11.0.1"
+    },
+    {
+      "name": "uuid",
+      "severity": "moderate",
+      "title": "uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided",
+      "url": "https://github.com/advisories/GHSA-w5hq-g745-h8pq",
+      "affected_range": "<11.1.1"
+    },
+    {
+      "name": "zod",
+      "severity": "high",
+      "title": "Zod can exhaust memory while validating oversized constrained collections",
+      "url": "https://github.com/advisories/GHSA-mrhx-c7xc-m3w5",
+      "affected_range": "<4.6.6"
+    }
+  ],
+  "interpretation": "Entry totals include packages propagating an advisory; they are not distinct exploitable vulnerabilities.",
+  "compatible_updates": [
+    {
+      "package": "diff",
+      "version": "8.0.4",
+      "effect": "Previously applied compatible patch retained"
+    },
+    {
+      "package": "tsx",
+      "version": "4.23.15",
+      "effect": "Same-major tool update resolves esbuild Windows development-server advisory through esbuild 0.28.2"
+    }
+  ],
+  "remaining_constraints": [
+    {
+      "package": "zod",
+      "detail": "Application uses patched 4.6.7; wallet integrations still depend on version 3 APIs and no patched version 3 release is available."
+    },
+    {
+      "package": "uuid",
+      "detail": "Wallet dependency ranges remain below patched 11.1.1; no incompatible major override was applied."
+    },
+    {
+      "package": "minimatch",
+      "detail": "TypeScript ESLint dependency requires version 10; advisory is fixed in 11.0.1 and no compatible version 10 fix is available."
+    }
+  ],
+  "all_dependency_findings_resolved": false
+}

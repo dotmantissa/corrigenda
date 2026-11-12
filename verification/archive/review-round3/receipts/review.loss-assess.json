@@ -1,0 +1,411 @@
+{
+  "hash": "0x727da23a97e67d143746cfcebd25a2909eccf5737d29543490ec921bb73c72d9",
+  "status": "FINALIZED",
+  "execution": "FAILED",
+  "consensus_outcome": "MAJORITY_DISAGREE",
+  "votes": {
+    "0x2e6A0fD0e70146C29AA24C630e2246507484a29A": "disagree",
+    "0x312ABA1e242485ea488Eb5fF6f74Ba4b614a45e1": "disagree",
+    "0x5E4DaA89F0d4C3fdaC2E357712f2d8b38dD856AB": "agree",
+    "0x8A36A66d49Bdf5E13e7Ed876AaC512aCa9FeaDCc": "idle",
+    "0xE4A46202259c48B33aEbfCd50cf1B548bf52AB0e": "disagree"
+  },
+  "leader_receipts": [
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "leader",
+      "vote": null,
+      "node_config": {
+        "stake": 100,
+        "address": "0x8A36A66d49Bdf5E13e7Ed876AaC512aCa9FeaDCc",
+        "primary_model": {
+          "model": "policy:prd-kimi-k2.7-code",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "kimi-k2.7-code"
+                  ],
+                  [
+                    "family_eq",
+                    "claude-sonnet-4-6"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-6.1-sol"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "kimi-k2.7-code"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "claude-sonnet-4-6"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-6.1-sol"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          },
+          "fallback_validator": "0x5E4DaA89F0d4C3fdaC2E357712f2d8b38dD856AB"
+        },
+        "secondary_model": {
+          "model": "google/gemini-3.5-flash-lite",
+          "config": {
+            "models": [
+              "google/gemini-3.5-flash-lite",
+              "openai/gpt-6.1-sol",
+              "anthropic/claude-sonnet-4.6"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "address": "0x5E4DaA89F0d4C3fdaC2E357712f2d8b38dD856AB",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"review.loss\",]\"method\":\"assess_impact\"}"
+      },
+      "eq_outputs": {
+        "0": {
+          "status": "return",
+          "payload": {
+            "readable": "{\"decisions\":[{\"action\":\"QUARANTINE\"\"impact\":\"RETRACTION\"\"material\":true\"new_support\":\"FALSE\"\"old_support\":\"TRUE\"\"proposition_id\":\"completed_review\"\"rule_ids\":[\"completed\",\"permit\",]\"witness_ids\":[\"691f51a49ad1c7c7a4f5ee087d2b33fa61d9bcf77be9e7ee7db0cac02f6306e8:record\",\"be155e099b1febddf6d064d28e23b264785b463f64dcd44282367892cbf3708b:record\",]},]\"reason\":\"\"\"status\":\"ASSESSED\"}"
+          }
+        }
+      },
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    },
+    {
+      "execution_result": "ERROR",
+      "genvm_result": {
+        "stderr": "Validator execution cancelled after quorum",
+        "stdout": "",
+        "raw_error": {
+          "fatal": false,
+          "causes": [
+            "VALIDATOR_QUORUM_REACHED"
+          ]
+        },
+        "error_code": "CONSENSUS_VALIDATOR_QUORUM_REACHED"
+      },
+      "mode": "validator",
+      "vote": "idle",
+      "node_config": {
+        "id": 5819,
+        "model": "policy:prd-kimi-k2.7-code",
+        "stake": 100,
+        "config": {
+          "policy_ir": [
+            "policy",
+            [
+              "and",
+              [
+                "meets_req"
+              ],
+              [
+                "not",
+                [
+                  "is",
+                  "disabled"
+                ]
+              ],
+              [
+                "cmp",
+                "success_rate",
+                "ge",
+                0.2
+              ],
+              [
+                "or",
+                [
+                  "family_eq",
+                  "kimi-k2.7-code"
+                ],
+                [
+                  "family_eq",
+                  "claude-sonnet-4-6"
+                ],
+                [
+                  "family_eq",
+                  "gpt-6.1-sol"
+                ]
+              ]
+            ],
+            [
+              "add",
+              [
+                "scale",
+                100,
+                [
+                  "gate",
+                  [
+                    "family_eq",
+                    "kimi-k2.7-code"
+                  ],
+                  [
+                    "lit",
+                    1
+                  ]
+                ]
+              ],
+              [
+                "scale",
+                10,
+                [
+                  "gate",
+                  [
+                    "family_eq",
+                    "claude-sonnet-4-6"
+                  ],
+                  [
+                    "lit",
+                    1
+                  ]
+                ]
+              ],
+              [
+                "scale",
+                1,
+                [
+                  "gate",
+                  [
+                    "family_eq",
+                    "gpt-6.1-sol"
+                  ],
+                  [
+                    "lit",
+                    1
+                  ]
+                ]
+              ],
+              [
+                "scale",
+                0.25,
+                [
+                  "neg",
+                  [
+                    "normalize",
+                    [
+                      "field",
+                      "price_in"
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "scale",
+                0.45,
+                [
+                  "neg",
+                  [
+                    "normalize",
+                    [
+                      "field",
+                      "price_out"
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "scale",
+                0.2,
+                [
+                  "field",
+                  "success_rate"
+                ]
+              ],
+              [
+                "scale",
+                0.1,
+                [
+                  "neg",
+                  [
+                    "normalize",
+                    [
+                      "field",
+                      "latency_ms"
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            [
+              "argmax"
+            ],
+            [
+              "id"
+            ],
+            [
+              "always",
+              {
+                "action": "next_candidate"
+              }
+            ]
+          ],
+          "timeout_ms": 22000,
+          "first_token_timeout_ms": 7000
+        },
+        "plugin": "openai-compatible",
+        "address": "0x8A36A66d49Bdf5E13e7Ed876AaC512aCa9FeaDCc",
+        "provider": "llm-router",
+        "plugin_config": {
+          "api_url": "https://router.ygr.ai",
+          "api_key_env_var": "LLM_ROUTER_API_KEY"
+        },
+        "fallback_validator": "0x5E4DaA89F0d4C3fdaC2E357712f2d8b38dD856AB"
+      },
+      "result": {
+        "status": "contract_error",
+        "payload": "idle"
+      }
+    }
+  ],
+  "triggered": []
+}

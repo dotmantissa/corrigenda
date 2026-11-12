@@ -1,0 +1,19 @@
+{
+  "classification": "Genuine finalized implementation rejection of a later KEEP successor correction before its first notice page; retained before corrected redeployment",
+  "case": "review.keep.successor.withdrawal-open",
+  "hash": "0xfb934e119473a32874a19775b1cecdf5df1baf424e72909a8ed6063384c7dfa4",
+  "consensus_outcome": "MAJORITY_AGREE",
+  "deciding_result": {
+    "status": "rollback",
+    "payload": "[EXPECTED] Locked proposition is not registered for this consumer and authorization"
+  },
+  "primary_suite_complete": true,
+  "recovery_suite_complete": false,
+  "passed_recovery_checks": [
+    "deadline_bound",
+    "public_recovery",
+    "overlap",
+    "overlap_recovery",
+    "accepted_successor_continuity"
+  ]
+}
