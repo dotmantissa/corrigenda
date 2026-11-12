@@ -3,12 +3,12 @@
   "chain_id": 61999,
   "runner": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6",
   "contracts": {
-    "registry": "0x4B4EC008e43afbdF39eCc01c11c9eD82749C9CB0",
-    "court": "0x95091F450F66643F12EEF7Ea9a841d4d9cc57Da9",
-    "dispatcher": "0xB870889f1209Eec6eB96231E31BE08FF6C479F63",
-    "listing_consumer": "0xF547A2Ec2B00cc9F2FE0585553Dd2BC7033c85EF",
-    "deployment_consumer": "0x92064A4F5Fb08022021396577E79300DE038b01A"
+    "registry": "0xF21A8de540fc44e0C389893C33B2E36e6cC5B84D",
+    "court": "0xb4668C57DabDa17f868A33ed98d6499009a59F53",
+    "dispatcher": "0x682a3B5AEb9b15895F52dfe4532E85F2ce60574E",
+    "listing_consumer": "0x9eb5e88ED64260459Cd74BAC66E4e5758476E952",
+    "deployment_consumer": "0xa083caeCF80Ed9aA62AfF163693CB0Fe69A4E19C"
   },
-  "source_commit": "79980f00e573587e929aa7e0e7f88387e51e45e1",
-  "clock_reference_transaction": "0x8d0a9ef7fb947158e7e3f1a3e95c1a138edf7c705cc1f9f2c9cb749619c14d8e"
+  "source_commit": "b110536a26417bfc4d59c95abf329c2249f5996e",
+  "clock_reference_transaction": "0xd7e670cf3d67bb3aeb26995d1d97f8f4d28330c930389ed60f11b7853506abc8"
 }

@@ -1,14 +1,14 @@
 {
-  "hash": "0x32d01f420c5b6d28f210d820b78b510e678394e024da2c8e6c21682124b02aed",
+  "hash": "0xdea056c0654465362a48bab3910d39dc43966cee9ee659bda064d4ca8b740375",
   "status": "FINALIZED",
   "execution": "SUCCESS",
   "consensus_outcome": "MAJORITY_AGREE",
   "votes": {
-    "0x0174b4D7494Be33F46B76976f6c9F94004F1b27f": "agree",
-    "0x37CD8552B86b2B662eCfb69C4A1253dBE41EB4C1": "agree",
-    "0x560FBD37a10bC2B96F118071e922c9106c12Ba1d": "agree",
-    "0x711353514049EAc21213834ADd07eF552aF394E6": "idle",
-    "0xf1EAD5E5f876eae701eF1881b42861079cd9A287": "idle"
+    "0x003192Feb616fA23158e1Ce232B4662458EebC28": "idle",
+    "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C": "agree",
+    "0xBDe7bCB9E579A6a63fC4C58e3f2BF458af7B1f30": "idle",
+    "0xc3107801f55D209f667101272bc2905Ad83ba792": "agree",
+    "0xee496Cab6D4428e20DAa0f3C4011C0772503cE95": "agree"
   },
   "leader_receipts": [
     {
@@ -24,9 +24,26 @@
       "vote": null,
       "node_config": {
         "stake": 100,
-        "address": "0x0174b4D7494Be33F46B76976f6c9F94004F1b27f",
+        "address": "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C",
         "primary_model": {
-          "model": "policy:prd-gemini",
+          "model": "openai/gpt-6.1-sol",
+          "config": {
+            "models": [
+              "openai/gpt-6.1-sol",
+              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3.5-flash-lite"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          },
+          "fallback_validator": "0x93bC68565cA1E41EA27D30192cB900B497dC7A04"
+        },
+        "secondary_model": {
+          "model": "policy:prd-claude-sonnet-4-6",
           "config": {
             "policy_ir": [
               "policy",
@@ -52,15 +69,15 @@
                   "or",
                   [
                     "family_eq",
-                    "gemini-3-flash-preview"
+                    "claude-sonnet-4-6"
                   ],
                   [
                     "family_eq",
-                    "gpt-oss-120b"
+                    "gpt-6.1-sol"
                   ],
                   [
                     "family_eq",
-                    "gpt-5.4"
+                    "gemini-3.5-flash-lite"
                   ]
                 ]
               ],
@@ -73,7 +90,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "gemini-3-flash-preview"
+                      "claude-sonnet-4-6"
                     ],
                     [
                       "lit",
@@ -88,7 +105,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "gpt-oss-120b"
+                      "gpt-6.1-sol"
                     ],
                     [
                       "lit",
@@ -103,7 +120,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "gpt-5.4"
+                      "gemini-3.5-flash-lite"
                     ],
                     [
                       "lit",
@@ -179,33 +196,16 @@
             "first_token_timeout_ms": 7000
           },
           "plugin": "openai-compatible",
+          "address": "0x93bC68565cA1E41EA27D30192cB900B497dC7A04",
           "provider": "llm-router",
           "plugin_config": {
             "api_url": "https://router.ygr.ai",
             "api_key_env_var": "LLM_ROUTER_API_KEY"
-          },
-          "fallback_validator": "0x0cf3809a31B0c7E0742d126451aDE1977e3748D2"
-        },
-        "secondary_model": {
-          "model": "google/gemini-3-flash-preview",
-          "config": {
-            "models": [
-              "google/gemini-3-flash-preview",
-              "openai/gpt-5.4",
-              "anthropic/claude-sonnet-4.6"
-            ]
-          },
-          "plugin": "openai-compatible",
-          "address": "0x0cf3809a31B0c7E0742d126451aDE1977e3748D2",
-          "provider": "openrouter",
-          "plugin_config": {
-            "api_url": "https://openrouter.ai/api",
-            "api_key_env_var": "OPENROUTERAPIKEY"
           }
         }
       },
       "calldata": {
-        "readable": "{\"args\":[\"0xB870889f1209Eec6eB96231E31BE08FF6C479F63\",]\"method\":\"bind_dispatcher\"}"
+        "readable": "{\"args\":[\"0x682a3B5AEb9b15895F52dfe4532E85F2ce60574E\",]\"method\":\"bind_dispatcher\"}"
       },
       "eq_outputs": {},
       "result": {
@@ -228,9 +228,26 @@
       "vote": "agree",
       "node_config": {
         "stake": 100,
-        "address": "0x0174b4D7494Be33F46B76976f6c9F94004F1b27f",
+        "address": "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C",
         "primary_model": {
-          "model": "policy:prd-gemini",
+          "model": "openai/gpt-6.1-sol",
+          "config": {
+            "models": [
+              "openai/gpt-6.1-sol",
+              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3.5-flash-lite"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          },
+          "fallback_validator": "0x93bC68565cA1E41EA27D30192cB900B497dC7A04"
+        },
+        "secondary_model": {
+          "model": "policy:prd-claude-sonnet-4-6",
           "config": {
             "policy_ir": [
               "policy",
@@ -256,15 +273,15 @@
                   "or",
                   [
                     "family_eq",
-                    "gemini-3-flash-preview"
+                    "claude-sonnet-4-6"
                   ],
                   [
                     "family_eq",
-                    "gpt-oss-120b"
+                    "gpt-6.1-sol"
                   ],
                   [
                     "family_eq",
-                    "gpt-5.4"
+                    "gemini-3.5-flash-lite"
                   ]
                 ]
               ],
@@ -277,7 +294,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "gemini-3-flash-preview"
+                      "claude-sonnet-4-6"
                     ],
                     [
                       "lit",
@@ -292,7 +309,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "gpt-oss-120b"
+                      "gpt-6.1-sol"
                     ],
                     [
                       "lit",
@@ -307,7 +324,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "gpt-5.4"
+                      "gemini-3.5-flash-lite"
                     ],
                     [
                       "lit",
@@ -383,33 +400,16 @@
             "first_token_timeout_ms": 7000
           },
           "plugin": "openai-compatible",
+          "address": "0x93bC68565cA1E41EA27D30192cB900B497dC7A04",
           "provider": "llm-router",
           "plugin_config": {
             "api_url": "https://router.ygr.ai",
             "api_key_env_var": "LLM_ROUTER_API_KEY"
-          },
-          "fallback_validator": "0x0cf3809a31B0c7E0742d126451aDE1977e3748D2"
-        },
-        "secondary_model": {
-          "model": "google/gemini-3-flash-preview",
-          "config": {
-            "models": [
-              "google/gemini-3-flash-preview",
-              "openai/gpt-5.4",
-              "anthropic/claude-sonnet-4.6"
-            ]
-          },
-          "plugin": "openai-compatible",
-          "address": "0x0cf3809a31B0c7E0742d126451aDE1977e3748D2",
-          "provider": "openrouter",
-          "plugin_config": {
-            "api_url": "https://openrouter.ai/api",
-            "api_key_env_var": "OPENROUTERAPIKEY"
           }
         }
       },
       "calldata": {
-        "readable": "{\"args\":[\"0xB870889f1209Eec6eB96231E31BE08FF6C479F63\",]\"method\":\"bind_dispatcher\"}"
+        "readable": "{\"args\":[\"0x682a3B5AEb9b15895F52dfe4532E85F2ce60574E\",]\"method\":\"bind_dispatcher\"}"
       },
       "result": {
         "status": "return",

@@ -1,9 +1,0 @@
-{
-  "database": "configured deployment database",
-  "concurrent_requests": 20,
-  "admitted": 10,
-  "rejected_429": 10,
-  "atomic_counter": 10,
-  "source_and_command_share_gate": true,
-  "complete": true
-}

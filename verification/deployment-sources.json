@@ -1,40 +1,40 @@
 {
   "network": "studionet",
   "chain_id": 61999,
-  "source_commit": "79980f00e573587e929aa7e0e7f88387e51e45e1",
+  "source_commit": "b110536a26417bfc4d59c95abf329c2249f5996e",
   "contracts": [
     {
       "name": "registry",
-      "address": "0x4B4EC008e43afbdF39eCc01c11c9eD82749C9CB0",
-      "transaction": "0x8d0a9ef7fb947158e7e3f1a3e95c1a138edf7c705cc1f9f2c9cb749619c14d8e",
+      "address": "0xF21A8de540fc44e0C389893C33B2E36e6cC5B84D",
+      "transaction": "0xd7e670cf3d67bb3aeb26995d1d97f8f4d28330c930389ed60f11b7853506abc8",
       "source_digest": "1c209d2936cf8eb9f22b28c4e1568f57db695107c7a5e889249b9d9ad9e2aca5",
       "exact_committed_source": true
     },
     {
       "name": "court",
-      "address": "0x95091F450F66643F12EEF7Ea9a841d4d9cc57Da9",
-      "transaction": "0x7ff388bc975b22f4002e60d4571bbd7b90167d600498aec7d01875279a79af0b",
+      "address": "0xb4668C57DabDa17f868A33ed98d6499009a59F53",
+      "transaction": "0xa9d481b72266dcf0bca111fd57326bc47b0374960501862994364719ed3d04e3",
       "source_digest": "4b8db32bdab5ff13a4e4e734fc24d682ef9a126373a15517006ab727c2d96862",
       "exact_committed_source": true
     },
     {
       "name": "dispatcher",
-      "address": "0xB870889f1209Eec6eB96231E31BE08FF6C479F63",
-      "transaction": "0xc588f6f454f8c7d2603b22a184f9b4443b488862f71d1586b4b10ef3df1bb803",
-      "source_digest": "f9b0b185151b344ecdd4d87c85c68b11caf3e2a90b10ff4ec326ec08e9546a56",
+      "address": "0x682a3B5AEb9b15895F52dfe4532E85F2ce60574E",
+      "transaction": "0xc89f60a124839f85a7d8ea9a4e4d02b0cb0c2eb8d43df8f59b9a51973df62279",
+      "source_digest": "1ca49dbb0ca6ca42dc81ef2680eb72d4856250e045225cd9b2aef42d63104724",
       "exact_committed_source": true
     },
     {
       "name": "listing_consumer",
-      "address": "0xF547A2Ec2B00cc9F2FE0585553Dd2BC7033c85EF",
-      "transaction": "0xb6ddb164af34e6ee7e764d8afffb0f0c869e4fa61798d78e3ec28fe95bd2a0be",
+      "address": "0x9eb5e88ED64260459Cd74BAC66E4e5758476E952",
+      "transaction": "0x7d3561db05fa8b023d09bf6717b5a9ed92eeb59ad4f96c6f874f3c7135bd8ec7",
       "source_digest": "914c8fde3edae3d451f1e883a4f8159230ddb885aff908139529a51a2373ac6b",
       "exact_committed_source": true
     },
     {
       "name": "deployment_consumer",
-      "address": "0x92064A4F5Fb08022021396577E79300DE038b01A",
-      "transaction": "0x51e76bf33863985a0c13774c4f88ec9d637e75d015e8451556434e27f12983ee",
+      "address": "0xa083caeCF80Ed9aA62AfF163693CB0Fe69A4E19C",
+      "transaction": "0x16839046959f524430940b2c8bbb7ec9c78c2160d9875da5b6b0c52eb540446d",
       "source_digest": "6bcc3f788ebbd2c3ed2cc96636fe22f1a367664865311dbcdeeab2bad9f8c150",
       "exact_committed_source": true
     }
