@@ -1,0 +1,422 @@
+{
+  "hash": "0xf0e95288995bf3b8c3989fda9c61a2e62b930401fd13b15e0d9111b96e7b39f2",
+  "status": "FINALIZED",
+  "execution": "SUCCESS",
+  "votes": {
+    "0x0cf3809a31B0c7E0742d126451aDE1977e3748D2": "agree",
+    "0x37CD8552B86b2B662eCfb69C4A1253dBE41EB4C1": "idle",
+    "0x560FBD37a10bC2B96F118071e922c9106c12Ba1d": "agree",
+    "0x8f1abcAF0fF10678Af925f83b2Bb8b3534c4b94b": "idle",
+    "0xC65Ec56a1141866951B34D846be8EF433764A48B": "agree"
+  },
+  "leader_receipts": [
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "leader",
+      "vote": null,
+      "node_config": {
+        "stake": 100,
+        "address": "0xC65Ec56a1141866951B34D846be8EF433764A48B",
+        "primary_model": {
+          "model": "openai/gpt-5.4",
+          "config": {
+            "models": [
+              "openai/gpt-5.4",
+              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3-flash-preview"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          },
+          "fallback_validator": "0x8ADae333478F9D037c78b0E3E8279DdAAb20a1B3"
+        },
+        "secondary_model": {
+          "model": "policy:prd-gpt-5-4",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "gpt-5.4"
+                  ],
+                  [
+                    "family_eq",
+                    "gemini-3-flash-preview"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-oss-120b"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-5.4"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gemini-3-flash-preview"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-oss-120b"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "address": "0x8ADae333478F9D037c78b0E3E8279DdAAb20a1B3",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"{\\\"policy_id\\\":\\\"controlled_verification\\\",\\\"revision\\\":1,\\\"rules\\\":[{\\\"id\\\":\\\"approval\\\",\\\"text\\\":\\\"Authorize only when all critical findings for the named test application are resolved.\\\"},{\\\"id\\\":\\\"exception\\\",\\\"text\\\":\\\"An unresolved critical finding overrides favorable wording and forbids authorization. The document is a controlled verification record, not real customer adoption.\\\"}]}\",]\"method\":\"register_policy\"}"
+      },
+      "eq_outputs": {},
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    },
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "validator",
+      "vote": "agree",
+      "node_config": {
+        "stake": 100,
+        "address": "0xC65Ec56a1141866951B34D846be8EF433764A48B",
+        "primary_model": {
+          "model": "openai/gpt-5.4",
+          "config": {
+            "models": [
+              "openai/gpt-5.4",
+              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3-flash-preview"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          },
+          "fallback_validator": "0x8ADae333478F9D037c78b0E3E8279DdAAb20a1B3"
+        },
+        "secondary_model": {
+          "model": "policy:prd-gpt-5-4",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "gpt-5.4"
+                  ],
+                  [
+                    "family_eq",
+                    "gemini-3-flash-preview"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-oss-120b"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-5.4"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gemini-3-flash-preview"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-oss-120b"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "address": "0x8ADae333478F9D037c78b0E3E8279DdAAb20a1B3",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"{\\\"policy_id\\\":\\\"controlled_verification\\\",\\\"revision\\\":1,\\\"rules\\\":[{\\\"id\\\":\\\"approval\\\",\\\"text\\\":\\\"Authorize only when all critical findings for the named test application are resolved.\\\"},{\\\"id\\\":\\\"exception\\\",\\\"text\\\":\\\"An unresolved critical finding overrides favorable wording and forbids authorization. The document is a controlled verification record, not real customer adoption.\\\"}]}\",]\"method\":\"register_policy\"}"
+      },
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    }
+  ],
+  "triggered": []
+}

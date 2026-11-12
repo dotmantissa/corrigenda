@@ -1,0 +1,14 @@
+{
+  "network": "studionet",
+  "chain_id": 61999,
+  "clock_reference_transaction": "0xb805d7c814006d1df5b97f7d971d28825f9d278c42c4faca4c84eef630758457",
+  "runner": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6",
+  "contracts": {
+    "registry": "0x672060B1d38339DCbB1bC533863c200c0Dc2c2a6",
+    "court": "0x9901D83BBbc55cc5eC8d18D9fA983D186727DC73",
+    "dispatcher": "0x4D4AeEe458228e1f291275C912C0Ca0BFf94370F",
+    "listing_consumer": "0xe1225306aa9D8D2aD047F7EC7ecEB8BfdFAab5dc",
+    "deployment_consumer": "0x7d37A19663eE13258ec67Cfb1eE6f392E34c9c3A"
+  },
+  "source_commit": "3c61d1503e3522f90b39fb66bb2f4599eb0d5335"
+}

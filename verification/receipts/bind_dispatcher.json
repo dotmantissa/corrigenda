@@ -1,13 +1,14 @@
 {
-  "hash": "0x139c354fff292bee025b3e9b5705d741974ce4edf928f47e3229869f38b59997",
+  "hash": "0x32d01f420c5b6d28f210d820b78b510e678394e024da2c8e6c21682124b02aed",
   "status": "FINALIZED",
   "execution": "SUCCESS",
+  "consensus_outcome": "MAJORITY_AGREE",
   "votes": {
-    "0x709a1dDECA594C16AB3864A00Eaa2BB1Cd9b5305": "idle",
-    "0x711353514049EAc21213834ADd07eF552aF394E6": "agree",
-    "0x8644a8D2D08903cAFA1F0fb28E34E0ecA727e9ED": "agree",
-    "0x8ADae333478F9D037c78b0E3E8279DdAAb20a1B3": "agree",
-    "0xC65Ec56a1141866951B34D846be8EF433764A48B": "agree"
+    "0x0174b4D7494Be33F46B76976f6c9F94004F1b27f": "agree",
+    "0x37CD8552B86b2B662eCfb69C4A1253dBE41EB4C1": "agree",
+    "0x560FBD37a10bC2B96F118071e922c9106c12Ba1d": "agree",
+    "0x711353514049EAc21213834ADd07eF552aF394E6": "idle",
+    "0xf1EAD5E5f876eae701eF1881b42861079cd9A287": "idle"
   },
   "leader_receipts": [
     {
@@ -23,9 +24,9 @@
       "vote": null,
       "node_config": {
         "stake": 100,
-        "address": "0x8644a8D2D08903cAFA1F0fb28E34E0ecA727e9ED",
+        "address": "0x0174b4D7494Be33F46B76976f6c9F94004F1b27f",
         "primary_model": {
-          "model": "policy:prd-glm",
+          "model": "policy:prd-gemini",
           "config": {
             "policy_ir": [
               "policy",
@@ -51,7 +52,7 @@
                   "or",
                   [
                     "family_eq",
-                    "glm-5.1"
+                    "gemini-3-flash-preview"
                   ],
                   [
                     "family_eq",
@@ -72,7 +73,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "glm-5.1"
+                      "gemini-3-flash-preview"
                     ],
                     [
                       "lit",
@@ -183,19 +184,19 @@
             "api_url": "https://router.ygr.ai",
             "api_key_env_var": "LLM_ROUTER_API_KEY"
           },
-          "fallback_validator": "0x722474B013fA39E5aA8785f927dCeB0e3F89815B"
+          "fallback_validator": "0x0cf3809a31B0c7E0742d126451aDE1977e3748D2"
         },
         "secondary_model": {
-          "model": "anthropic/claude-sonnet-4.6",
+          "model": "google/gemini-3-flash-preview",
           "config": {
             "models": [
-              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3-flash-preview",
               "openai/gpt-5.4",
-              "google/gemini-3-flash-preview"
+              "anthropic/claude-sonnet-4.6"
             ]
           },
           "plugin": "openai-compatible",
-          "address": "0x722474B013fA39E5aA8785f927dCeB0e3F89815B",
+          "address": "0x0cf3809a31B0c7E0742d126451aDE1977e3748D2",
           "provider": "openrouter",
           "plugin_config": {
             "api_url": "https://openrouter.ai/api",
@@ -204,7 +205,7 @@
         }
       },
       "calldata": {
-        "readable": "{\"args\":[\"0x4D4AeEe458228e1f291275C912C0Ca0BFf94370F\",]\"method\":\"bind_dispatcher\"}"
+        "readable": "{\"args\":[\"0xB870889f1209Eec6eB96231E31BE08FF6C479F63\",]\"method\":\"bind_dispatcher\"}"
       },
       "eq_outputs": {},
       "result": {
@@ -227,9 +228,9 @@
       "vote": "agree",
       "node_config": {
         "stake": 100,
-        "address": "0x8644a8D2D08903cAFA1F0fb28E34E0ecA727e9ED",
+        "address": "0x0174b4D7494Be33F46B76976f6c9F94004F1b27f",
         "primary_model": {
-          "model": "policy:prd-glm",
+          "model": "policy:prd-gemini",
           "config": {
             "policy_ir": [
               "policy",
@@ -255,7 +256,7 @@
                   "or",
                   [
                     "family_eq",
-                    "glm-5.1"
+                    "gemini-3-flash-preview"
                   ],
                   [
                     "family_eq",
@@ -276,7 +277,7 @@
                     "gate",
                     [
                       "family_eq",
-                      "glm-5.1"
+                      "gemini-3-flash-preview"
                     ],
                     [
                       "lit",
@@ -387,19 +388,19 @@
             "api_url": "https://router.ygr.ai",
             "api_key_env_var": "LLM_ROUTER_API_KEY"
           },
-          "fallback_validator": "0x722474B013fA39E5aA8785f927dCeB0e3F89815B"
+          "fallback_validator": "0x0cf3809a31B0c7E0742d126451aDE1977e3748D2"
         },
         "secondary_model": {
-          "model": "anthropic/claude-sonnet-4.6",
+          "model": "google/gemini-3-flash-preview",
           "config": {
             "models": [
-              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3-flash-preview",
               "openai/gpt-5.4",
-              "google/gemini-3-flash-preview"
+              "anthropic/claude-sonnet-4.6"
             ]
           },
           "plugin": "openai-compatible",
-          "address": "0x722474B013fA39E5aA8785f927dCeB0e3F89815B",
+          "address": "0x0cf3809a31B0c7E0742d126451aDE1977e3748D2",
           "provider": "openrouter",
           "plugin_config": {
             "api_url": "https://openrouter.ai/api",
@@ -408,7 +409,7 @@
         }
       },
       "calldata": {
-        "readable": "{\"args\":[\"0x4D4AeEe458228e1f291275C912C0Ca0BFf94370F\",]\"method\":\"bind_dispatcher\"}"
+        "readable": "{\"args\":[\"0xB870889f1209Eec6eB96231E31BE08FF6C479F63\",]\"method\":\"bind_dispatcher\"}"
       },
       "result": {
         "status": "return",

@@ -5,32 +5,32 @@
   "contracts": [
     {
       "name": "registry",
-      "address": "0x672060B1d38339DCbB1bC533863c200c0Dc2c2a6",
-      "source_digest": "95b3cd080d84cd8f7b7c9b302d7f034f3a272bc1c2f0186689d37af613f46207",
+      "address": "0x4B4EC008e43afbdF39eCc01c11c9eD82749C9CB0",
+      "source_digest": "1c209d2936cf8eb9f22b28c4e1568f57db695107c7a5e889249b9d9ad9e2aca5",
       "exact_match": true
     },
     {
       "name": "court",
-      "address": "0x9901D83BBbc55cc5eC8d18D9fA983D186727DC73",
-      "source_digest": "4dc6992cb7b168dd37d278371ab93783d44693da866d5a2e0323cf9c127e16e9",
+      "address": "0x95091F450F66643F12EEF7Ea9a841d4d9cc57Da9",
+      "source_digest": "4b8db32bdab5ff13a4e4e734fc24d682ef9a126373a15517006ab727c2d96862",
       "exact_match": true
     },
     {
       "name": "dispatcher",
-      "address": "0x4D4AeEe458228e1f291275C912C0Ca0BFf94370F",
-      "source_digest": "9ccfb952ee0a0065953ecf502ea79891537ff74e8b7e043efc37b152316c5c27",
+      "address": "0xB870889f1209Eec6eB96231E31BE08FF6C479F63",
+      "source_digest": "f9b0b185151b344ecdd4d87c85c68b11caf3e2a90b10ff4ec326ec08e9546a56",
       "exact_match": true
     },
     {
       "name": "listing_consumer",
-      "address": "0xe1225306aa9D8D2aD047F7EC7ecEB8BfdFAab5dc",
-      "source_digest": "e59329907c5b31565a2372931494f107880a6171964c34406854973f9faa3c59",
+      "address": "0xF547A2Ec2B00cc9F2FE0585553Dd2BC7033c85EF",
+      "source_digest": "914c8fde3edae3d451f1e883a4f8159230ddb885aff908139529a51a2373ac6b",
       "exact_match": true
     },
     {
       "name": "deployment_consumer",
-      "address": "0x7d37A19663eE13258ec67Cfb1eE6f392E34c9c3A",
-      "source_digest": "b440bf4cd492cf2e81ecd7e1a8d0c8b0634eb0bdcbc9061ce2fc889f78e5d86d",
+      "address": "0x92064A4F5Fb08022021396577E79300DE038b01A",
+      "source_digest": "6bcc3f788ebbd2c3ed2cc96636fe22f1a367664865311dbcdeeab2bad9f8c150",
       "exact_match": true
     }
   ],

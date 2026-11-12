@@ -1,0 +1,33 @@
+{
+  "contract_source_commit": "3c61d1503e3522f90b39fb66bb2f4599eb0d5335",
+  "runtime_source_commit": "30995a6",
+  "runner": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6",
+  "direct_contract_and_captured_validator_tests": {
+    "passed": 74,
+    "classification": "Direct mode logic tests and captured independent-validator comparisons; hosted consensus recorded separately"
+  },
+  "server_tests": {
+    "passed": 39,
+    "test_files": 10
+  },
+  "pinned_genvm_lint": {
+    "deployables_and_fault_fixture": 7,
+    "passed": true
+  },
+  "typescript_no_incremental": true,
+  "eslint_no_cache": true,
+  "node_22_production_build": true,
+  "hosted_consensus_evidence": [
+    "review-network.json",
+    "review-recovery-network.json"
+  ],
+  "independent_live_source_comparison": "source-comparison.json",
+  "real_concurrent_admission": "admission.json",
+  "dependency_audit": {
+    "report": "dependency-audit.json",
+    "total_propagated_entries": 27,
+    "high_propagated_entries": 13,
+    "critical": 0,
+    "limitation": "High findings propagate an upstream Zod3 advisory through current Privy/wallet dependencies. Incompatible major overrides were not applied; these entries are not 13 independently verified exploits."
+  }
+}
