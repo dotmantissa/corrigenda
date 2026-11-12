@@ -1,6 +1,7 @@
 import './network';
 import { createClient, createAccount } from 'genlayer-js';
 import { studionet } from 'genlayer-js/chains';
+import { TransactionHashVariant, type TransactionHash } from 'genlayer-js/types';
 import { keccak256, type Hex } from 'viem';
 import { canonical } from '../shared/canonical';
 import deployments from '../../../deployments/studionet.json';
@@ -30,7 +31,21 @@ export async function read<T>(
     functionName: method,
     args,
     jsonSafeReturn: true,
+    transactionHashVariant: TransactionHashVariant.LATEST_FINAL,
   })) as T;
+}
+let networkClock: { seconds: number; observedAt: number } | undefined;
+export async function networkTime(): Promise<number> {
+  const now = Date.now();
+  if (networkClock && now - networkClock.observedAt < 15000)
+    return networkClock.seconds + Math.floor((now - networkClock.observedAt) / 1000);
+  const transaction = await chain().getTransaction({
+    hash: deployments.clock_reference_transaction as TransactionHash,
+  });
+  const seconds = Number((transaction as unknown as Record<string, unknown>).current_timestamp);
+  if (!Number.isSafeInteger(seconds) || seconds <= 0) throw new Error('Network clock unavailable');
+  networkClock = { seconds, observedAt: Date.now() };
+  return seconds;
 }
 export function requestDigest(value: unknown) {
   return canonical(value);
@@ -38,6 +53,15 @@ export function requestDigest(value: unknown) {
 export function executionSucceeded(receipt: unknown): boolean {
   if (!receipt || typeof receipt !== 'object') return false;
   const r = receipt as Record<string, unknown>;
+  const outcome = r.result_name ?? r.resultName ?? r.result;
+  if (typeof outcome === 'number' || /^\d+$/.test(String(outcome))) {
+    if (![1, 6].includes(Number(outcome))) return false;
+  } else if (
+    typeof outcome === 'string' &&
+    !['SUCCESS', 'AGREE', 'MAJORITY_AGREE'].includes(outcome)
+  ) {
+    return false;
+  }
   const consensus = r.consensus_data as Record<string, unknown> | undefined;
   const leader = consensus?.leader_receipt;
   const leaders = Array.isArray(leader) ? leader : leader ? [leader] : [];

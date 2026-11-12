@@ -29,6 +29,7 @@ import { Logo } from './logo';
 import { RequestForm } from './request-form';
 import { type Snapshot, type Incident, type Command, type Dependency } from '@/lib/shared/schema';
 import { humanStatus } from '@/lib/shared/canonical';
+import { assessmentDeadline } from '@/lib/shared/assessment-window';
 const tabs = [
   { id: 'inbox', name: 'Correction inbox', icon: Inbox },
   { id: 'sources', name: 'Source library', icon: FileText },
@@ -995,7 +996,7 @@ function IncidentDetails({
       {['UNRESOLVED', 'TIMEOUT'].includes(incident.status) && (
         <RecoveryPanel
           incident={incident}
-          canRecover={accountAddress?.toLowerCase() === incident.owner.toLowerCase()}
+          recoveryOwner={accountAddress}
           send={send}
           pending={pending}
         />
@@ -1290,21 +1291,22 @@ function DispatchPanel({
 
 function RecoveryPanel({
   incident,
-  canRecover,
+  recoveryOwner,
   send,
   pending,
 }: {
   incident: Incident;
-  canRecover: boolean;
+  recoveryOwner?: string;
   send: (c: Command) => Promise<boolean>;
   pending: boolean;
 }) {
-  const [deadline, setDeadline] = useState(''),
+  const [minutes, setMinutes] = useState('120'),
     [error, setError] = useState('');
   async function recover(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError('');
     try {
+      if (!recoveryOwner) throw new Error('Sign in to open a recovery.');
       const response = await fetch('/api/generation'),
         value = await response.json();
       if (!response.ok) throw new Error(value.error);
@@ -1312,7 +1314,7 @@ function RecoveryPanel({
         kind: 'open_correction',
         payload: {
           request_id: `recovery.${crypto.randomUUID().replaceAll('-', '')}`,
-          owner: incident.owner,
+          owner: recoveryOwner,
           parties: incident.parties,
           policy_id: incident.policy_id,
           policy_revision: incident.policy_revision,
@@ -1322,7 +1324,7 @@ function RecoveryPanel({
           consumer: incident.consumer,
           consequence_digest: incident.consequence_digest,
           generation: value.generation + 1,
-          deadline: Math.floor(new Date(deadline).getTime() / 1000),
+          deadline: assessmentDeadline(value.network_time, Number(minutes)),
           old_revision: incident.old_revision,
           new_revision: incident.new_revision,
           propositions: incident.propositions,
@@ -1340,26 +1342,29 @@ function RecoveryPanel({
         A recovery keeps the evidence and policy locked, and opens a new generation. The previous
         unresolved record stays visible.
       </p>
-      {canRecover ? (
+      {recoveryOwner ? (
         <form onSubmit={recover} className="dispatch-row">
           <label className="form-field">
-            <span>New assessment deadline</span>
+            <span>Assessment window (minutes)</span>
             <input
-              aria-label="New assessment deadline"
-              type="datetime-local"
+              aria-label="Assessment window (minutes)"
+              type="number"
+              min={5}
+              max={1440}
+              step={1}
               required
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
+              value={minutes}
+              onChange={(e) => setMinutes(e.target.value)}
             />
           </label>
-          <button className="primary" disabled={pending || !deadline}>
+          <button className="primary" disabled={pending || !minutes}>
             Open recovery
           </button>
         </form>
       ) : (
         <p className="muted">
-          The correction owner can open recovery. Anyone can inspect its evidence and delivery
-          history.
+          Sign in to open recovery. Any account can recover the locked request while assessment
+          eligibility remains available.
         </p>
       )}
       {error && <p role="alert">{error}</p>}

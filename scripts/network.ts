@@ -60,6 +60,8 @@ async function transact(
     hash,
     status: receiptStatus(receipt),
     execution: success ? 'SUCCESS' : 'FAILED',
+    consensus_outcome:
+      (receipt as unknown as Record<string, unknown>).result_name ?? receipt.result,
     votes: receipt.consensus_data?.votes,
     result: rows.map((r) => ({ execution_result: r.execution_result, result: r.result })),
     triggered: await client.getTriggeredTransactionIds({ hash: hash as TransactionHash }),
@@ -275,17 +277,20 @@ const correction = {
   parties: [operator, owners.listing],
   request_id: 'public.pep724.withdrawal',
   source_manifest_digest: digest(revisions),
-  generation: 1,
+  generation: (await read<number>(contracts.court, 'get_generation')) + 1,
   old_revision: 'pep724.r0',
   new_revision: 'pep724.r1',
   propositions: [proposition],
   deadline: (await networkTime()) + 7200,
 };
 try {
-  const retained = await read<{ deadline: number }>(contracts.court, 'get_request', [
-    correction.request_id,
-  ]);
+  const retained = await read<{ deadline: number; generation: number }>(
+    contracts.court,
+    'get_request',
+    [correction.request_id],
+  );
   correction.deadline = retained.deadline;
+  correction.generation = retained.generation;
 } catch {}
 await transact('public-open', main, contracts.court, 'open_correction', [canonical(correction)]);
 await transact(
@@ -313,7 +318,12 @@ for (let attempt = 0; attempt < 3; attempt++) {
     } catch {
       throw error;
     }
-    if (saved.execution !== 'FAILED' || !JSON.stringify(saved.result).includes('[LLM_ERROR]'))
+    if (
+      saved.execution !== 'FAILED' ||
+      (!JSON.stringify(saved.result).includes('[LLM_ERROR]') &&
+        saved.consensus_outcome !== 'MAJORITY_DISAGREE' &&
+        saved.consensus_outcome !== 7)
+    )
       throw error;
     console.log('Assessment model output failed closed; retained receipt', saved.hash);
   }
@@ -348,12 +358,13 @@ for (let n = 0; n < 10; n++) {
   }
 }
 const { crashAndRecover } = await import('./worker-crash');
-await crashAndRecover(correction.request_id, proposition.id, 0, 'public.page.0');
+const firstPageOperation = `public.page.${contracts.dispatcher.slice(2)}.0`;
+await crashAndRecover(correction.request_id, proposition.id, 0, firstPageOperation);
 await transact('page0-restart', main, contracts.dispatcher, 'dispatch_page', [
   correction.request_id,
   proposition.id,
   0,
-  'public.page.0',
+  firstPageOperation,
 ]);
 await transact('page1', main, contracts.dispatcher, 'dispatch_page', [
   correction.request_id,

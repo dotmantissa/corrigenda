@@ -67,6 +67,7 @@ async function submit(name: string, code: string, args: string[]) {
     ),
   );
   manifest.contracts[name] = address;
+  if (name === 'registry') manifest.clock_reference_transaction = hash;
   await writeFile('deployments/studionet.json', JSON.stringify(manifest, null, 2) + '\n');
   console.log(name, 'deployed', address);
   return address;

@@ -96,6 +96,8 @@ export async function workerTick(crashAfterBroadcast = false, operationId?: stri
               hash: receipt.hash,
               status,
               execution: success ? 'SUCCESS' : 'FAILED',
+              consensus_outcome:
+                (receipt as unknown as Record<string, unknown>).result_name ?? receipt.result,
               votes: receipt.consensus_data?.votes,
             };
             await sql`UPDATE operations SET status=${finalStatus},receipt=${JSON.stringify(captured)},error_code=${success ? null : 'CONTRACT_EXECUTION_FAILED'},lease_until=NULL,updated_at=now() WHERE id=${op.id}`;

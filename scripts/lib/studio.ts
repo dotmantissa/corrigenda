@@ -38,6 +38,8 @@ export async function transact(
       hash,
       status: receiptStatus(receipt),
       execution: success ? 'SUCCESS' : 'FAILED',
+      consensus_outcome:
+        (receipt as unknown as Record<string, unknown>).result_name ?? receipt.result,
       votes: receipt.consensus_data?.votes,
       leader_receipts: receipt.consensus_data?.leader_receipt,
       triggered: await client.getTriggeredTransactionIds({ hash: hash as TransactionHash }),
@@ -75,6 +77,8 @@ export async function finalizedCallbacks(name: string, parent: { triggered: stri
       hash,
       status: receiptStatus(receipt),
       execution: executionSucceeded(receipt) ? 'SUCCESS' : 'FAILED',
+      consensus_outcome:
+        (receipt as unknown as Record<string, unknown>).result_name ?? receipt.result,
       votes: receipt.consensus_data?.votes,
       leader_receipts: receipt.consensus_data?.leader_receipt,
     };

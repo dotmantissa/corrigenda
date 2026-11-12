@@ -1,9 +1,14 @@
-import { read, contracts } from '@/lib/server/chain';
+import { read, contracts, networkTime } from '@/lib/server/chain';
 export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
+    const [generation, network_time] = await Promise.all([
+      read<number>(contracts.court, 'get_generation'),
+      networkTime(),
+    ]);
     return Response.json({
-      generation: await read<number>(contracts.court, 'get_generation'),
+      generation,
+      network_time,
       finality: 'conservative state read',
     });
   } catch {

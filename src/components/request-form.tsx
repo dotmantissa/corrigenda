@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ArrowLeft, FileText, ShieldCheck, Plus, Check, AlertCircle } from 'lucide-react';
 import { type Snapshot, type Command, type Revision, type Proposition } from '@/lib/shared/schema';
 import { canonical } from '@/lib/shared/canonical';
+import { assessmentDeadline } from '@/lib/shared/assessment-window';
 async function hash(value: unknown) {
   return Array.from(
     new Uint8Array(
@@ -189,7 +190,7 @@ export function RequestForm({
         consumer: dependency.consumer,
         consequence_digest: dependency.consequence_digest,
         generation: data.generation + 1,
-        deadline: Math.floor(new Date(value('deadline')).getTime() / 1000),
+        deadline: assessmentDeadline(data.network_time, Number(value('assessment_minutes'))),
         old_revision: oldRevision,
         new_revision: next.revision_id,
         propositions,
@@ -386,8 +387,16 @@ export function RequestForm({
                 pattern="[A-Za-z0-9_.:]{1,96}"
               />
             </Field>
-            <Field label="Assessment deadline">
-              <input required name="deadline" type="datetime-local" />
+            <Field label="Assessment window (minutes)" help="Choose 5 minutes to 24 hours.">
+              <input
+                required
+                name="assessment_minutes"
+                type="number"
+                min={5}
+                max={1440}
+                step={1}
+                defaultValue={120}
+              />
             </Field>
             <div className="form-note field-wide">
               <ShieldCheck size={20} />

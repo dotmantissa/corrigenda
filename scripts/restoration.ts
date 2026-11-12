@@ -178,6 +178,34 @@ async function correct(role: 'listing' | 'deployment', i: number, name: string) 
   return request as { request_id: string; generation: number };
 }
 const results: Record<string, unknown> = {};
+async function assess(requestId: string) {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const name = requestId + '-assess' + (attempt === 1 ? '' : `.attempt${attempt}`);
+    try {
+      return await transact(name, main, contracts.court, 'assess_impact', [requestId]);
+    } catch (error) {
+      let saved;
+      try {
+        saved = JSON.parse(await readFile(`verification/receipts/${name}.json`, 'utf8'));
+      } catch {
+        throw error;
+      }
+      if (
+        saved.execution !== 'FAILED' ||
+        (!['MAJORITY_DISAGREE', 'NO_MAJORITY', 7, 5].includes(saved.consensus_outcome) &&
+          !JSON.stringify(saved.leader_receipts).includes('[LLM_ERROR]'))
+      )
+        throw error;
+      console.log(
+        'Assessment failed closed; retaining consensus outcome and retrying the same locked request',
+        saved.hash,
+      );
+    }
+  }
+  throw new Error(
+    'Three assessment executions failed; request and restrictions retained for timeout recovery',
+  );
+}
 for (const role of ['listing', 'deployment'] as const) {
   const suffix = role === 'listing' ? '' : '.deployment';
   const config = binding(role);
@@ -190,13 +218,7 @@ for (const role of ['listing', 'deployment'] as const) {
     [config.dependency_id, 'controlled.stale.' + role, config.consequence_digest],
     false,
   );
-  const withdrawalReceipt = await transact(
-    withdrawal.request_id + '-assess',
-    main,
-    contracts.court,
-    'assess_impact',
-    [withdrawal.request_id],
-  );
+  const withdrawalReceipt = await assess(withdrawal.request_id);
   if (Object.values(withdrawalReceipt.votes ?? {}).filter((v) => v === 'agree').length < 2)
     throw new Error('Independent withdrawal consensus missing');
   const first = await waitUntil(() =>
@@ -229,13 +251,7 @@ for (const role of ['listing', 'deployment'] as const) {
   );
   await waitUntil(() => read(successor.consumer, 'get_decision', [successor.dependency_id]));
   const replacement = await correct(role, 1, 'controlled.replacement' + suffix);
-  const replacementReceipt = await transact(
-    replacement.request_id + '-assess',
-    main,
-    contracts.court,
-    'assess_impact',
-    [replacement.request_id],
-  );
+  const replacementReceipt = await assess(replacement.request_id);
   if (Object.values(replacementReceipt.votes ?? {}).filter((v) => v === 'agree').length < 2)
     throw new Error('Independent replacement consensus missing');
   const second = await waitUntil(() =>
