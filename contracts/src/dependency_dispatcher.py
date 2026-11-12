@@ -14,6 +14,8 @@ class DependencyDispatcher(gl.Contract):
     proposition_schemas: TreeMap[str,str]
     delivered: TreeMap[str,str]
     reverse_members: TreeMap[str,bool]
+    keep_links: TreeMap[str,str]
+    keep_cursors: TreeMap[str,u64]
 
     def __init__(self, court: str, registry: str):
         self.court=Address(court);self.registry=Address(registry)
@@ -27,6 +29,8 @@ class DependencyDispatcher(gl.Contract):
         self.reverse_members[member]=True
 
     def _retain_successor(self, node, certificate, proposition_id, context):
+        link=self.keep_links.get(source_ref(certificate['new_revision'],proposition_id,context),'')
+        if link:certificate=json.loads(self.certificates[link])
         proposition=next(p for p in certificate['propositions'] if p['id']==proposition_id)
         schema_key=tuple_key('schema.v2',certificate['new_revision'],proposition_id,str(Address(node['consumer'])),context)
         if not self.proposition_schemas.get(schema_key,''):
@@ -89,7 +93,34 @@ class DependencyDispatcher(gl.Contract):
         if not immutable_put(self.certificates,request_id,cert):return
         for p in cert['propositions']:
             self.cursors[tuple_key('cursor.v2',request_id,p['id'])]=u64(0)
+            decision=next((d for d in cert['decisions'] if d['proposition_id']==p['id']),None)
+            if not cert['unresolved'] and decision and decision['action']=='KEEP' and decision['new_support']=='TRUE':
+                ref=source_ref(cert['new_revision'],p['id'],cert['contexts'][p['id']])
+                if not self.keep_links.get(ref,''):self.keep_links[ref]=request_id
+                self._retain_keep_page(request_id,p['id'])
         history_append(self.history,{'event':'CERTIFICATE_FINALIZED','request_id':request_id,'generation':cert['generation'],'status':cert['status']})
+
+    def _retain_keep_page(self, request_id, proposition_id):
+        cert=json.loads(self.certificates[request_id])
+        decision=next((d for d in cert['decisions'] if d['proposition_id']==proposition_id),None)
+        if cert['unresolved'] or not decision or decision['action']!='KEEP' or decision['new_support']!='TRUE':fail('Finalized KEEP required')
+        key=tuple_key('keep-retention.v2',request_id,proposition_id)
+        cursor=int(self.keep_cursors.get(key,u64(0)))
+        context=cert['contexts'][proposition_id]
+        ref=source_ref(cert['old_revision'],proposition_id,context)
+        count=int(self.reverse_counts.get(ref,u64(0)));end=min(cursor+MAX_PAGE,count)
+        for i in range(cursor,end):
+            node=json.loads(self.nodes[self.reverse_entries[tuple_key('reverse.v2',ref,i)]])
+            self._retain_successor(node,cert,proposition_id,context)
+        self.keep_cursors[key]=u64(end)
+        if end<count:
+            gl.get_contract_at(gl.message.contract_address).emit(on='finalized').retain_keep_page(request_id,proposition_id)
+        return {'cursor':end,'total':count}
+
+    @gl.public.write
+    def retain_keep_page(self, request_id: str, proposition_id: str) -> dict:
+        # Anyone may resume this bounded, authenticated certificate projection without sending notices.
+        return self._retain_keep_page(request_id,proposition_id)
 
     @gl.public.write
     def dispatch_page(self, request_id: str, proposition_id: str, expected_cursor: int, operation_id: str) -> dict:
@@ -218,9 +249,26 @@ class DependencyDispatcher(gl.Contract):
 
     @gl.public.view
     def get_proposition(self, revision: str, proposition: str, consumer: str, context: str) -> dict:
-        value=self.proposition_schemas.get(tuple_key('schema.v2',identifier(revision),identifier(proposition),str(Address(consumer)),hex_digest(context)),'')
-        if not value:fail('Locked proposition is not registered for this consumer and authorization')
-        return json.loads(value)
+        revision=identifier(revision);proposition=identifier(proposition);consumer=str(Address(consumer));context=hex_digest(context)
+        links=[]
+        for step in range(8):
+            value=self.proposition_schemas.get(tuple_key('schema.v2',revision,proposition,consumer,context),'')
+            if value:
+                schema=json.loads(value)
+                for cert in reversed(links):
+                    definition=next(p for p in cert['propositions'] if p['id']==proposition)
+                    meaning=lambda p:dict({k:v for k,v in p.items() if k not in ('old_span','new_span')},rule_ids=sorted(p['rule_ids']))
+                    if schema['context']!=context or meaning(schema['definition'])!=meaning(definition):fail('Locked KEEP proposition meaning mismatch')
+                    schema=dict(schema,definition=dict(definition,old_span=definition['new_span'],new_span=definition['new_span']))
+                return schema
+            link=self.keep_links.get(source_ref(revision,proposition,context),'')
+            if not link:fail('Locked proposition is not registered for this consumer and authorization')
+            cert=json.loads(self.certificates[link])
+            if cert['new_revision']!=revision or cert['contexts'].get(proposition)!=context or cert['unresolved']:fail('Locked KEEP certificate mismatch')
+            decision=next((d for d in cert['decisions'] if d['proposition_id']==proposition),None)
+            if not decision or decision['action']!='KEEP' or decision['new_support']!='TRUE':fail('Finalized KEEP required')
+            links.append(cert);revision=cert['old_revision']
+        fail('Locked KEEP successor chain limit')
 
     @gl.public.view
     def get_dispatch(self, request_id: str, proposition_id: str) -> dict:

@@ -178,6 +178,63 @@ def test_keep_follows_successor_restriction_before_notice_delivery(direct_vm,gra
     assert len(c.notices)==0
 
 
+def test_keep_claim_and_future_delivery_do_not_require_its_first_notice_page(direct_vm,graph):
+    c,m,views,calls,flags,node,make_cert,court,consumer=graph
+    c.register_dependency(json.dumps(node(0)))
+    keep=make_cert();keep['decisions'][0].update(action='KEEP',impact='NONMATERIAL',material=False)
+    direct_vm.sender=m.Address(court);c.begin_quarantine(json.dumps(keep))
+    context=keep['contexts']['security']
+    assert c.get_proposition('r1','security',consumer,context)['definition']['old_span']=='critical'
+    assert int(c.reverse_counts[m.source_ref('r1','security',context)])==1
+    assert len(c.notices)==0
+    following=dict(make_cert(2,'following','FALSE'),old_revision='r1',new_revision='r2')
+    flags['r0/security']={'generation':1,'status':'CLEAR','request_id':'correction'}
+    flags['r1/security']={'generation':2,'status':'UNRESOLVED','request_id':'following'}
+    assert not c.get_dependency('d0')['usable']
+    c.begin_quarantine(json.dumps(following));c.dispatch_page('following','security',0,'following.page')
+    assert c.get_notice(m.tuple_key('notice.v2','following','security','d0'))['dependency_id']=='d0'
+    assert len(c.notices)==1
+
+
+def test_keep_retention_is_bounded_replayable_and_schema_resolution_remains_consumer_scoped(direct_vm,graph):
+    c,m,views,calls,flags,node,make_cert,court,consumer=graph
+    tail='0x'+'44'*20
+    for i in range(21):
+        value=node(i)
+        if i==20:
+            value.update(consumer=tail,owner=tail,parties=[tail])
+            value['references'][0]['definition']=dict(value['references'][0]['definition'],rule_ids=list(reversed(value['references'][0]['definition']['rule_ids'])))
+        direct_vm.sender=m.Address(value['consumer']);c.register_dependency(json.dumps(value))
+    keep=make_cert();keep['decisions'][0].update(action='KEEP',impact='NONMATERIAL',material=False)
+    direct_vm.sender=m.Address(court);c.begin_quarantine(json.dumps(keep))
+    context=keep['contexts']['security'];ref=m.source_ref('r1','security',context)
+    assert int(c.reverse_counts[ref])==20
+    assert calls[-1]['calldata']['method']=='retain_keep_page' and calls[-1]['on']=='finalized'
+    assert c.get_proposition('r1','security',tail,context)['definition']['old_span']=='critical'
+    assert not c.proposition_schemas.get(m.tuple_key('schema.v2','r1','security',tail,context),'')
+    with direct_vm.expect_revert('not registered'):c.get_proposition('r1','security','0x'+'55'*20,context)
+    with direct_vm.expect_revert('not registered'):c.get_proposition('r1','security',tail,'d'*64)
+    direct_vm.sender=m.Address(tail)
+    assert c.retain_keep_page('correction','security')=={'cursor':21,'total':21}
+    assert c.retain_keep_page('correction','security')=={'cursor':21,'total':21}
+    assert int(c.reverse_counts[ref])==21 and len(c.notices)==0
+    following=dict(make_cert(2,'following','FALSE'),old_revision='r1',new_revision='r2')
+    direct_vm.sender=m.Address(court);c.begin_quarantine(json.dumps(following))
+    c.dispatch_page('following','security',0,'following.page0');c.dispatch_page('following','security',20,'following.page1')
+    assert c.get_notice(m.tuple_key('notice.v2','following','security','d20'))['dependency_id']=='d20'
+    assert len(c.notices)==21
+
+
+def test_keep_projection_cannot_use_a_restrictive_certificate(direct_vm,graph):
+    c,m,views,calls,flags,node,make_cert,court,consumer=graph
+    c.register_dependency(json.dumps(node(0)))
+    direct_vm.sender=m.Address(court);c.begin_quarantine(json.dumps(make_cert()))
+    context=make_cert()['contexts']['security']
+    with direct_vm.expect_revert('Finalized KEEP'):c.retain_keep_page('correction','security')
+    with direct_vm.expect_revert('not registered'):c.get_proposition('r1','security',consumer,context)
+    assert len(c.notices)==0
+
+
 def test_keep_retains_successor_schema_and_later_dispatch_membership(direct_vm,graph):
     c,m,views,calls,flags,node,make_cert,court,consumer=graph
     c.register_dependency(json.dumps(node(0)))
