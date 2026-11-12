@@ -7,7 +7,7 @@ def consumer(request,module,direct_vm,cross_calls,packet):
  name,kind,action,status=request.param;owner='0x'+'33'*20;dispatcher='0x'+'22'*20
  c,m=module(name,owner,dispatcher);views,calls=cross_calls;direct_vm.sender=m.Address(owner)
  config={'request_id':'configuration','owner':owner,'parties':[owner],'policy_id':'security','policy_revision':1,'subject_id':'provider','subject_digest':'a'*64,'source_manifest_digest':digest([packet['manifests'][0]]),'consumer':str(m.gl.message.contract_address),'consequence_digest':'b'*64,'generation':0,'deadline':9999999999,'dependency_id':'decision','rank':1,'parents':[],'references':[{'revision':'r0','proposition':'security','span':'critical','definition':packet['propositions'][0]}],'kind':kind,'unresolved_route':'QUARANTINED','remediation_route':'ACCEPT_REPLACEMENT'}
- c.configure(json.dumps(config));binding=dict(config,decision_digest=digest(config),ancestors=config['references'],last_applied_generation=0)
+ c.configure(json.dumps(config));binding=dict(config,decision_digest=digest(config),ancestors=[dict(ref,context=m.authorization_context(config,ref['definition'])) for ref in config['references']],last_applied_generation=0)
  direct_vm.sender=m.Address(dispatcher);c.receive_binding(json.dumps(binding));direct_vm.sender=m.Address(owner)
  state={'usable':True,'last_applied_generation':0,'restrictions':[]}
  views['get_dependency']=lambda *args:state
@@ -32,7 +32,7 @@ def test_consumer_owner_and_consequence_binding(direct_vm,consumer,direct_bob):
 
 def test_duplicate_reordered_notice_and_finalized_ack_gate(direct_vm,consumer):
  c,m,views,calls,config,binding,state,owner,dispatcher,action,status=consumer
- cert=dict(config,generation=2,old_revision='r0',certificate_digest='c'*64,decisions=[{'proposition_id':'security','new_support':'TRUE'}],unresolved=False)
+ cert=dict(config,contexts={'security':m.authorization_context(config,config['references'][0]['definition'])},generation=2,old_revision='r0',certificate_digest='c'*64,decisions=[{'proposition_id':'security','new_support':'TRUE'}],unresolved=False)
  views['get_certificate']=lambda *args:cert
  notice={'operation_id':'notice2','dependency_id':'decision','decision_digest':binding['decision_digest'],'certificate':cert,'proposition_id':'security','action':'REFRESH'}
  direct_vm.sender=m.Address(dispatcher);c.receive_notice(json.dumps(notice));c.receive_notice(json.dumps(notice))
@@ -54,10 +54,12 @@ def test_consumer_deadline(direct_vm,consumer):
 
 def test_unrelated_proposition_generation_does_not_block_ack(direct_vm,consumer):
  c,m,views,calls,config,binding,state,owner,dispatcher,action,status=consumer
- cert=dict(config,generation=1,old_revision='r0',certificate_digest='c'*64,decisions=[{'proposition_id':'security','new_support':'TRUE'}],unresolved=False)
+ cert=dict(config,contexts={'security':m.authorization_context(config,config['references'][0]['definition'])},generation=1,old_revision='r0',certificate_digest='c'*64,decisions=[{'proposition_id':'security','new_support':'TRUE'}],unresolved=False)
  views['get_certificate']=lambda *args:cert
  notice={'operation_id':'first','dependency_id':'decision','decision_digest':binding['decision_digest'],'certificate':cert,'proposition_id':'security','action':'REFRESH'}
  direct_vm.sender=m.Address(dispatcher);c.receive_notice(json.dumps(notice))
- c.receive_notice(json.dumps(dict(notice,operation_id='other',proposition_id='unrelated',certificate=dict(cert,generation=2))))
+ other=dict(notice,operation_id='other',proposition_id='unrelated',certificate=dict(cert,generation=2,contexts={'unrelated':'d'*64}))
+ state['restrictions']=[{'revision':'r0','proposition':'unrelated','context':'d'*64}]
+ c.receive_notice(json.dumps(other))
  direct_vm.sender=m.Address(owner);c.acknowledge_generation('first',1,'REFRESHED')
  assert calls[-1]['on']=='finalized'

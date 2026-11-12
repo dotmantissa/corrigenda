@@ -26,6 +26,7 @@ class ImpactCourt(gl.Contract):
     def open_correction(self, request: str) -> None:
         value=envelope(record(request))
         require_sender(value['owner']);require_live(value)
+        if not 60<=value['deadline']-now_seconds()<=MAX_CORRECTION_SECONDS:fail('Correction deadline must be between one minute and one day')
         existing=self.requests.get(value['request_id'],'')
         if existing:
             if json.loads(existing)['original_digest']!=digest(value):fail('Conflicting request ID reuse')
@@ -36,10 +37,8 @@ class ImpactCourt(gl.Contract):
             identifier(predecessor)
             prior_request=json.loads(self.requests[predecessor])
             if prior_request['status'] not in ('UNRESOLVED','TIMEOUT'):fail('Only unresolved or timed out requests can recover')
-            require_sender(prior_request['owner'])
-            locked=[k for k in BINDINGS if k not in ('request_id','generation','deadline')]+['old_revision','new_revision','propositions']
+            locked=[k for k in BINDINGS if k not in ('request_id','generation','deadline','owner')]+['old_revision','new_revision','propositions']
             if any(prior_request[k]!=value[k] for k in locked):fail('Recovery changed locked request')
-            if int(self.packet_digests.get(value['source_manifest_digest'],'0'))>=3:fail('Evidence retry limit; register successor evidence')
         props=value['propositions']
         if not isinstance(props,list) or not 1<=len(props)<=MAX_PROPOSITIONS:fail('Proposition limit')
         old=gl.get_contract_at(self.registry).view().get_revision(value['old_revision'])
@@ -52,17 +51,24 @@ class ImpactCourt(gl.Contract):
         if any(m['byte_size']>MAX_TEXT_BYTES for m in manifests) or sum(m['byte_size'] for m in manifests)+len(canonical(value).encode())+len(canonical(manifests).encode())+2500>MAX_PROMPT_BYTES:fail('Complete assessment context limit')
         policy=gl.get_contract_at(self.registry).view().get_policy(value['policy_id'],value['policy_revision'])
         rules={r['id'] for r in policy['rules']}
+        contexts={p['id']:authorization_context(value,p) for p in props}
+        budget_key=tuple_key('assessment-budget.v2',value['source_manifest_digest'],sorted(contexts.values()))
+        if int(self.packet_digests.get(budget_key,'0'))>=3:fail('Evidence retry limit; register successor evidence')
+        # Reserve eligibility before any restriction; concurrent openings cannot steal this slot.
+        value['contexts']=contexts;value['budget_key']=budget_key
+        message_json(dict(value,manifests=manifests,policy=policy))
+        if len(canonical(dict(value,manifests=manifests)).encode())+6000>MAX_MESSAGE_BYTES:fail('Complete certificate message limit')
         seen=set()
         for p in props:
             identifier(p['id'])
-            registered=gl.get_contract_at(self.dispatcher).view().get_proposition(value['old_revision'],p['id'])
-            if registered['definition']!=p or registered['policy_id']!=value['policy_id'] or registered['policy_revision']!=value['policy_revision']:fail('Locked proposition or materiality question changed')
+            registered=gl.get_contract_at(self.dispatcher).view().get_proposition(value['old_revision'],p['id'],value['consumer'],contexts[p['id']])
+            if dict(registered['definition'],new_span=p['new_span'])!=p or registered['context']!=contexts[p['id']]:fail('Locked proposition or materiality question changed')
             if p['id'] in seen:fail('Duplicate proposition')
             seen.add(p['id'])
             if not 1<=len(p['statement'])<=1000 or not 1<=len(p['materiality_question'])<=1000:fail('Proposition text limit')
             if set(p['rule_ids'])!=rules or len(p['rule_ids'])!=len(rules):fail('Complete policy rule coverage required')
             if p['old_span'] not in [s['id'] for s in old['spans']] or p['new_span'] not in [s['id'] for s in new['spans']]:fail('Missing controlling span')
-            ref=source_ref(value['old_revision'],p['id'])
+            ref=source_ref(value['old_revision'],p['id'],value['contexts'][p['id']])
             prior=json.loads(self.flags.get(ref,'{}'))
             if prior.get('status')=='UNRESOLVED' and prior.get('request_id')!=predecessor:fail('Prior impact unresolved; recover it first')
             self.flags[ref]=canonical({'request_id':value['request_id'],'generation':value['generation'],'status':'UNRESOLVED','sticky':prior.get('sticky',False)})
@@ -70,7 +76,8 @@ class ImpactCourt(gl.Contract):
             prior_request['status']='SUPERSEDED';prior_request['superseded_by']=value['request_id']
             self.requests[predecessor]=canonical(prior_request)
             history_append(self.history,{'event':'REQUEST_SUPERSEDED','request_id':predecessor,'superseded_by':value['request_id']})
-        value=dict(value,original_digest=digest(value),status='PENDING',superseded_by='',manifests=manifests,policy=policy)
+        self.packet_digests[budget_key]=str(int(self.packet_digests.get(budget_key,'0'))+1)
+        value=dict(value,original_digest=digest(envelope(record(request))),status='PENDING',superseded_by='',manifests=manifests,policy=policy)
         self.requests[value['request_id']]=canonical(value)
         self.generation=u64(value['generation'])
         history_append(self.history,{'event':'CORRECTION_OPENED','request_id':value['request_id'],'generation':value['generation']})
@@ -82,18 +89,15 @@ class ImpactCourt(gl.Contract):
         require_live(value)
         count=int(self.attempts.get(request_id,u8(0)))
         if count>=3:fail('Assessment retry limit; timeout recovery required')
-        packet_attempts=int(self.packet_digests.get(value['source_manifest_digest'],'0'))
-        if packet_attempts>=3:fail('Evidence retry limit; register successor evidence')
-        self.packet_digests[value['source_manifest_digest']]=str(packet_attempts+1)
         self.attempts[request_id]=u8(count+1)
         result=assess_consensus(value)
         cert={k:value[k] for k in BINDINGS}
-        cert.update(status=result['status'],decisions=result['decisions'],reason=result['reason'],coverage=len(result['decisions'])==len(value['propositions']),unresolved=result['status']=='UNRESOLVED',superseded_by='',old_revision=value['old_revision'],new_revision=value['new_revision'],propositions=value['propositions'],manifests=value['manifests'])
+        cert.update(status=result['status'],decisions=result['decisions'],reason=result['reason'],coverage=len(result['decisions'])==len(value['propositions']),unresolved=result['status']=='UNRESOLVED',superseded_by='',old_revision=value['old_revision'],new_revision=value['new_revision'],propositions=value['propositions'],manifests=value['manifests'],contexts=value['contexts'])
         cert['certificate_digest']=digest(cert)
         self.certificates[request_id]=canonical(cert)
         value['status']=result['status'];self.requests[request_id]=canonical(value)
         for p in value['propositions']:
-            ref=source_ref(value['old_revision'],p['id']);flag=json.loads(self.flags[ref])
+            ref=source_ref(value['old_revision'],p['id'],value['contexts'][p['id']]);flag=json.loads(self.flags[ref])
             if flag['generation']==value['generation']:
                 decision=next((d for d in result['decisions'] if d['proposition_id']==p['id']),None)
                 restriction=decision is None or decision['action']!='KEEP'
@@ -103,16 +107,20 @@ class ImpactCourt(gl.Contract):
                 self.flags[ref]=canonical(flag)
         for decision in result['decisions']:
             if decision['new_support']!='TRUE' and decision['action']!='KEEP':
-                new_ref=source_ref(value['new_revision'],decision['proposition_id'])
-                self.flags[new_ref]=canonical({'request_id':value['request_id'],'generation':value['generation'],'status':'UNRESOLVED' if decision['new_support']=='UNRESOLVED' else 'QUARANTINED','sticky':True})
+                new_ref=source_ref(value['new_revision'],decision['proposition_id'],value['contexts'][decision['proposition_id']])
+                previous=json.loads(self.flags.get(new_ref,'{}'))
+                if previous.get('generation',0)<=value['generation']:
+                    previous=json.loads(self.flags.get(new_ref,'{}'))
+                if previous.get('generation',0)<=value['generation']:
+                    self.flags[new_ref]=canonical({'request_id':value['request_id'],'generation':value['generation'],'status':'UNRESOLVED' if decision['new_support']=='UNRESOLVED' else 'QUARANTINED','sticky':True})
         for decision in result['decisions']:
             if decision['new_support']=='TRUE':
-                new_ref=source_ref(value['new_revision'],decision['proposition_id'])
+                new_ref=source_ref(value['new_revision'],decision['proposition_id'],value['contexts'][decision['proposition_id']])
                 previous=json.loads(self.flags.get(new_ref,'{}'))
-                if previous.get('request_id')==value.get('supersedes_request'):
+                if previous.get('request_id')==value.get('supersedes_request') and previous.get('generation',0)<=value['generation']:
                     self.flags[new_ref]=canonical({'request_id':request_id,'generation':value['generation'],'status':'CLEAR','sticky':False})
         # Positive permission and consequence reach dispatcher only after this transaction is finalized.
-        gl.get_contract_at(self.dispatcher).emit(on='finalized').begin_quarantine(canonical(cert))
+        gl.get_contract_at(self.dispatcher).emit(on='finalized').begin_quarantine(message_json(cert))
         history_append(self.history,{'event':'IMPACT_ASSESSED','request_id':request_id,'generation':value['generation'],'status':result['status'],'certificate_digest':cert['certificate_digest']})
 
     @gl.public.write
@@ -124,19 +132,19 @@ class ImpactCourt(gl.Contract):
         value['status']='TIMEOUT';self.requests[request_id]=canonical(value)
         if not self.certificates.get(request_id,''):
             cert={k:value[k] for k in BINDINGS}
-            cert.update(status='UNRESOLVED',decisions=[],reason='DEADLINE_ELAPSED',coverage=False,unresolved=True,superseded_by='',old_revision=value['old_revision'],new_revision=value['new_revision'],propositions=value['propositions'],manifests=value['manifests'])
+            cert.update(status='UNRESOLVED',decisions=[],reason='DEADLINE_ELAPSED',coverage=False,unresolved=True,superseded_by='',old_revision=value['old_revision'],new_revision=value['new_revision'],propositions=value['propositions'],manifests=value['manifests'],contexts=value['contexts'])
             cert['certificate_digest']=digest(cert);self.certificates[request_id]=canonical(cert)
-            gl.get_contract_at(self.dispatcher).emit(on='finalized').begin_quarantine(canonical(cert))
+            gl.get_contract_at(self.dispatcher).emit(on='finalized').begin_quarantine(message_json(cert))
         history_append(self.history,{'event':'TIMEOUT','request_id':request_id,'generation':value['generation']})
 
     @gl.public.write
     def replay_certificate(self, request_id: str) -> None:
         cert=json.loads(self.certificates[request_id])
-        gl.get_contract_at(self.dispatcher).emit(on='finalized').begin_quarantine(canonical(cert))
+        gl.get_contract_at(self.dispatcher).emit(on='finalized').begin_quarantine(message_json(cert))
 
     @gl.public.view
-    def get_flag(self, revision: str, proposition: str) -> dict:
-        return json.loads(self.flags.get(source_ref(revision,proposition),'{"generation":0,"status":"CLEAR","sticky":false}'))
+    def get_flag(self, revision: str, proposition: str, context: str) -> dict:
+        return json.loads(self.flags.get(source_ref(revision,proposition,context),'{"generation":0,"status":"CLEAR","sticky":false}'))
 
     @gl.public.view
     def get_request(self, request_id: str) -> dict:

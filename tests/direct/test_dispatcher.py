@@ -7,13 +7,15 @@ def graph(module,direct_vm,cross_calls,packet):
     court='0x'+'11'*20;registry='0x'+'22'*20;consumer='0x'+'33'*20
     c,m=module('dependency_dispatcher',court,registry);views,calls=cross_calls
     views['get_revision']=lambda revision:next(v for v in packet['manifests'] if v['revision_id']==revision)
-    flags={};views['get_flag']=lambda revision,prop:flags.get(revision+'/'+prop,{'generation':0,'status':'CLEAR','sticky':False})
+    views['get_policy']=lambda *args:packet['policy']
+    flags={};views['get_flag']=lambda revision,prop,context:flags.get(revision+'/'+prop,{'generation':0,'status':'CLEAR','sticky':False})
     direct_vm.sender=m.Address(consumer)
     def node(i,parents=None):
-        return {'request_id':'node'+str(i),'owner':consumer,'parties':[consumer],'policy_id':'security','policy_revision':1,'subject_id':'subject'+str(i),'subject_digest':'a'*64,'source_manifest_digest':digest([packet['manifests'][0]]),'consumer':consumer,'consequence_digest':'b'*64,'generation':0,'deadline':9999999999,'dependency_id':'d'+str(i),'rank':i+1,'parents':parents or [],'references':[{'revision':'r0','proposition':'security','span':'critical','definition':packet['propositions'][0]}]}
+        return {'request_id':'node'+str(i),'owner':consumer,'parties':[consumer],'policy_id':'security','policy_revision':1,'subject_id':'subject','subject_digest':'a'*64,'source_manifest_digest':digest([packet['manifests'][0]]),'consumer':consumer,'consequence_digest':'b'*64,'generation':0,'deadline':9999999999,'dependency_id':'d'+str(i),'rank':i+1,'parents':parents or [],'references':[{'revision':'r0','proposition':'security','span':'critical','definition':packet['propositions'][0]}]}
     def certificate(generation=1,request_id='correction',new_support='TRUE'):
         value={k:node(0)[k] for k in ('request_id','owner','parties','policy_id','policy_revision','subject_id','subject_digest','source_manifest_digest','consumer','consequence_digest','generation','deadline')}
         value.update(request_id=request_id,generation=generation,status='ASSESSED',unresolved=False,coverage=True,decisions=[{'proposition_id':'security','impact':'QUALIFICATION','old_support':'TRUE','new_support':new_support,'material':True,'action':'REFRESH'}],propositions=packet['propositions'],old_revision='r0',new_revision='r1',certificate_digest='c'*64)
+        value['contexts']={'security':m.authorization_context(value,packet['propositions'][0])}
         return value
     return c,m,views,calls,flags,node,certificate,court,consumer
 
@@ -42,7 +44,7 @@ def test_backward_edge_and_conflicting_registration(direct_vm,graph):
 def test_old_acknowledgement_cannot_clear_new_generation(direct_vm,graph):
     c,m,views,calls,flags,node,cert,court,consumer=graph
     c.register_dependency(json.dumps(node(0)));direct_vm.sender=m.Address(court);c.begin_quarantine(json.dumps(cert()));c.dispatch_page('correction','security',0,'page0')
-    notice=c.get_notice('correction:security:d0')
+    notice=c.get_notice(m.tuple_key('notice.v2','correction','security','d0'))
     flags['r0/security']={'generation':2,'status':'QUARANTINED'}
     direct_vm.sender=m.Address(consumer)
     ack={'notice_id':notice['operation_id'],'operation_id':'ack1','dependency_id':'d0','decision_digest':notice['decision_digest'],'certificate_digest':'c'*64,'generation':1,'route':'REFRESHED','replacement_certificate_id':'correction'}
@@ -54,7 +56,7 @@ def test_old_acknowledgement_cannot_clear_new_generation(direct_vm,graph):
 def test_finalized_refresh_duplicate_and_quarantine_recovery(direct_vm,graph):
     c,m,views,calls,flags,node,cert,court,consumer=graph
     c.register_dependency(json.dumps(node(0)));direct_vm.sender=m.Address(court);c.begin_quarantine(json.dumps(cert()));c.dispatch_page('correction','security',0,'page0')
-    notice=c.get_notice('correction:security:d0');flags['r0/security']={'generation':1,'status':'QUARANTINED'}
+    notice=c.get_notice(m.tuple_key('notice.v2','correction','security','d0'));flags['r0/security']={'generation':1,'status':'QUARANTINED'}
     direct_vm.sender=m.Address(consumer)
     ack={'notice_id':notice['operation_id'],'operation_id':'ack.quarantine','dependency_id':'d0','decision_digest':notice['decision_digest'],'certificate_digest':'c'*64,'generation':1,'route':'QUARANTINED','replacement_certificate_id':'correction'}
     c.acknowledge_generation(json.dumps(ack));assert not c.get_dependency('d0')['usable']
@@ -77,7 +79,7 @@ def test_delivery_confirmation_is_authenticated_and_paginated(direct_vm,graph):
     c,m,views,calls,flags,node,cert,court,consumer=graph
     c.register_dependency(json.dumps(node(0)));direct_vm.sender=m.Address(court)
     c.begin_quarantine(json.dumps(cert()));c.dispatch_page('correction','security',0,'page0')
-    notice_id='correction:security:d0'
+    notice_id=m.tuple_key('notice.v2','correction','security','d0')
     assert c.get_delivery_page('correction','security',0,20)['items'][0]['status']=='BROADCAST'
     with direct_vm.expect_revert('Unauthorized'):c.confirm_delivery(notice_id)
     direct_vm.sender=m.Address(consumer);c.confirm_delivery(notice_id);c.confirm_delivery(notice_id)
