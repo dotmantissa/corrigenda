@@ -95,7 +95,31 @@ def test_partial_model_binding_fields_are_rejected(direct_vm,module,packet,evide
     direct_vm.mock_llm('CORRIGENDA_INDEPENDENT_ASSESSMENT',json.dumps({'decisions':[decision]}))
     with pytest.raises(Exception,match='LLM_ERROR'):m.assess_consensus(packet)
 
-@pytest.mark.parametrize('impact,old_support,new_support,material',[('NONMATERIAL','TRUE','FALSE',False),('RETRACTION','TRUE','TRUE',True),('CONTRADICTION','FALSE','TRUE',True)])
+@pytest.mark.parametrize('impact,old_support,new_support,material',[('NONMATERIAL','TRUE','FALSE',False),('RETRACTION','TRUE','TRUE',True),('CONTRADICTION','TRUE','TRUE',True)])
 def test_inconsistent_semantic_vectors_fail_closed(module,packet,evidence,impact,old_support,new_support,material):
     _,m=module('impact_court','0x'+'11'*20);evidence(impact,new_support,material,old_support)
     with pytest.raises(Exception,match='LLM_ERROR'):m.assess_consensus(packet)
+
+@pytest.mark.parametrize('impact',['NONMATERIAL','QUALIFICATION','CONTRADICTION','RETRACTION','RESTORATION'])
+def test_regained_support_has_one_precise_authorization_classification(direct_vm,module,packet,evidence,impact):
+    _,m=module('impact_court','0x'+'11'*20)
+    evidence(impact,'TRUE',True,'FALSE')
+    result=m.assess_consensus(packet)
+    assert result['decisions'][0]['impact']=='RESTORATION'
+    assert result['decisions'][0]['action']=='REFRESH'
+    assert result['decisions'][0]['material'] is True
+    assert direct_vm.run_validator()
+
+def test_independent_restoration_labels_cannot_prevent_agreement_on_support(direct_vm,module,packet,evidence):
+    _,m=module('impact_court','0x'+'11'*20)
+    evidence('CONTRADICTION','TRUE',True,'FALSE');result=m.assess_consensus(packet)
+    evidence('RETRACTION','TRUE',True,'FALSE')
+    assert direct_vm.run_validator(leader_result=result)
+    wrong=copy.deepcopy(result);wrong['decisions'][0]['new_support']='FALSE'
+    assert not direct_vm.run_validator(leader_result=wrong)
+
+@pytest.mark.parametrize('old_support,new_support',[('TRUE','TRUE'),('TRUE','FALSE')])
+def test_restoration_label_cannot_claim_support_that_was_not_regained(direct_vm,module,packet,evidence,old_support,new_support):
+    _,m=module('impact_court','0x'+'11'*20)
+    evidence('RESTORATION',new_support,True,old_support)
+    with pytest.raises(Exception,match='Restoration requires'):m.assess_consensus(packet)
