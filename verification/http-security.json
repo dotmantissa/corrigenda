@@ -1,0 +1,82 @@
+{
+  "production_deployment": "dpl_FJ5ogL29aTKNopc6gMkaoWuVeMMs",
+  "production_source_commit": "02cbf66ffe635db493b5d1d119cc6fcadb0a7051",
+  "contracts": {
+    "registry": "0xF21A8de540fc44e0C389893C33B2E36e6cC5B84D",
+    "court": "0xb4668C57DabDa17f868A33ed98d6499009a59F53",
+    "dispatcher": "0x682a3B5AEb9b15895F52dfe4532E85F2ce60574E",
+    "listing_consumer": "0x9eb5e88ED64260459Cd74BAC66E4e5758476E952",
+    "deployment_consumer": "0xa083caeCF80Ed9aA62AfF163693CB0Fe69A4E19C"
+  },
+  "results": [
+    {
+      "path": "/api/worker",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/snapshot",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "path": "/api/commands",
+      "method": "POST",
+      "status": 401
+    },
+    {
+      "path": "/api/commands",
+      "method": "POST",
+      "status": 403
+    },
+    {
+      "path": "/api/commit",
+      "method": "POST",
+      "status": 401
+    },
+    {
+      "path": "/api/commit",
+      "method": "POST",
+      "status": 403
+    },
+    {
+      "path": "/api/sources?revision=https%3A%2F%2F127.0.0.1%2Fprivate",
+      "method": "GET",
+      "status": 400
+    },
+    {
+      "path": "/api/snapshot",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/generation",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/sources?revision=pep724.keep",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/sources?revision=pep724.r1",
+      "method": "GET",
+      "status": 200
+    }
+  ],
+  "sources": [
+    {
+      "id": "pep724.keep",
+      "digest": "e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5",
+      "verified": true
+    },
+    {
+      "id": "pep724.r1",
+      "digest": "1384cd319c6af0556a7e415cbc317822067203b17457df3031e5cec649ec76ed",
+      "verified": true
+    }
+  ],
+  "network_clock": 1794564167,
+  "complete": true
+}

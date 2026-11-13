@@ -1,0 +1,28 @@
+{
+  "network": "studionet",
+  "chain_id": 61999,
+  "checks": [
+    {
+      "contract": "0xF21A8de540fc44e0C389893C33B2E36e6cC5B84D",
+      "cursor": 22,
+      "total": 22,
+      "events": 22
+    },
+    {
+      "contract": "0xb4668C57DabDa17f868A33ed98d6499009a59F53",
+      "cursor": 39,
+      "total": 39,
+      "events": 39
+    },
+    {
+      "contract": "0x682a3B5AEb9b15895F52dfe4532E85F2ce60574E",
+      "cursor": 131,
+      "total": 131,
+      "events": 131
+    }
+  ],
+  "public_notices": 21,
+  "all_public_notices_delivered": true,
+  "all_public_dependents_quarantined": true,
+  "complete": true
+}

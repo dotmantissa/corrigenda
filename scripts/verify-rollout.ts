@@ -65,7 +65,13 @@ await writeFile(
   ) + '\n',
 );
 const operations =
-  await sql`SELECT id,kind,status,transaction_hash AS hash,error_code,receipt_checks,created_at,updated_at FROM operations ORDER BY created_at`;
+  await sql`SELECT id,kind,status,transaction_hash AS hash,receipt,error_code,receipt_checks,created_at,updated_at FROM operations ORDER BY created_at`;
+if (
+  operations.some((operation) =>
+    ['PENDING', 'SIGNED', 'SUBMITTED', 'ACCEPTED', 'STRANDED'].includes(operation.status),
+  )
+)
+  throw new Error('Preserved operation journal still requires reconciliation');
 await writeFile(
   'verification/journal-final.json',
   JSON.stringify(
