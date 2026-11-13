@@ -1,0 +1,423 @@
+{
+  "hash": "0xa466d5138b3ac66f0fc89da2efcc5a8faf7d778d0754b3a7e28354a9816e0058",
+  "status": "FINALIZED",
+  "execution": "SUCCESS",
+  "consensus_outcome": "MAJORITY_AGREE",
+  "votes": {
+    "0x003192Feb616fA23158e1Ce232B4662458EebC28": "agree",
+    "0x0CE08AA7F69f0b5a9A4C10E18d890B4fc94AEdA2": "agree",
+    "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C": "idle",
+    "0x42509F1b311C37DD50297fe16C283F392C7cD3E7": "idle",
+    "0x736d834361E9b2BeB24441905252FC7421818Fb1": "agree"
+  },
+  "leader_receipts": [
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "leader",
+      "vote": null,
+      "node_config": {
+        "stake": 100,
+        "address": "0x0CE08AA7F69f0b5a9A4C10E18d890B4fc94AEdA2",
+        "primary_model": {
+          "model": "policy:prd-gemma-4-31b-it",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "gemma-4-31b-it"
+                  ],
+                  [
+                    "family_eq",
+                    "gemma-4-26b-a4b-it"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-6.1-sol"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gemma-4-31b-it"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gemma-4-26b-a4b-it"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-6.1-sol"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          },
+          "fallback_validator": "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C"
+        },
+        "secondary_model": {
+          "model": "openai/gpt-6.1-sol",
+          "config": {
+            "models": [
+              "openai/gpt-6.1-sol",
+              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3.5-flash-lite"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "address": "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"{\\\"consequence_digest\\\":\\\"e465edbcfe7ca226a3fb0c85008e5fa93ca55ecef906be911618d7df9a4058ef\\\",\\\"consumer\\\":\\\"0x25068eA862A0C6857d067Bb0a7f14e85A50dDFd8\\\",\\\"deadline\\\":1794535087,\\\"generation\\\":6,\\\"new_revision\\\":\\\"review.loss2\\\",\\\"old_revision\\\":\\\"review.loss1\\\",\\\"owner\\\":\\\"0xBC1399c55538eC034d4Da550C03c34Ae0C357f53\\\",\\\"parties\\\":[\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\"],\\\"policy_id\\\":\\\"review_policy\\\",\\\"policy_revision\\\":1,\\\"propositions\\\":[{\\\"id\\\":\\\"completed_review\\\",\\\"materiality_question\\\":\\\"Does the completed review and authorization permit support continued authorization under every policy rule?\\\",\\\"new_span\\\":\\\"record\\\",\\\"old_span\\\":\\\"record\\\",\\\"rule_ids\\\":[\\\"completed\\\",\\\"permit\\\"],\\\"statement\\\":\\\"The named test application completed the review\\\"}],\\\"request_id\\\":\\\"review.replacement\\\",\\\"source_manifest_digest\\\":\\\"ca4e5701c7e2fb8a75aaaa4003c5cba8c4570124b8c06b9bc792fc3390170682\\\",\\\"subject_digest\\\":\\\"3bbdd47893cf96266407ae23d82bcbe1b785d3ca902f00d8f824485683c86607\\\",\\\"subject_id\\\":\\\"review_test_application\\\"}\",]\"method\":\"open_correction\"}"
+      },
+      "eq_outputs": {},
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    },
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "validator",
+      "vote": "agree",
+      "node_config": {
+        "stake": 100,
+        "address": "0x0CE08AA7F69f0b5a9A4C10E18d890B4fc94AEdA2",
+        "primary_model": {
+          "model": "policy:prd-gemma-4-31b-it",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "gemma-4-31b-it"
+                  ],
+                  [
+                    "family_eq",
+                    "gemma-4-26b-a4b-it"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-6.1-sol"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gemma-4-31b-it"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gemma-4-26b-a4b-it"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-6.1-sol"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          },
+          "fallback_validator": "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C"
+        },
+        "secondary_model": {
+          "model": "openai/gpt-6.1-sol",
+          "config": {
+            "models": [
+              "openai/gpt-6.1-sol",
+              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3.5-flash-lite"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "address": "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"{\\\"consequence_digest\\\":\\\"e465edbcfe7ca226a3fb0c85008e5fa93ca55ecef906be911618d7df9a4058ef\\\",\\\"consumer\\\":\\\"0x25068eA862A0C6857d067Bb0a7f14e85A50dDFd8\\\",\\\"deadline\\\":1794535087,\\\"generation\\\":6,\\\"new_revision\\\":\\\"review.loss2\\\",\\\"old_revision\\\":\\\"review.loss1\\\",\\\"owner\\\":\\\"0xBC1399c55538eC034d4Da550C03c34Ae0C357f53\\\",\\\"parties\\\":[\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\"],\\\"policy_id\\\":\\\"review_policy\\\",\\\"policy_revision\\\":1,\\\"propositions\\\":[{\\\"id\\\":\\\"completed_review\\\",\\\"materiality_question\\\":\\\"Does the completed review and authorization permit support continued authorization under every policy rule?\\\",\\\"new_span\\\":\\\"record\\\",\\\"old_span\\\":\\\"record\\\",\\\"rule_ids\\\":[\\\"completed\\\",\\\"permit\\\"],\\\"statement\\\":\\\"The named test application completed the review\\\"}],\\\"request_id\\\":\\\"review.replacement\\\",\\\"source_manifest_digest\\\":\\\"ca4e5701c7e2fb8a75aaaa4003c5cba8c4570124b8c06b9bc792fc3390170682\\\",\\\"subject_digest\\\":\\\"3bbdd47893cf96266407ae23d82bcbe1b785d3ca902f00d8f824485683c86607\\\",\\\"subject_id\\\":\\\"review_test_application\\\"}\",]\"method\":\"open_correction\"}"
+      },
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    }
+  ],
+  "triggered": []
+}

@@ -1,0 +1,423 @@
+{
+  "hash": "0xfe25e02ddaf3bd98025e063cae8b4e3625406678d7b9045cd862985abca1e1d8",
+  "status": "FINALIZED",
+  "execution": "SUCCESS",
+  "consensus_outcome": "MAJORITY_AGREE",
+  "votes": {
+    "0x0CE08AA7F69f0b5a9A4C10E18d890B4fc94AEdA2": "agree",
+    "0x111F278186F7D8371f8da960acC04f9D0911Ed2e": "agree",
+    "0x28A9AEd6c177f234BDdD6f0507B2B2E07E6FfcE1": "agree",
+    "0x435b49A3c8356E1B5eB4369d829510A7a004eCfC": "agree",
+    "0xc3107801f55D209f667101272bc2905Ad83ba792": "idle"
+  },
+  "leader_receipts": [
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "leader",
+      "vote": null,
+      "node_config": {
+        "stake": 100,
+        "address": "0x28A9AEd6c177f234BDdD6f0507B2B2E07E6FfcE1",
+        "primary_model": {
+          "model": "policy:prd-gemini-3.5-flash-lite",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "gemini-3.5-flash-lite"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-oss-120b"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-6.1-sol"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gemini-3.5-flash-lite"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-oss-120b"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-6.1-sol"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          },
+          "fallback_validator": "0xBDe7bCB9E579A6a63fC4C58e3f2BF458af7B1f30"
+        },
+        "secondary_model": {
+          "model": "google/gemini-3.5-flash-lite",
+          "config": {
+            "models": [
+              "google/gemini-3.5-flash-lite",
+              "openai/gpt-6.1-sol",
+              "anthropic/claude-sonnet-4.6"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "address": "0xBDe7bCB9E579A6a63fC4C58e3f2BF458af7B1f30",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"{\\\"authority_id\\\":\\\"review_records\\\",\\\"byte_digest\\\":\\\"acfc144a88baa0ad3cadee1c819ca60ec94530245d11188bfb9c529f310bc224\\\",\\\"byte_size\\\":105,\\\"channel\\\":\\\"controlled_review\\\",\\\"request_id\\\":\\\"review.revision.stable0\\\",\\\"revision_id\\\":\\\"review.stable0\\\",\\\"scope\\\":\\\"Complete controlled test record with untrusted injection text where present\\\",\\\"source_id\\\":\\\"review.stable\\\",\\\"spans\\\":[{\\\"digest\\\":\\\"acfc144a88baa0ad3cadee1c819ca60ec94530245d11188bfb9c529f310bc224\\\",\\\"end\\\":105,\\\"id\\\":\\\"record\\\",\\\"start\\\":0}],\\\"supersedes\\\":\\\"\\\",\\\"url\\\":\\\"https://raw.githubusercontent.com/dotmantissa/corrigenda/fd734955b8a94aad6bd2c38c10aa62184c4f342b/tests/fixtures/review/stable0.json\\\"}\",]\"method\":\"register_revision\"}"
+      },
+      "eq_outputs": {},
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    },
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "validator",
+      "vote": "agree",
+      "node_config": {
+        "stake": 100,
+        "address": "0x28A9AEd6c177f234BDdD6f0507B2B2E07E6FfcE1",
+        "primary_model": {
+          "model": "policy:prd-gemini-3.5-flash-lite",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "gemini-3.5-flash-lite"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-oss-120b"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-6.1-sol"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gemini-3.5-flash-lite"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-oss-120b"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-6.1-sol"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          },
+          "fallback_validator": "0xBDe7bCB9E579A6a63fC4C58e3f2BF458af7B1f30"
+        },
+        "secondary_model": {
+          "model": "google/gemini-3.5-flash-lite",
+          "config": {
+            "models": [
+              "google/gemini-3.5-flash-lite",
+              "openai/gpt-6.1-sol",
+              "anthropic/claude-sonnet-4.6"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "address": "0xBDe7bCB9E579A6a63fC4C58e3f2BF458af7B1f30",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"{\\\"authority_id\\\":\\\"review_records\\\",\\\"byte_digest\\\":\\\"acfc144a88baa0ad3cadee1c819ca60ec94530245d11188bfb9c529f310bc224\\\",\\\"byte_size\\\":105,\\\"channel\\\":\\\"controlled_review\\\",\\\"request_id\\\":\\\"review.revision.stable0\\\",\\\"revision_id\\\":\\\"review.stable0\\\",\\\"scope\\\":\\\"Complete controlled test record with untrusted injection text where present\\\",\\\"source_id\\\":\\\"review.stable\\\",\\\"spans\\\":[{\\\"digest\\\":\\\"acfc144a88baa0ad3cadee1c819ca60ec94530245d11188bfb9c529f310bc224\\\",\\\"end\\\":105,\\\"id\\\":\\\"record\\\",\\\"start\\\":0}],\\\"supersedes\\\":\\\"\\\",\\\"url\\\":\\\"https://raw.githubusercontent.com/dotmantissa/corrigenda/fd734955b8a94aad6bd2c38c10aa62184c4f342b/tests/fixtures/review/stable0.json\\\"}\",]\"method\":\"register_revision\"}"
+      },
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    }
+  ],
+  "triggered": []
+}

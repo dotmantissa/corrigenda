@@ -1,0 +1,15 @@
+{
+  "deployment_id": "dpl_FJ5ogL29aTKNopc6gMkaoWuVeMMs",
+  "deployment_url": "https://corrigenda-gr3zs9wnb-mantissas-projects.vercel.app",
+  "build": "READY",
+  "source_commit": "02cbf66ffe635db493b5d1d119cc6fcadb0a7051",
+  "contracts": {
+    "registry": "0xF21A8de540fc44e0C389893C33B2E36e6cC5B84D",
+    "court": "0xb4668C57DabDa17f868A33ed98d6499009a59F53",
+    "dispatcher": "0x682a3B5AEb9b15895F52dfe4532E85F2ce60574E",
+    "listing_consumer": "0x9eb5e88ED64260459Cd74BAC66E4e5758476E952",
+    "deployment_consumer": "0xa083caeCF80Ed9aA62AfF163693CB0Fe69A4E19C"
+  },
+  "protected_snapshot_verified": true,
+  "promoted": false
+}
