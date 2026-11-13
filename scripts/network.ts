@@ -6,7 +6,7 @@ import { TransactionStatus, type TransactionHash } from 'genlayer-js/types';
 import { type Hex } from 'viem';
 import { chain, contracts, read, executionSucceeded, receiptStatus } from '../src/lib/server/chain';
 import { canonical } from '../src/lib/shared/canonical';
-import { networkTime } from './lib/studio';
+import { finalizedCallbacks, networkTime } from './lib/studio';
 const digest = (v: unknown) => createHash('sha256').update(canonical(v)).digest('hex');
 const evidenceRoot = 'verification/receipts';
 await mkdir(evidenceRoot, { recursive: true });
@@ -32,7 +32,7 @@ async function transact(
   expectedSuccess = true,
 ) {
   const path = `${evidenceRoot}/network-${name}.json`;
-  let saved: { hash: TransactionHash; execution?: string } | undefined;
+  let saved: { hash: TransactionHash; execution?: string; triggered?: string[] } | undefined;
   try {
     saved = JSON.parse(await readFile(path, 'utf8'));
   } catch {}
@@ -159,8 +159,12 @@ const commits = [
   '4112eff73b7e3c53bd40025602fda442b7b97b9e',
 ];
 const revisions = [];
-for (let i = 0; i < commits.length; i++) {
-  const url = `https://raw.githubusercontent.com/python/peps/${commits[i]}/peps/pep-0724.rst`;
+for (const [label, commit, prior, span, operation] of [
+  ['r0', commits[0], '', 'status', '0'],
+  ['keep', commits[0], 'pep724.r0', 'status_keep', '-keep'],
+  ['r1', commits[1], 'pep724.keep', 'status', '1'],
+]) {
+  const url = `https://raw.githubusercontent.com/python/peps/${commit}/peps/pep-0724.rst`;
   const response = await fetch(url);
   if (!response.ok) throw new Error('Public evidence unavailable');
   const bytes = new Uint8Array(await response.arrayBuffer());
@@ -170,27 +174,29 @@ for (let i = 0; i < commits.length; i++) {
   const start = new TextEncoder().encode(text.slice(0, statusStart)).length,
     end = new TextEncoder().encode(text.slice(0, statusEnd)).length;
   const revision = {
-    request_id: `public.pep724.r${i}`,
-    revision_id: `pep724.r${i}`,
+    request_id: `public.pep724.${label}`,
+    revision_id: `pep724.${label}`,
     source_id: 'pep724',
     authority_id: 'python_peps_observer',
     channel: 'public_record_observer',
     url,
     byte_size: bytes.length,
     byte_digest: createHash('sha256').update(bytes).digest('hex'),
-    scope: 'The complete official PEP 724 record, including status and exceptions',
+    scope:
+      'The complete official PEP 724 record, including status and exceptions' +
+      (label === 'keep' ? '; byte-identical repeat observation of the Draft record' : ''),
     spans: [
       {
-        id: 'status',
+        id: span,
         start,
         end,
         digest: createHash('sha256').update(bytes.slice(start, end)).digest('hex'),
       },
     ],
-    supersedes: i ? 'pep724.r0' : '',
+    supersedes: prior,
   };
   revisions.push(revision);
-  await transact('public-revision' + i, main, contracts.registry, 'register_revision', [
+  await transact('public-revision' + operation, main, contracts.registry, 'register_revision', [
     canonical(revision),
   ]);
 }
@@ -271,16 +277,113 @@ await transact('public-positive-listing', keys.listing, consumer, 'authorize_lis
   'public.before.correction',
   base.consequence_digest,
 ]);
+async function publicAssessment(requestId: string, prefix: string) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const name = attempt ? `${prefix}-retry${attempt}` : prefix;
+    try {
+      const receipt = await transact(name, main, contracts.court, 'assess_impact', [requestId]);
+      const raw = await chain().getTransaction({ hash: receipt.hash as TransactionHash });
+      if (Object.values(raw.consensus_data?.votes ?? {}).filter((v) => v === 'agree').length < 2)
+        throw new Error('Independent multi validator agreement missing');
+      return { receipt, attempts: attempt + 1 };
+    } catch (error) {
+      let saved;
+      try {
+        saved = JSON.parse(await readFile(`${evidenceRoot}/network-${name}.json`, 'utf8'));
+      } catch {
+        throw error;
+      }
+      if (
+        saved.status !== 'FINALIZED' ||
+        saved.execution !== 'FAILED' ||
+        (!JSON.stringify(saved.result).includes('[LLM_ERROR]') &&
+          !['MAJORITY_DISAGREE', 'NO_MAJORITY', 7, 5].includes(saved.consensus_outcome))
+      )
+        throw error;
+      console.log('Assessment failed closed; retaining the same locked request', saved.hash);
+    }
+  }
+  throw new Error('Three failed model outputs; restrictions and all receipts retained');
+}
+const keep = {
+  ...base,
+  owner: operator,
+  parties: [operator, owners.listing],
+  request_id: 'public.pep724.keep',
+  source_manifest_digest: digest(revisions.slice(0, 2)),
+  generation: (await read<number>(contracts.court, 'get_generation')) + 1,
+  old_revision: 'pep724.r0',
+  new_revision: 'pep724.keep',
+  propositions: [{ ...proposition, new_span: 'status_keep' }],
+  deadline: (await networkTime()) + 7200,
+};
+try {
+  const retained = await read<{ deadline: number; generation: number }>(
+    contracts.court,
+    'get_request',
+    [keep.request_id],
+  );
+  keep.deadline = retained.deadline;
+  keep.generation = retained.generation;
+} catch {}
+await transact('public-keep-open', main, contracts.court, 'open_correction', [canonical(keep)]);
+const keepAssessment = await publicAssessment(keep.request_id, 'public-keep-assessment');
+const parentIds =
+  keepAssessment.receipt.triggered ??
+  (await chain().getTriggeredTransactionIds({ hash: keepAssessment.receipt.hash }));
+const keepCallbacks = await finalizedCallbacks('public-keep', { triggered: parentIds });
+const continuationIds = await chain().getTriggeredTransactionIds({
+  hash: keepCallbacks[0].hash as TransactionHash,
+});
+if (continuationIds.length !== 1) throw new Error('Expected one bounded KEEP continuation');
+const keepContinuation = await finalizedCallbacks('public-keep-retention', {
+  triggered: continuationIds,
+});
+const keepCertificate = await read<{ decisions: { action: string; new_support: string }[] }>(
+  contracts.dispatcher,
+  'get_certificate',
+  [keep.request_id],
+);
+if (
+  keepCertificate.decisions[0].action !== 'KEEP' ||
+  keepCertificate.decisions[0].new_support !== 'TRUE'
+)
+  throw new Error('Byte-identical Draft observation must keep authorization');
+const keepDispatch = await read<{ cursor: number; total: number }>(
+  contracts.dispatcher,
+  'get_dispatch',
+  [keep.request_id, proposition.id],
+);
+if (keepDispatch.cursor !== 0 || keepDispatch.total !== 21)
+  throw new Error('KEEP retention depended on notice delivery or omitted a public dependent');
+await writeFile(
+  'verification/public-keep.json',
+  JSON.stringify(
+    {
+      classification:
+        'Byte-identical repeat observation of a public Draft record, not a new upstream revision',
+      request: keep,
+      assessment: keepAssessment,
+      finalized_callbacks: keepCallbacks,
+      finalized_continuation: keepContinuation,
+      notice_cursor: 0,
+      affected_dependencies: 21,
+      complete: true,
+    },
+    null,
+    2,
+  ) + '\n',
+);
 const correction = {
   ...base,
   owner: operator,
   parties: [operator, owners.listing],
   request_id: 'public.pep724.withdrawal',
-  source_manifest_digest: digest(revisions),
+  source_manifest_digest: digest(revisions.slice(1)),
   generation: (await read<number>(contracts.court, 'get_generation')) + 1,
-  old_revision: 'pep724.r0',
+  old_revision: 'pep724.keep',
   new_revision: 'pep724.r1',
-  propositions: [proposition],
+  propositions: [{ ...proposition, old_span: 'status_keep' }],
   deadline: (await networkTime()) + 7200,
 };
 try {
@@ -301,42 +404,10 @@ await transact(
   ['pep724.listing.20', 'public.stale.before.notice', base.consequence_digest],
   false,
 );
-let assessmentReceipt: Awaited<ReturnType<typeof transact>> | undefined;
-let assessmentAttempts = 0;
-for (let attempt = 0; attempt < 3; attempt++) {
-  const name = attempt ? `public-assessment-retry${attempt}` : 'public-assessment';
-  assessmentAttempts = attempt + 1;
-  try {
-    assessmentReceipt = await transact(name, main, contracts.court, 'assess_impact', [
-      correction.request_id,
-    ]);
-    break;
-  } catch (error) {
-    let saved;
-    try {
-      saved = JSON.parse(await readFile(`${evidenceRoot}/network-${name}.json`, 'utf8'));
-    } catch {
-      throw error;
-    }
-    if (
-      saved.execution !== 'FAILED' ||
-      (!JSON.stringify(saved.result).includes('[LLM_ERROR]') &&
-        saved.consensus_outcome !== 'MAJORITY_DISAGREE' &&
-        saved.consensus_outcome !== 7)
-    )
-      throw error;
-    console.log('Assessment model output failed closed; retained receipt', saved.hash);
-  }
-}
-if (!assessmentReceipt)
-  throw new Error('Three failed model outputs; quarantine and all receipts retained');
-const rawAssessment = await chain().getTransaction({
-  hash: assessmentReceipt.hash as TransactionHash,
-});
-if (
-  Object.values(rawAssessment.consensus_data?.votes ?? {}).filter((v) => v === 'agree').length < 2
-)
-  throw new Error('Independent multi validator agreement missing');
+const { attempts: assessmentAttempts } = await publicAssessment(
+  correction.request_id,
+  'public-assessment',
+);
 const assessed = await read<{
   status: string;
   certificate: { decisions: { impact: string; new_support: string; action: string }[] };
@@ -390,6 +461,8 @@ await writeFile(
       stale_action_refused_before_notice: true,
       public_withdrawal: assessed.certificate.decisions[0],
       assessment_attempts: assessmentAttempts,
+      keep_continuation_verified: true,
+      keep_members_before_notice: 21,
       complete: true,
     },
     null,
