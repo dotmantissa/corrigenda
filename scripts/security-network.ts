@@ -110,8 +110,11 @@ const duplicate = await read<{ last_applied_generation: number; usable: boolean 
   'get_decision',
   ['controlled.listing'],
 );
-if (duplicate.last_applied_generation !== before.last_applied_generation || !duplicate.usable)
-  throw new Error('Duplicate notice changed restored authorization');
+if (
+  duplicate.last_applied_generation !== before.last_applied_generation ||
+  duplicate.usable !== before.usable
+)
+  throw new Error('Duplicate notice changed authorization');
 
 const nextId = 'controlled.security.newer';
 const networkNow = await studioTime();
@@ -159,12 +162,39 @@ try {
 await transact('security-newer-open', main, contracts.court, 'open_correction', [
   canonical(request),
 ]);
-await transact(
+const restrictedBeforeReplay = await read<{
+  usable: boolean;
+  restrictions: { generation: number }[];
+}>(consumer, 'get_decision', ['controlled.listing']);
+if (
+  restrictedBeforeReplay.usable ||
+  !restrictedBeforeReplay.restrictions.some((r) => r.generation === request.generation)
+)
+  throw new Error('Newer correction did not restrict authorization before notice delivery');
+// A completed acknowledgement replays its authenticated result without changing acceptance.
+const oldAcknowledgement = await transact(
   'security-stale-ack',
   keys.listing,
   consumer,
   'acknowledge_generation',
   [noticeId, Number(original.generation), 'REFRESHED', 'controlled.replacement'],
+);
+const oldAcknowledgementCallbacks = await finalizedCallbacks(
+  'security-old-ack',
+  oldAcknowledgement,
+);
+const oldAcknowledgementFinalCallbacks = await finalizedCallbacks('security-old-ack-final', {
+  triggered: await chain().getTriggeredTransactionIds({
+    hash: oldAcknowledgementCallbacks[0].hash as TransactionHash,
+  }),
+});
+// A different route creates a fresh operation and must pass current-generation preflight.
+await transact(
+  'security-stale-new-ack',
+  keys.listing,
+  consumer,
+  'acknowledge_generation',
+  [noticeId, Number(original.generation), 'QUARANTINED', 'controlled.replacement'],
   false,
 );
 await transact(
@@ -180,7 +210,10 @@ const restricted = await read<{ usable: boolean; restrictions: { generation: num
   'get_decision',
   ['controlled.listing'],
 );
-if (restricted.usable || !restricted.restrictions.some((r) => r.generation === request.generation))
+if (
+  restricted.usable ||
+  canonical(restricted.restrictions) !== canonical(restrictedBeforeReplay.restrictions)
+)
   throw new Error('An old acknowledgement cleared the newer correction');
 
 // The deployment adapter consumes the same source but its owner has never accepted the new generation.
@@ -221,6 +254,7 @@ await writeFile(
     {
       network: 'studionet',
       chain_id: 61999,
+      contracts,
       classification: 'Signed controlled security scenarios',
       unauthorized_writes_refused: true,
       forged_finalized_messages_refused: true,
@@ -228,7 +262,10 @@ await writeFile(
       replay_callbacks: replayCallbacks,
       duplicate_callbacks: duplicateCallbacks,
       decision_after_duplicate: duplicate,
-      old_acknowledgement_refused_before_new_notice: true,
+      old_acknowledgement_replay_callbacks: oldAcknowledgementCallbacks,
+      old_acknowledgement_replay_final_callbacks: oldAcknowledgementFinalCallbacks,
+      old_acknowledgement_replay_preserves_newer_restrictions: true,
+      fresh_stale_acknowledgement_refused_before_new_notice: true,
       newer_generation: request.generation,
       clock_observation: {
         network_seconds: networkNow,

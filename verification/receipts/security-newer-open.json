@@ -1,0 +1,423 @@
+{
+  "hash": "0xb1815a82c0c1d8e3974124114fb35d824379e7166fb08fb72dceb87e36c857d9",
+  "status": "FINALIZED",
+  "execution": "SUCCESS",
+  "consensus_outcome": "MAJORITY_AGREE",
+  "votes": {
+    "0x22681B4D0B784973415385F6e37876eB62383783": "agree",
+    "0x435b49A3c8356E1B5eB4369d829510A7a004eCfC": "agree",
+    "0x93bC68565cA1E41EA27D30192cB900B497dC7A04": "idle",
+    "0xAF618472AEfF108f7Af2E6f9748794C57A2A11b5": "idle",
+    "0xc3107801f55D209f667101272bc2905Ad83ba792": "agree"
+  },
+  "leader_receipts": [
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "leader",
+      "vote": null,
+      "node_config": {
+        "stake": 100,
+        "address": "0x22681B4D0B784973415385F6e37876eB62383783",
+        "primary_model": {
+          "model": "policy:prd-grok-4.3",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "grok-4.3"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-6.1-sol"
+                  ],
+                  [
+                    "family_eq",
+                    "gemini-3.5-flash-lite"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "grok-4.3"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-6.1-sol"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gemini-3.5-flash-lite"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          },
+          "fallback_validator": "0x736d834361E9b2BeB24441905252FC7421818Fb1"
+        },
+        "secondary_model": {
+          "model": "openai/gpt-6.1-sol",
+          "config": {
+            "models": [
+              "openai/gpt-6.1-sol",
+              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3.5-flash-lite"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "address": "0x736d834361E9b2BeB24441905252FC7421818Fb1",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"{\\\"budget_keys\\\":[\\\"7158fd3b28472ac919d1264aedb9fe5fea41d78bf61f76bdcb966f3c6e023d8f\\\"],\\\"consequence_digest\\\":\\\"39d612d04699bcb37fd1adbbcf6932c380d60445885b4b8fe59c1d56cae38bef\\\",\\\"consumer\\\":\\\"0x9eb5e88ED64260459Cd74BAC66E4e5758476E952\\\",\\\"contexts\\\":{\\\"critical_resolved\\\":\\\"a3658dfd1d58853fa95667c8abd743c7d7a714ed81f5afd619675f899e957ee2\\\"},\\\"deadline\\\":1794556103,\\\"generation\\\":19,\\\"new_revision\\\":\\\"controlled.r1\\\",\\\"old_revision\\\":\\\"controlled.r0\\\",\\\"owner\\\":\\\"0xBC1399c55538eC034d4Da550C03c34Ae0C357f53\\\",\\\"parties\\\":[\\\"0xBC1399c55538eC034d4Da550C03c34Ae0C357f53\\\",\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\"],\\\"policy_id\\\":\\\"controlled_verification\\\",\\\"policy_revision\\\":1,\\\"propositions\\\":[{\\\"id\\\":\\\"critical_resolved\\\",\\\"materiality_question\\\":\\\"Does the evidence permit future authorization under the no unresolved critical finding policy?\\\",\\\"new_span\\\":\\\"record\\\",\\\"old_span\\\":\\\"record\\\",\\\"rule_ids\\\":[\\\"approval\\\",\\\"exception\\\"],\\\"statement\\\":\\\"All critical findings for corrigenda_test_application are resolved\\\"}],\\\"request_id\\\":\\\"controlled.security.newer\\\",\\\"source_manifest_digest\\\":\\\"6c737115112a0d128703341ac1573ee982d3dc458df7adddf6c219903939a2d4\\\",\\\"subject_digest\\\":\\\"62e0e7b0c0d28dadd006c52312c6eb9d394a246481b26057b17158efdbb6abe9\\\",\\\"subject_id\\\":\\\"corrigenda_test_application\\\"}\",]\"method\":\"open_correction\"}"
+      },
+      "eq_outputs": {},
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    },
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "validator",
+      "vote": "agree",
+      "node_config": {
+        "stake": 100,
+        "address": "0x22681B4D0B784973415385F6e37876eB62383783",
+        "primary_model": {
+          "model": "policy:prd-grok-4.3",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "grok-4.3"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-6.1-sol"
+                  ],
+                  [
+                    "family_eq",
+                    "gemini-3.5-flash-lite"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "grok-4.3"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-6.1-sol"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gemini-3.5-flash-lite"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          },
+          "fallback_validator": "0x736d834361E9b2BeB24441905252FC7421818Fb1"
+        },
+        "secondary_model": {
+          "model": "openai/gpt-6.1-sol",
+          "config": {
+            "models": [
+              "openai/gpt-6.1-sol",
+              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3.5-flash-lite"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "address": "0x736d834361E9b2BeB24441905252FC7421818Fb1",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"{\\\"budget_keys\\\":[\\\"7158fd3b28472ac919d1264aedb9fe5fea41d78bf61f76bdcb966f3c6e023d8f\\\"],\\\"consequence_digest\\\":\\\"39d612d04699bcb37fd1adbbcf6932c380d60445885b4b8fe59c1d56cae38bef\\\",\\\"consumer\\\":\\\"0x9eb5e88ED64260459Cd74BAC66E4e5758476E952\\\",\\\"contexts\\\":{\\\"critical_resolved\\\":\\\"a3658dfd1d58853fa95667c8abd743c7d7a714ed81f5afd619675f899e957ee2\\\"},\\\"deadline\\\":1794556103,\\\"generation\\\":19,\\\"new_revision\\\":\\\"controlled.r1\\\",\\\"old_revision\\\":\\\"controlled.r0\\\",\\\"owner\\\":\\\"0xBC1399c55538eC034d4Da550C03c34Ae0C357f53\\\",\\\"parties\\\":[\\\"0xBC1399c55538eC034d4Da550C03c34Ae0C357f53\\\",\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\"],\\\"policy_id\\\":\\\"controlled_verification\\\",\\\"policy_revision\\\":1,\\\"propositions\\\":[{\\\"id\\\":\\\"critical_resolved\\\",\\\"materiality_question\\\":\\\"Does the evidence permit future authorization under the no unresolved critical finding policy?\\\",\\\"new_span\\\":\\\"record\\\",\\\"old_span\\\":\\\"record\\\",\\\"rule_ids\\\":[\\\"approval\\\",\\\"exception\\\"],\\\"statement\\\":\\\"All critical findings for corrigenda_test_application are resolved\\\"}],\\\"request_id\\\":\\\"controlled.security.newer\\\",\\\"source_manifest_digest\\\":\\\"6c737115112a0d128703341ac1573ee982d3dc458df7adddf6c219903939a2d4\\\",\\\"subject_digest\\\":\\\"62e0e7b0c0d28dadd006c52312c6eb9d394a246481b26057b17158efdbb6abe9\\\",\\\"subject_id\\\":\\\"corrigenda_test_application\\\"}\",]\"method\":\"open_correction\"}"
+      },
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    }
+  ],
+  "triggered": []
+}

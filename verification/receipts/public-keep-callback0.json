@@ -1,0 +1,422 @@
+{
+  "hash": "0x6716ce4a6e5bbc39cf5d7ad46b006cf5e1070fecea6abb58925f2dcaae8c6aa6",
+  "status": "FINALIZED",
+  "execution": "SUCCESS",
+  "consensus_outcome": "MAJORITY_AGREE",
+  "votes": {
+    "0x111F278186F7D8371f8da960acC04f9D0911Ed2e": "agree",
+    "0x435b49A3c8356E1B5eB4369d829510A7a004eCfC": "idle",
+    "0x93bC68565cA1E41EA27D30192cB900B497dC7A04": "agree",
+    "0xc3107801f55D209f667101272bc2905Ad83ba792": "agree",
+    "0xee496Cab6D4428e20DAa0f3C4011C0772503cE95": "idle"
+  },
+  "leader_receipts": [
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "leader",
+      "vote": null,
+      "node_config": {
+        "stake": 100,
+        "address": "0x93bC68565cA1E41EA27D30192cB900B497dC7A04",
+        "primary_model": {
+          "model": "policy:prd-claude-sonnet-4-6",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "claude-sonnet-4-6"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-6.1-sol"
+                  ],
+                  [
+                    "family_eq",
+                    "gemini-3.5-flash-lite"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "claude-sonnet-4-6"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-6.1-sol"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gemini-3.5-flash-lite"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          },
+          "fallback_validator": "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C"
+        },
+        "secondary_model": {
+          "model": "openai/gpt-6.1-sol",
+          "config": {
+            "models": [
+              "openai/gpt-6.1-sol",
+              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3.5-flash-lite"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "address": "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"{\\\"certificate_digest\\\":\\\"152eb694267d90722f0e3b502eb6a9a34b17f60ce0285d9c0c9b6e84879b2e52\\\",\\\"consequence_digest\\\":\\\"f5905b49edae028a327ecafd9dbdab7b45f261e9def13a7299588bf56e5b1286\\\",\\\"consumer\\\":\\\"0x9eb5e88ED64260459Cd74BAC66E4e5758476E952\\\",\\\"contexts\\\":{\\\"draft_status\\\":\\\"2d0b489711ce1a36536f4c4642e7cbc2a5753de82399c3b3e206efe313826197\\\"},\\\"coverage\\\":true,\\\"deadline\\\":1794542923,\\\"decisions\\\":[{\\\"action\\\":\\\"KEEP\\\",\\\"impact\\\":\\\"NONMATERIAL\\\",\\\"material\\\":false,\\\"new_support\\\":\\\"TRUE\\\",\\\"old_support\\\":\\\"TRUE\\\",\\\"proposition_id\\\":\\\"draft_status\\\",\\\"rule_ids\\\":[\\\"draft\\\",\\\"exception\\\"],\\\"witness_ids\\\":[\\\"e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5:status\\\",\\\"e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5:status_keep\\\"]}],\\\"generation\\\":17,\\\"manifests\\\":[{\\\"authority_id\\\":\\\"python_peps_observer\\\",\\\"byte_digest\\\":\\\"e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5\\\",\\\"byte_size\\\":12521,\\\"channel\\\":\\\"public_record_observer\\\",\\\"request_id\\\":\\\"public.pep724.r0\\\",\\\"revision_id\\\":\\\"pep724.r0\\\",\\\"scope\\\":\\\"The complete official PEP 724 record, including status and exceptions\\\",\\\"source_id\\\":\\\"pep724\\\",\\\"spans\\\":[{\\\"digest\\\":\\\"b354e53da1bf29b944a85fa988c07018d340f1a842ca38adf1527bebdf84288d\\\",\\\"end\\\":323,\\\"id\\\":\\\"status\\\",\\\"start\\\":310}],\\\"supersedes\\\":\\\"\\\",\\\"url\\\":\\\"https://raw.githubusercontent.com/python/peps/a75631e0d4192d83158bdcb98ac43f618ecf83d5/peps/pep-0724.rst\\\"},{\\\"authority_id\\\":\\\"python_peps_observer\\\",\\\"byte_digest\\\":\\\"e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5\\\",\\\"byte_size\\\":12521,\\\"channel\\\":\\\"public_record_observer\\\",\\\"request_id\\\":\\\"public.pep724.keep\\\",\\\"revision_id\\\":\\\"pep724.keep\\\",\\\"scope\\\":\\\"The complete official PEP 724 record, including status and exceptions; byte-identical repeat observation of the Draft record\\\",\\\"source_id\\\":\\\"pep724\\\",\\\"spans\\\":[{\\\"digest\\\":\\\"b354e53da1bf29b944a85fa988c07018d340f1a842ca38adf1527bebdf84288d\\\",\\\"end\\\":323,\\\"id\\\":\\\"status_keep\\\",\\\"start\\\":310}],\\\"supersedes\\\":\\\"pep724.r0\\\",\\\"url\\\":\\\"https://raw.githubusercontent.com/python/peps/a75631e0d4192d83158bdcb98ac43f618ecf83d5/peps/pep-0724.rst\\\"}],\\\"new_revision\\\":\\\"pep724.keep\\\",\\\"old_revision\\\":\\\"pep724.r0\\\",\\\"owner\\\":\\\"0xBC1399c55538eC034d4Da550C03c34Ae0C357f53\\\",\\\"parties\\\":[\\\"0xBC1399c55538eC034d4Da550C03c34Ae0C357f53\\\",\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\"],\\\"policy_id\\\":\\\"proposal_listing\\\",\\\"policy_revision\\\":1,\\\"propositions\\\":[{\\\"id\\\":\\\"draft_status\\\",\\\"materiality_question\\\":\\\"Does the official status permit continued authorization of the active proposal listing?\\\",\\\"new_span\\\":\\\"status_keep\\\",\\\"old_span\\\":\\\"status\\\",\\\"rule_ids\\\":[\\\"draft\\\",\\\"exception\\\"],\\\"statement\\\":\\\"PEP 724 has official Draft status and remains an active proposal\\\"}],\\\"reason\\\":\\\"\\\",\\\"request_id\\\":\\\"public.pep724.keep\\\",\\\"source_manifest_digest\\\":\\\"7531001a79051f0977cfa065948920348359ab311a7fa5c990e7b166d57ee0de\\\",\\\"status\\\":\\\"ASSESSED\\\",\\\"subject_digest\\\":\\\"c6bc5ef1c18581e08e89ba294518efbea12c8a185f9af6c83c82a8aa711b59e2\\\",\\\"subject_id\\\":\\\"pep724_active_proposal\\\",\\\"superseded_by\\\":\\\"\\\",\\\"unresolved\\\":false}\",]\"method\":\"begin_quarantine\"}"
+      },
+      "eq_outputs": {},
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    },
+    {
+      "execution_result": "SUCCESS",
+      "genvm_result": {
+        "stderr": "",
+        "stdout": "",
+        "raw_error": null,
+        "error_code": null,
+        "error_description": null
+      },
+      "mode": "validator",
+      "vote": "agree",
+      "node_config": {
+        "stake": 100,
+        "address": "0x93bC68565cA1E41EA27D30192cB900B497dC7A04",
+        "primary_model": {
+          "model": "policy:prd-claude-sonnet-4-6",
+          "config": {
+            "policy_ir": [
+              "policy",
+              [
+                "and",
+                [
+                  "meets_req"
+                ],
+                [
+                  "not",
+                  [
+                    "is",
+                    "disabled"
+                  ]
+                ],
+                [
+                  "cmp",
+                  "success_rate",
+                  "ge",
+                  0.2
+                ],
+                [
+                  "or",
+                  [
+                    "family_eq",
+                    "claude-sonnet-4-6"
+                  ],
+                  [
+                    "family_eq",
+                    "gpt-6.1-sol"
+                  ],
+                  [
+                    "family_eq",
+                    "gemini-3.5-flash-lite"
+                  ]
+                ]
+              ],
+              [
+                "add",
+                [
+                  "scale",
+                  100,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "claude-sonnet-4-6"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  10,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gpt-6.1-sol"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  1,
+                  [
+                    "gate",
+                    [
+                      "family_eq",
+                      "gemini-3.5-flash-lite"
+                    ],
+                    [
+                      "lit",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.25,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_in"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.45,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "price_out"
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "scale",
+                  0.2,
+                  [
+                    "field",
+                    "success_rate"
+                  ]
+                ],
+                [
+                  "scale",
+                  0.1,
+                  [
+                    "neg",
+                    [
+                      "normalize",
+                      [
+                        "field",
+                        "latency_ms"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "argmax"
+              ],
+              [
+                "id"
+              ],
+              [
+                "always",
+                {
+                  "action": "next_candidate"
+                }
+              ]
+            ],
+            "timeout_ms": 22000,
+            "first_token_timeout_ms": 7000
+          },
+          "plugin": "openai-compatible",
+          "provider": "llm-router",
+          "plugin_config": {
+            "api_url": "https://router.ygr.ai",
+            "api_key_env_var": "LLM_ROUTER_API_KEY"
+          },
+          "fallback_validator": "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C"
+        },
+        "secondary_model": {
+          "model": "openai/gpt-6.1-sol",
+          "config": {
+            "models": [
+              "openai/gpt-6.1-sol",
+              "anthropic/claude-sonnet-4.6",
+              "google/gemini-3.5-flash-lite"
+            ]
+          },
+          "plugin": "openai-compatible",
+          "address": "0x3bfC19e9460903563b9F6C85025b0E9d8B55A41C",
+          "provider": "openrouter",
+          "plugin_config": {
+            "api_url": "https://openrouter.ai/api",
+            "api_key_env_var": "OPENROUTERAPIKEY"
+          }
+        }
+      },
+      "calldata": {
+        "readable": "{\"args\":[\"{\\\"certificate_digest\\\":\\\"152eb694267d90722f0e3b502eb6a9a34b17f60ce0285d9c0c9b6e84879b2e52\\\",\\\"consequence_digest\\\":\\\"f5905b49edae028a327ecafd9dbdab7b45f261e9def13a7299588bf56e5b1286\\\",\\\"consumer\\\":\\\"0x9eb5e88ED64260459Cd74BAC66E4e5758476E952\\\",\\\"contexts\\\":{\\\"draft_status\\\":\\\"2d0b489711ce1a36536f4c4642e7cbc2a5753de82399c3b3e206efe313826197\\\"},\\\"coverage\\\":true,\\\"deadline\\\":1794542923,\\\"decisions\\\":[{\\\"action\\\":\\\"KEEP\\\",\\\"impact\\\":\\\"NONMATERIAL\\\",\\\"material\\\":false,\\\"new_support\\\":\\\"TRUE\\\",\\\"old_support\\\":\\\"TRUE\\\",\\\"proposition_id\\\":\\\"draft_status\\\",\\\"rule_ids\\\":[\\\"draft\\\",\\\"exception\\\"],\\\"witness_ids\\\":[\\\"e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5:status\\\",\\\"e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5:status_keep\\\"]}],\\\"generation\\\":17,\\\"manifests\\\":[{\\\"authority_id\\\":\\\"python_peps_observer\\\",\\\"byte_digest\\\":\\\"e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5\\\",\\\"byte_size\\\":12521,\\\"channel\\\":\\\"public_record_observer\\\",\\\"request_id\\\":\\\"public.pep724.r0\\\",\\\"revision_id\\\":\\\"pep724.r0\\\",\\\"scope\\\":\\\"The complete official PEP 724 record, including status and exceptions\\\",\\\"source_id\\\":\\\"pep724\\\",\\\"spans\\\":[{\\\"digest\\\":\\\"b354e53da1bf29b944a85fa988c07018d340f1a842ca38adf1527bebdf84288d\\\",\\\"end\\\":323,\\\"id\\\":\\\"status\\\",\\\"start\\\":310}],\\\"supersedes\\\":\\\"\\\",\\\"url\\\":\\\"https://raw.githubusercontent.com/python/peps/a75631e0d4192d83158bdcb98ac43f618ecf83d5/peps/pep-0724.rst\\\"},{\\\"authority_id\\\":\\\"python_peps_observer\\\",\\\"byte_digest\\\":\\\"e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5\\\",\\\"byte_size\\\":12521,\\\"channel\\\":\\\"public_record_observer\\\",\\\"request_id\\\":\\\"public.pep724.keep\\\",\\\"revision_id\\\":\\\"pep724.keep\\\",\\\"scope\\\":\\\"The complete official PEP 724 record, including status and exceptions; byte-identical repeat observation of the Draft record\\\",\\\"source_id\\\":\\\"pep724\\\",\\\"spans\\\":[{\\\"digest\\\":\\\"b354e53da1bf29b944a85fa988c07018d340f1a842ca38adf1527bebdf84288d\\\",\\\"end\\\":323,\\\"id\\\":\\\"status_keep\\\",\\\"start\\\":310}],\\\"supersedes\\\":\\\"pep724.r0\\\",\\\"url\\\":\\\"https://raw.githubusercontent.com/python/peps/a75631e0d4192d83158bdcb98ac43f618ecf83d5/peps/pep-0724.rst\\\"}],\\\"new_revision\\\":\\\"pep724.keep\\\",\\\"old_revision\\\":\\\"pep724.r0\\\",\\\"owner\\\":\\\"0xBC1399c55538eC034d4Da550C03c34Ae0C357f53\\\",\\\"parties\\\":[\\\"0xBC1399c55538eC034d4Da550C03c34Ae0C357f53\\\",\\\"0x016cBF0ADC8529ce0de61a17216288da97667Be3\\\"],\\\"policy_id\\\":\\\"proposal_listing\\\",\\\"policy_revision\\\":1,\\\"propositions\\\":[{\\\"id\\\":\\\"draft_status\\\",\\\"materiality_question\\\":\\\"Does the official status permit continued authorization of the active proposal listing?\\\",\\\"new_span\\\":\\\"status_keep\\\",\\\"old_span\\\":\\\"status\\\",\\\"rule_ids\\\":[\\\"draft\\\",\\\"exception\\\"],\\\"statement\\\":\\\"PEP 724 has official Draft status and remains an active proposal\\\"}],\\\"reason\\\":\\\"\\\",\\\"request_id\\\":\\\"public.pep724.keep\\\",\\\"source_manifest_digest\\\":\\\"7531001a79051f0977cfa065948920348359ab311a7fa5c990e7b166d57ee0de\\\",\\\"status\\\":\\\"ASSESSED\\\",\\\"subject_digest\\\":\\\"c6bc5ef1c18581e08e89ba294518efbea12c8a185f9af6c83c82a8aa711b59e2\\\",\\\"subject_id\\\":\\\"pep724_active_proposal\\\",\\\"superseded_by\\\":\\\"\\\",\\\"unresolved\\\":false}\",]\"method\":\"begin_quarantine\"}"
+      },
+      "result": {
+        "status": "return",
+        "payload": {
+          "readable": "null"
+        }
+      }
+    }
+  ]
+}

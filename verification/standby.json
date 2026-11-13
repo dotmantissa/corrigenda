@@ -11,5 +11,5 @@
     "deployment_consumer": "0xa083caeCF80Ed9aA62AfF163693CB0Fe69A4E19C"
   },
   "protected_snapshot_verified": true,
-  "promoted": false
+  "promoted": true
 }

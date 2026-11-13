@@ -1,0 +1,72 @@
+{
+  "source": "Python PEP 724",
+  "adoption": false,
+  "scope": "Authentic public source integration, not an endorsement by Python",
+  "revisions": [
+    {
+      "request_id": "public.pep724.r0",
+      "revision_id": "pep724.r0",
+      "source_id": "pep724",
+      "authority_id": "python_peps_observer",
+      "channel": "public_record_observer",
+      "url": "https://raw.githubusercontent.com/python/peps/a75631e0d4192d83158bdcb98ac43f618ecf83d5/peps/pep-0724.rst",
+      "byte_size": 12521,
+      "byte_digest": "e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5",
+      "scope": "The complete official PEP 724 record, including status and exceptions",
+      "spans": [
+        {
+          "id": "status",
+          "start": 310,
+          "end": 323,
+          "digest": "b354e53da1bf29b944a85fa988c07018d340f1a842ca38adf1527bebdf84288d"
+        }
+      ],
+      "supersedes": ""
+    },
+    {
+      "request_id": "public.pep724.keep",
+      "revision_id": "pep724.keep",
+      "source_id": "pep724",
+      "authority_id": "python_peps_observer",
+      "channel": "public_record_observer",
+      "url": "https://raw.githubusercontent.com/python/peps/a75631e0d4192d83158bdcb98ac43f618ecf83d5/peps/pep-0724.rst",
+      "byte_size": 12521,
+      "byte_digest": "e4c825026c85ce9bc6526959a66a3fc344cc8a28093c26bbd8881f1c30ec53e5",
+      "scope": "The complete official PEP 724 record, including status and exceptions; byte-identical repeat observation of the Draft record",
+      "spans": [
+        {
+          "id": "status_keep",
+          "start": 310,
+          "end": 323,
+          "digest": "b354e53da1bf29b944a85fa988c07018d340f1a842ca38adf1527bebdf84288d"
+        }
+      ],
+      "supersedes": "pep724.r0"
+    },
+    {
+      "request_id": "public.pep724.r1",
+      "revision_id": "pep724.r1",
+      "source_id": "pep724",
+      "authority_id": "python_peps_observer",
+      "channel": "public_record_observer",
+      "url": "https://raw.githubusercontent.com/python/peps/4112eff73b7e3c53bd40025602fda442b7b97b9e/peps/pep-0724.rst",
+      "byte_size": 12672,
+      "byte_digest": "1384cd319c6af0556a7e415cbc317822067203b17457df3031e5cec649ec76ed",
+      "scope": "The complete official PEP 724 record, including status and exceptions",
+      "spans": [
+        {
+          "id": "status",
+          "start": 310,
+          "end": 327,
+          "digest": "d1f7a5e59483f918c6640d4996cda4321c49a0a96bb2f48722097abd67e6ae00"
+        }
+      ],
+      "supersedes": "pep724.keep"
+    }
+  ],
+  "bytes": [
+    12521,
+    12521,
+    12672
+  ]
+}

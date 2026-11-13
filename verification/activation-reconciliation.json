@@ -1,0 +1,41 @@
+{
+  "network": "studionet",
+  "chain_id": 61999,
+  "classification": "Preserved obsolete unsigned system dispatch journal entries during authorized successor activation; no signed or user operation canceled",
+  "before": [
+    {
+      "id": "dispatch.afaa6717602833b59ad1b1999bcf4460b72f1af2070a0ee328e7140b871e6034",
+      "kind": "dispatch_page",
+      "status": "PENDING",
+      "target": "0x4D4AeEe458228e1f291275C912C0Ca0BFf94370F",
+      "transaction_hash": null,
+      "error_code": null
+    },
+    {
+      "id": "dispatch.efe2df27e8eeaa8a14bea295d1a9efd57bb7ce0d7d4a9e126b18ef5fd3650a36",
+      "kind": "dispatch_page",
+      "status": "PENDING",
+      "target": "0x4D4AeEe458228e1f291275C912C0Ca0BFf94370F",
+      "transaction_hash": null,
+      "error_code": null
+    }
+  ],
+  "changed": [
+    {
+      "id": "dispatch.afaa6717602833b59ad1b1999bcf4460b72f1af2070a0ee328e7140b871e6034",
+      "kind": "dispatch_page",
+      "status": "DELIVERY_FAILED",
+      "target": "0x4D4AeEe458228e1f291275C912C0Ca0BFf94370F",
+      "transaction_hash": null,
+      "error_code": "SUCCESSOR_NETWORK_ACTIVATED"
+    },
+    {
+      "id": "dispatch.efe2df27e8eeaa8a14bea295d1a9efd57bb7ce0d7d4a9e126b18ef5fd3650a36",
+      "kind": "dispatch_page",
+      "status": "DELIVERY_FAILED",
+      "target": "0x4D4AeEe458228e1f291275C912C0Ca0BFf94370F",
+      "transaction_hash": null,
+      "error_code": "SUCCESSOR_NETWORK_ACTIVATED"
+    }
+  ]
+}

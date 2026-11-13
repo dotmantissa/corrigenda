@@ -1,0 +1,24 @@
+{
+  "operation_id": "public.page.682a3B5AEb9b15895F52dfe4532E85F2ce60574E.0",
+  "hash": "0xae1c21b3a14d1bb4df82e34e709befdf7281c6a67570728456cda33e26914d39",
+  "termination": {
+    "code": null,
+    "signal": "SIGKILL",
+    "pid": 310600
+  },
+  "complete": true,
+  "receipt": {
+    "hash": "0xae1c21b3a14d1bb4df82e34e709befdf7281c6a67570728456cda33e26914d39",
+    "votes": {
+      "0x003192Feb616fA23158e1Ce232B4662458EebC28": "agree",
+      "0x22681B4D0B784973415385F6e37876eB62383783": "agree",
+      "0x42509F1b311C37DD50297fe16C283F392C7cD3E7": "agree",
+      "0x5004AED07d19D8750DA8488EDa327A3A81c0Ec27": "agree",
+      "0xb6f925c91960bcB8a29C2c2108cC1ad42D519475": "agree"
+    },
+    "status": "FINALIZED",
+    "execution": "SUCCESS",
+    "consensus_outcome": "MAJORITY_AGREE"
+  },
+  "recovered_status": "FINALIZED"
+}
